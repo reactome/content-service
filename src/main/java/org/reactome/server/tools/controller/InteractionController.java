@@ -23,80 +23,91 @@ import java.util.*;
  */
 
 @RestController
-@Api(value = "/interaction", description = "Interactions")
-@RequestMapping("/interaction")
+@Api(value = "/interactors", description = "Static content")
+@RequestMapping("/interactors/static/")
 public class InteractionController {
 
-    /** Create the service that queries DB **/
+    /**
+     * Create the service that queries DB
+     **/
     private InteractionService interactionService = InteractionService.getInstance();
     private InteractionResourceService interactionResourceService = InteractionResourceService.getInstance();
     private InteractorResourceService interactorResourceService = InteractorResourceService.getInstance();
 
-    /** These attributes will be used to cache the resource **/
+    /**
+     * These attributes will be used to cache the resource
+     **/
     private Map<String, InteractorResource> interactorResourceMap = new HashMap<>();
     private Map<String, InteractionResource> interactionResourceMap = new HashMap<>();
 
     @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = InteractionResult.class)
-    @RequestMapping(value = "/{resource}/protein/{acc}/summary", method = RequestMethod.GET)
-    public @ResponseBody InteractionResult getProteinSummaryByResourceAndAcc(@PathVariable String resource, @PathVariable String acc)  {
+    @RequestMapping(value = "/protein/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public InteractionResult getProteinSummaryByResourceAndAcc(@PathVariable String acc) {
         List<String> accs = new ArrayList<>(1);
         accs.add(acc);
 
-        return getProteinsSummary(accs, resource);
+        return getProteinsSummary(accs, "IntAct");
     }
 
     @ApiOperation(value = "Retrieve a detailed interaction information of a given accession by resource", response = InteractionResult.class)
-    @RequestMapping(value = "/{resource}/protein/{acc}/details", method = RequestMethod.GET)
-    public @ResponseBody InteractionResult getProteinDetailsByResourceAndAcc(@PathVariable String resource, @PathVariable String acc, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "pageSize", required = false) Integer pageSize)  {
-        if(page == null){
+    @RequestMapping(value = "/protein/{acc}/details", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public InteractionResult getProteinDetailsByResourceAndAcc(@PathVariable String acc,
+                                                               @RequestParam(value = "page", required = false) Integer page,
+                                                               @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        if (page == null) {
             page = -1;
         }
 
-        if(pageSize == null){
+        if (pageSize == null) {
             pageSize = -1;
         }
 
         List<String> accs = new ArrayList<>(1);
         accs.add(acc);
 
-        return getProteinDetails(accs, resource, page, pageSize);
+        return getProteinDetails(accs, "IntAct", page, pageSize);
     }
 
     @ApiOperation(value = "Retrieve a summary of a given accession list by resource", response = InteractionResult.class)
-    @RequestMapping(value = "/{resource}/proteins/summary", method = RequestMethod.POST)
-    public @ResponseBody InteractionResult getProteinsSummaryByResource(@PathVariable String resource, @RequestBody String proteins)  {
+    @RequestMapping(value = "//proteins/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
+    @ResponseBody
+    public InteractionResult getProteinsSummaryByResource(@RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
 
-        return  getProteinsSummary(accs, resource);
+        return getProteinsSummary(accs, "IntAct");
 
     }
 
     @ApiOperation(value = "Retrieve a detailed interaction information of a given accession by resource", response = InteractionResult.class)
-    @RequestMapping(value = "/{resource}/proteins/details", method = RequestMethod.POST)
-    public @ResponseBody InteractionResult getProteinsDetailsByResource(@PathVariable String resource, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestBody String proteins)  {
-        if(page == null){
+    @RequestMapping(value = "/proteins/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
+    @ResponseBody
+    public InteractionResult getProteinsDetailsByResource(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestBody String proteins) {
+        if (page == null) {
             page = -1;
         }
 
-        if(pageSize == null){
+        if (pageSize == null) {
             pageSize = -1;
         }
 
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
 
-        return getProteinDetails(accs, resource, page, pageSize);
+        return getProteinDetails(accs, "IntAct", page, pageSize);
     }
 
     /**
      * Caching resources for easy access during json handling
+     *
      * @throws SQLException
      */
     private void cacheResources() throws SQLException {
         List<InteractionResource> interactionResourceList = interactionResourceService.getAll();
         for (InteractionResource interactionResource : interactionResourceList) {
-            interactionResourceMap.put(interactionResource.getName().toLowerCase(),interactionResource);
+            interactionResourceMap.put(interactionResource.getName().toLowerCase(), interactionResource);
         }
 
         List<InteractorResource> interactorResourceList = interactorResourceService.getAll();
@@ -110,7 +121,7 @@ public class InteractionController {
      *
      * @return InteractionResult
      */
-    private InteractionResult getProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize){
+    private InteractionResult getProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         /** Json Result **/
         InteractionResult interactionResult = new InteractionResult();
 
@@ -141,7 +152,7 @@ public class InteractionController {
                 interactionResult.setInteractorUrl(""); // TODO sometimes a protein interacts with chebi, consider both urls here + type in the json
                 interactionResult.setInteractionUrl(interactionResource.getUrl());
 
-                Entity entity =  new Entity();
+                Entity entity = new Entity();
                 entity.setAcc(accKey);
                 entity.setCount(interactions.size());
 
@@ -174,7 +185,7 @@ public class InteractionController {
 
             }
 
-        }catch (SQLException | InvalidInteractionResourceException s){
+        } catch (SQLException | InvalidInteractionResourceException s) {
             s.printStackTrace();
             interactionResult.setMessage(s.getMessage());
         }
@@ -204,7 +215,7 @@ public class InteractionController {
             for (String accKey : interactionCountMap.keySet()) {
                 Integer count = interactionCountMap.get(accKey);
 
-                Entity entity =  new Entity();
+                Entity entity = new Entity();
                 entity.setAcc(accKey);
                 entity.setCount(count);
 
@@ -213,7 +224,7 @@ public class InteractionController {
 
             interactionResult.setEntities(entities);
 
-        }catch (SQLException | InvalidInteractionResourceException s){
+        } catch (SQLException | InvalidInteractionResourceException s) {
             s.printStackTrace();
             interactionResult.setMessage(s.getMessage());
         }
@@ -223,9 +234,9 @@ public class InteractionController {
 }
 
 /**
- NEXT STEPS
-
-  1- Work in the pagination and pageSize results - OK
-  2- Work in the summary - OK
-  3- interactor url - this has to be fixed (discuss)
-**/
+ * NEXT STEPS
+ * <p>
+ * 1- Work in the pagination and pageSize results - OK
+ * 2- Work in the summary - OK
+ * 3- interactor url - this has to be fixed (discuss)
+ **/
