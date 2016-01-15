@@ -123,7 +123,7 @@ public class InteractionController {
             Map<String, List<Interaction>> interactionMaps = interactionService.getInteractions(accs, resource, page, pageSize);
 
             /** Get interaction resource from cache **/
-            InteractionResource interactionResource = interactionResourceMap.get(resource);
+            InteractionResource interactionResource = interactionResourceMap.get(resource.toLowerCase());
 
             /** Get interactor resource from cache **/ // TODO define what should be done here
 
