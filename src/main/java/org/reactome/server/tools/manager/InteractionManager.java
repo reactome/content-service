@@ -1,4 +1,4 @@
-package org.reactome.server.tools.helper;
+package org.reactome.server.tools.manager;
 
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.model.Interaction;
@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-public class InteractionHelper {
+public class InteractionManager {
     /**
      * Create the service that queries DB
      **/
@@ -32,7 +32,7 @@ public class InteractionHelper {
     private Map<String, InteractorResource> interactorResourceMap;
     private Map<String, InteractionResource> interactionResourceMap;
 
-    public InteractionHelper() {
+    public InteractionManager() {
         this.interactionService = InteractionService.getInstance();
         this.interactionResourceService = InteractionResourceService.getInstance();
         this.interactorResourceService = InteractorResourceService.getInstance();
