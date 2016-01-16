@@ -2,6 +2,8 @@ package org.reactome.server.tools.handler;
 
 import org.reactome.server.tools.exception.ContentServiceException;
 import org.reactome.server.tools.model.ContentServiceError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,7 +20,7 @@ import java.io.IOException;
  */
 public class HandlerExceptionResolverImpl implements HandlerExceptionResolver {
 
-//    private static Logger logger = Logger.getLogger(HandlerExceptionResolverImpl.class.getName());
+    final static Logger logger = LoggerFactory.getLogger(HandlerExceptionResolverImpl.class);
 
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response,
                                          Object handler, Exception ex) {
@@ -33,7 +35,7 @@ public class HandlerExceptionResolverImpl implements HandlerExceptionResolver {
             try {
                 response.getWriter().println(error);
             } catch (IOException e) {
-//                logger.error("Error writing to output stream", e);
+                logger.error("Error writing to output stream", e);
             }
             return new ModelAndView();
         }
