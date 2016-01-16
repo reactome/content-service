@@ -3,7 +3,7 @@ package org.reactome.server.tools.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.reactome.server.tools.manager.InteractionManager;
-import org.reactome.server.tools.model.InteractionResult;
+import org.reactome.server.tools.model.interactions.InteractionResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;

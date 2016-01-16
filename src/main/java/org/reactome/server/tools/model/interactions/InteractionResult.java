@@ -1,4 +1,4 @@
-package org.reactome.server.tools.model;
+package org.reactome.server.tools.model.interactions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -23,9 +23,6 @@ public class InteractionResult {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Synonym> synonym;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String message = null;
 
 
     public String getResource() {
@@ -68,11 +65,4 @@ public class InteractionResult {
         this.synonym = synonym;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }
