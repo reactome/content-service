@@ -14,8 +14,8 @@ import java.util.List;
  */
 
 @RestController
-@Api(value = "/psicquic", description = "PSICQUIC content")
-@RequestMapping("/psicquic")
+@Api(value = "/interactors", description = "Molecule interactors")
+@RequestMapping("/interactors/psicquic")
 public class PsicquicInteractionsController {
 
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")

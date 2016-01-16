@@ -16,7 +16,7 @@ import java.util.Set;
  */
 
 @RestController
-@Api(value = "/interactors", description = "Static content")
+@Api(value = "/interactors", description = "Molecule interactors")
 @RequestMapping("/interactors/static")
 public class StaticInteractionsController {
 
