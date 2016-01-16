@@ -1,4 +1,4 @@
-package org.reactome.server.tools.controller;
+package org.reactome.server.tools.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
