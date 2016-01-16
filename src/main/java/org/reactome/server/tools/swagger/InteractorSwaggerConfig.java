@@ -26,14 +26,13 @@ public class InteractorSwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        ApiInfo apiInfo = new ApiInfo(
-                "Reactome Interactors REST Service",
-                "Provide easy access to protein or chemical interactions based on IntAct dataset.",
-                "API TOS",
+        return new ApiInfo(
+                "Reactome Content Service",
+                "RESTFul service for Reactome content",
+                "0.1",
                 "Terms of service",
-                "Guilherme Viteri [gviteri@ebi.ac.uk]",
-                "License of API",
-                "API license URL");
-        return apiInfo;
+                "Reactome [help@reactome.org]",
+                "Creative Commons Attribution 3.0 Unported License",
+                "http://creativecommons.org/licenses/by/3.0/legalcode");
     }
 }
