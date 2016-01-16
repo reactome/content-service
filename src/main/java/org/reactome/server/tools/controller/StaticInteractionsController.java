@@ -18,14 +18,16 @@ import java.util.Set;
 @RestController
 @Api(value = "/interactors", description = "Static content")
 @RequestMapping("/interactors/static")
-public class InteractionController {
+public class StaticInteractionsController {
+
+    private static final String STATIC_RESOURCE_NAME = "IntAct";
 
     @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = InteractionResult.class)
     @RequestMapping(value = "/protein/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public InteractionResult getProteinSummaryByResourceAndAcc(@PathVariable String acc) {
         InteractionManager interactions = new InteractionManager();
-        return interactions.getProteinsSummary(Collections.singletonList(acc), "IntAct");
+        return interactions.getProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
 
     @ApiOperation(value = "Retrieve a detailed interaction information of a given accession by resource", response = InteractionResult.class)
@@ -35,7 +37,7 @@ public class InteractionController {
                                                                @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                                @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
         InteractionManager interactions = new InteractionManager();
-        return interactions.getProteinDetails(Collections.singletonList(acc), "IntAct", page, pageSize);
+        return interactions.getProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
     }
 
     @ApiOperation(value = "Retrieve a summary of a given accession list by resource", response = InteractionResult.class)
@@ -45,7 +47,7 @@ public class InteractionController {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         InteractionManager interactions = new InteractionManager();
-        return interactions.getProteinsSummary(accs, "IntAct");
+        return interactions.getProteinsSummary(accs, STATIC_RESOURCE_NAME);
 
     }
 
@@ -58,6 +60,6 @@ public class InteractionController {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         InteractionManager interactions = new InteractionManager();
-        return interactions.getProteinDetails(accs, "IntAct", page, pageSize);
+        return interactions.getProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
     }
 }
