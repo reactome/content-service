@@ -1,5 +1,6 @@
 package org.reactome.server.tools.manager;
 
+import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionResource;
@@ -7,10 +8,10 @@ import org.reactome.server.tools.interactors.model.InteractorResource;
 import org.reactome.server.tools.interactors.service.InteractionResourceService;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.InteractorResourceService;
-import org.reactome.server.tools.model.Entity;
-import org.reactome.server.tools.model.InteractionResult;
-import org.reactome.server.tools.model.InteractorResult;
-import org.reactome.server.tools.model.Synonym;
+import org.reactome.server.tools.model.interactions.Entity;
+import org.reactome.server.tools.model.interactions.InteractionResult;
+import org.reactome.server.tools.model.interactions.InteractorResult;
+import org.reactome.server.tools.model.interactions.Synonym;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -128,8 +129,7 @@ public class InteractionManager {
             }
 
         } catch (SQLException | InvalidInteractionResourceException s) {
-            s.printStackTrace();
-            interactionResult.setMessage(s.getMessage());
+            throw new InteractorResourceNotFound(resource);
         }
 
         return interactionResult;
@@ -167,8 +167,7 @@ public class InteractionManager {
             interactionResult.setEntities(entities);
 
         } catch (SQLException | InvalidInteractionResourceException s) {
-            s.printStackTrace();
-            interactionResult.setMessage(s.getMessage());
+            throw new InteractorResourceNotFound(resource);
         }
 
         return interactionResult;
