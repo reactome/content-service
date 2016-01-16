@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.reactome.server.tools.manager.InteractionManager;
 import org.reactome.server.tools.model.interactions.InteractionResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -22,11 +23,13 @@ public class StaticInteractionsController {
 
     private static final String STATIC_RESOURCE_NAME = "IntAct";
 
+    @Autowired
+    private InteractionManager interactions;
+
     @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = InteractionResult.class)
     @RequestMapping(value = "/protein/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public InteractionResult getProteinSummaryByResourceAndAcc(@PathVariable String acc) {
-        InteractionManager interactions = new InteractionManager();
         return interactions.getProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
 
@@ -36,7 +39,6 @@ public class StaticInteractionsController {
     public InteractionResult getProteinDetailsByResourceAndAcc(@PathVariable String acc,
                                                                @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                                @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
-        InteractionManager interactions = new InteractionManager();
         return interactions.getProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
     }
 
@@ -46,7 +48,6 @@ public class StaticInteractionsController {
     public InteractionResult getProteinsSummaryByResource(@RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-        InteractionManager interactions = new InteractionManager();
         return interactions.getProteinsSummary(accs, STATIC_RESOURCE_NAME);
 
     }
@@ -59,7 +60,6 @@ public class StaticInteractionsController {
                                                           @RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-        InteractionManager interactions = new InteractionManager();
         return interactions.getProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
     }
 }

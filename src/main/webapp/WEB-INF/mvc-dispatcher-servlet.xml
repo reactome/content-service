@@ -11,10 +11,34 @@
 
     <mvc:annotation-driven />
 
+    <context:property-placeholder location="classpath:/service.properties" />
+
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
     <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
+
+    <!-- Configuration for the Interactors-Core components -->
+    <bean id="interactorsDB" class="org.reactome.server.tools.interactors.database.InteractorsDatabase">
+        <constructor-arg name="fileName" value="${interactors.static.db}"/>
+    </bean>
+
+    <bean id="interactionParserService" class="org.reactome.server.tools.interactors.service.InteractionParserService">
+        <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+    <bean id="interactionResourceService" class="org.reactome.server.tools.interactors.service.InteractionResourceService">
+        <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+    <bean id="interactionService" class="org.reactome.server.tools.interactors.service.InteractionService">
+        <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+    <bean id="interactorResourceService" class="org.reactome.server.tools.interactors.service.InteractorResourceService">
+        <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+    <bean id="InteractionService" class="org.reactome.server.tools.interactors.service.InteractorService">
+        <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+
 </beans>

@@ -4,14 +4,14 @@ import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionResource;
-import org.reactome.server.tools.interactors.model.InteractorResource;
 import org.reactome.server.tools.interactors.service.InteractionResourceService;
 import org.reactome.server.tools.interactors.service.InteractionService;
-import org.reactome.server.tools.interactors.service.InteractorResourceService;
 import org.reactome.server.tools.model.interactions.Entity;
 import org.reactome.server.tools.model.interactions.InteractionResult;
 import org.reactome.server.tools.model.interactions.InteractorResult;
 import org.reactome.server.tools.model.interactions.Synonym;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -19,26 +19,22 @@ import java.util.*;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
+@Controller
 public class InteractionManager {
     /**
-     * Create the service that queries DB
+     * Holds the services that query the DB
      **/
+    @Autowired
     private InteractionService interactionService;
+    @Autowired
     private InteractionResourceService interactionResourceService;
-    private InteractorResourceService interactorResourceService;
 
     /**
      * These attributes will be used to cache the resource
      **/
-    private Map<String, InteractorResource> interactorResourceMap;
     private Map<String, InteractionResource> interactionResourceMap;
 
     public InteractionManager() {
-        this.interactionService = InteractionService.getInstance();
-        this.interactionResourceService = InteractionResourceService.getInstance();
-        this.interactorResourceService = InteractorResourceService.getInstance();
-
-        this.interactorResourceMap = new HashMap<>();
         this.interactionResourceMap = new HashMap<>();
     }
 
@@ -51,11 +47,6 @@ public class InteractionManager {
         List<InteractionResource> interactionResourceList = interactionResourceService.getAll();
         for (InteractionResource interactionResource : interactionResourceList) {
             interactionResourceMap.put(interactionResource.getName().toLowerCase(), interactionResource);
-        }
-
-        List<InteractorResource> interactorResourceList = interactorResourceService.getAll();
-        for (InteractorResource interactorResource : interactorResourceList) {
-            interactorResourceMap.put(interactorResource.getName().toLowerCase(), interactorResource);
         }
     }
 
@@ -129,6 +120,7 @@ public class InteractionManager {
             }
 
         } catch (SQLException | InvalidInteractionResourceException s) {
+            s.printStackTrace();
             throw new InteractorResourceNotFound(resource);
         }
 
