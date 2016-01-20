@@ -65,12 +65,16 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
+                <!--<exclusion>-->
+                    <!--<groupId>org.hupo.psi.mi.psicquic</groupId>-->
+                    <!--<artifactId>psicquic-client</artifactId>-->
+                <!--</exclusion>-->
             </exclusions>
         </dependency>
 
@@ -99,11 +103,6 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.2.2</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.mangofactory</groupId>-->
-            <!--<artifactId>swagger-springmvc</artifactId>-->
-            <!--<version>0.8.5</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>junit</groupId>

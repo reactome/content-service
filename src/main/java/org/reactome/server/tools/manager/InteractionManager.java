@@ -55,7 +55,7 @@ public class InteractionManager {
      *
      * @return InteractionResult
      */
-    public InteractionResult getProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
+    public InteractionResult getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         /** Json Result **/
         InteractionResult interactionResult = new InteractionResult();
 
@@ -132,7 +132,7 @@ public class InteractionManager {
      *
      * @return InteractionResult
      */
-    public InteractionResult getProteinsSummary(Collection<String> accs, String resource) {
+    public InteractionResult getStaticProteinsSummary(Collection<String> accs, String resource) {
         /** Json Result **/
         InteractionResult interactionResult = new InteractionResult();
 
@@ -160,6 +160,60 @@ public class InteractionManager {
 
         } catch (SQLException | InvalidInteractionResourceException s) {
             throw new InteractorResourceNotFound(resource);
+        }
+
+        return interactionResult;
+    }
+
+    public InteractionResult test(Map<String, List<Interaction>> interactionMaps, String resource){
+        InteractionResult interactionResult = new InteractionResult();
+
+        /** Entities are a JSON Object **/
+        List<Entity> entities = new ArrayList<>();
+
+        /** Synomys are a JSON Object **/
+        Map<String, Synonym> synonymsMaps = new HashMap<>();
+
+        for (String accKey : interactionMaps.keySet()) {
+
+            List<Interaction> interactions = interactionMaps.get(accKey);
+
+            interactionResult.setResource(resource);
+            interactionResult.setInteractorUrl(""); // TODO sometimes a protein interacts with chebi, consider both urls here + type in the json
+            interactionResult.setInteractionUrl("");
+
+            Entity entity = new Entity();
+            entity.setAcc(accKey.trim());
+            entity.setCount(interactions.size());
+
+            List<InteractorResult> interactorsResultList = new ArrayList<>();
+            for (Interaction interaction : interactions) {
+                InteractorResult interactor = new InteractorResult();
+                interactor.setAcc(interaction.getInteractorB().getAcc());
+                interactor.setScore(interaction.getIntactScore());
+
+                if(interaction.getInteractionDetailsList().size() > 0) {
+                    interactor.setInteractionId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
+                }
+
+                /** Creating synonym **/
+                Synonym synonym = new Synonym();
+                synonym.setAcc(interaction.getInteractorB().getAcc());
+                synonym.setImageUrl(null); // TODO define image in the interactor ?
+                synonym.setText(interaction.getInteractorB().getAlias());
+                synonymsMaps.put(synonym.getAcc(), synonym);
+
+                interactorsResultList.add(interactor);
+            }
+
+            entity.setInteractors(interactorsResultList);
+
+            entities.add(entity);
+
+            interactionResult.setEntities(entities);
+
+            interactionResult.setSynonym(synonymsMaps);
+
         }
 
         return interactionResult;

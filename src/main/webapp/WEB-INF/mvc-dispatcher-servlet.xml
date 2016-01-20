@@ -41,4 +41,5 @@
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
+    <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
 </beans>

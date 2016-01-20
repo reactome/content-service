@@ -26,40 +26,40 @@ public class StaticInteractionsController {
     @Autowired
     private InteractionManager interactions;
 
-    @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = InteractionResult.class)
+    @ApiOperation(value = "Retrieve a summary of a given accession", response = InteractionResult.class)
     @RequestMapping(value = "/protein/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public InteractionResult getProteinSummaryByResourceAndAcc(@PathVariable String acc) {
-        return interactions.getProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
+    public InteractionResult getProteinSummaryByAcc(@PathVariable String acc) {
+        return interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
 
-    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession by resource", response = InteractionResult.class)
+    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = InteractionResult.class)
     @RequestMapping(value = "/protein/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public InteractionResult getProteinDetailsByResourceAndAcc(@PathVariable String acc,
+    public InteractionResult getProteinDetailsByAcc(@PathVariable String acc,
                                                                @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                                @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
-        return interactions.getProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
+        return interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
     }
 
-    @ApiOperation(value = "Retrieve a summary of a given accession list by resource", response = InteractionResult.class)
+    @ApiOperation(value = "Retrieve a summary of a given accession list", response = InteractionResult.class)
     @RequestMapping(value = "/proteins/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public InteractionResult getProteinsSummaryByResource(@RequestBody String proteins) {
+    public InteractionResult getProteinsSummaryByAccs(@RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-        return interactions.getProteinsSummary(accs, STATIC_RESOURCE_NAME);
+        return interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
 
     }
 
-    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession by resource", response = InteractionResult.class)
+    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = InteractionResult.class)
     @RequestMapping(value = "/proteins/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public InteractionResult getProteinsDetailsByResource(@RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
+    public InteractionResult getProteinsDetailsByAccs(@RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize,
                                                           @RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-        return interactions.getProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
+        return interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
     }
 }
