@@ -65,16 +65,16 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <version>0.0.5-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
-                <!--<exclusion>-->
-                    <!--<groupId>org.hupo.psi.mi.psicquic</groupId>-->
-                    <!--<artifactId>psicquic-client</artifactId>-->
-                <!--</exclusion>-->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-asm</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
