@@ -21,7 +21,7 @@ import java.util.Set;
 @RequestMapping("/interactors/static")
 public class StaticInteractionsController {
 
-    private static final String STATIC_RESOURCE_NAME = "IntAct";
+    private static final String STATIC_RESOURCE_NAME = "static";
 
     @Autowired
     private InteractionManager interactions;
