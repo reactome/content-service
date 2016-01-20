@@ -37,7 +37,7 @@
     <bean id="interactorResourceService" class="org.reactome.server.tools.interactors.service.InteractorResourceService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
-    <bean id="InteractionService" class="org.reactome.server.tools.interactors.service.InteractorService">
+    <bean id="interactorService" class="org.reactome.server.tools.interactors.service.InteractorService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
