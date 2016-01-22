@@ -3,7 +3,7 @@ package org.reactome.server.tools.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.reactome.server.tools.interactors.model.Interaction;
-import org.reactome.server.tools.interactors.model.PsicquicRegistry;
+import org.reactome.server.tools.interactors.model.PsicquicResource;
 import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.manager.InteractionManager;
 import org.reactome.server.tools.model.interactions.Entity;
@@ -30,21 +30,21 @@ public class PsicquicInteractionsController {
     @Autowired
     private InteractionManager interactions;
 
-    @ApiOperation(value = "Retrieve a list of all Psicquic Registries services", response = PsicquicRegistry.class)
+    @ApiOperation(value = "Retrieve a list of all Psicquic Registries services", response = PsicquicResource.class)
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<PsicquicRegistry> getResources()  {
+    public List<PsicquicResource> getResources()  {
 
         /**
          * TEMPORARY SOLUTION: Remove service with issues.
          *      Theses services are active but throwing exception. We decided to remove them from the list:
          *      MatrixDB, I2D, Spike
          */
-        List<PsicquicRegistry> registries = psicquicService.getRegistries();
+        List<PsicquicResource> registries = psicquicService.getResources();
 
-        Iterator<PsicquicRegistry> iterator = registries.iterator();
+        Iterator<PsicquicResource> iterator = registries.iterator();
         while (iterator.hasNext()) {
-            PsicquicRegistry registry = iterator.next();
+            PsicquicResource registry = iterator.next();
 
             if (registry.getName().equalsIgnoreCase("MatrixDB") ||
                     registry.getName().equalsIgnoreCase("I2D") ||
