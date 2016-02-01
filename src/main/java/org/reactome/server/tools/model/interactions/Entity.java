@@ -8,6 +8,7 @@ import java.util.List;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Deprecated
 public class Entity {
 
     private String acc;

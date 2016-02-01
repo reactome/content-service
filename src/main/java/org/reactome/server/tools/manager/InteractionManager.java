@@ -1,22 +1,20 @@
 package org.reactome.server.tools.manager;
 
-import org.reactome.server.tools.exception.ContentServiceException;
 import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
+import org.reactome.server.tools.interactors.mapper.EntityMapper;
+import org.reactome.server.tools.interactors.mapper.InteractionMapper;
+import org.reactome.server.tools.interactors.mapper.InteractorMapper;
+import org.reactome.server.tools.interactors.mapper.SynonymMapper;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionResource;
 import org.reactome.server.tools.interactors.model.PsicquicResource;
 import org.reactome.server.tools.interactors.service.InteractionResourceService;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.PsicquicService;
-import org.reactome.server.tools.model.interactions.Entity;
-import org.reactome.server.tools.model.interactions.InteractionResult;
-import org.reactome.server.tools.model.interactions.InteractorResult;
-import org.reactome.server.tools.model.interactions.Synonym;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
@@ -63,9 +61,9 @@ public class InteractionManager {
     /**
      * Retrieve static interactions details
      *
-     * @return InteractionResult
+     * @return InteractionMapper
      */
-    public InteractionResult getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
+    public InteractionMapper getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         try {
             /** caching resources, get values from the Map **/
             cacheStaticResources();
@@ -85,9 +83,9 @@ public class InteractionManager {
     /**
      * Retrieve PSICQUIC interactions
      * @param resource PSICQUIC Resource
-     * @return InteractionResult which will be serialized to JSON by Jackson
+     * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public InteractionResult getPsicquicProteinsDetails(Collection<String> accs, String resource){
+    public InteractionMapper getPsicquicProteinsDetails(Collection<String> accs, String resource){
         try {
             /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
             Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
@@ -101,9 +99,9 @@ public class InteractionManager {
     /**
      * Generic method that queries the database and build the JSON Object
      *
-     * @return InteractionResult
+     * @return InteractionMapper
      */
-    public InteractionResult getStaticProteinsSummary(Collection<String> accs, String resource) {
+    public InteractionMapper getStaticProteinsSummary(Collection<String> accs, String resource) {
         try {
             /** Query database and get the count **/
             Map<String, Integer> interactionCountMap = interactionService.countInteractionsByAccessions(accs, resource);
@@ -119,9 +117,9 @@ public class InteractionManager {
     /**
      * Retrieve PSICQUIC interactions summary
      * @param resource PSICQUIC Resource
-     * @return InteractionResult which will be serialized to JSON by Jackson
+     * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public InteractionResult getPsicquicProteinsSummary(Collection<String> accs, String resource){
+    public InteractionMapper getPsicquicProteinsSummary(Collection<String> accs, String resource){
 
         /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
         Map<String, Integer> interactionMap;
@@ -174,50 +172,58 @@ public class InteractionManager {
      *
      * @param interactionMaps key=accession and value=List of interactions
      * @param resource resource that can be static or psicquic resource
-     * @return InteractionResult
+     * @return InteractionMapper
      */
-    public InteractionResult getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
-        InteractionResult interactionResult = new InteractionResult();
+    public InteractionMapper getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
+        InteractionMapper interactionMapper = new InteractionMapper();
 
         /** Entities are a JSON Object **/
-        List<Entity> entities = new ArrayList<>();
+        List<EntityMapper> entities = new ArrayList<>();
 
         /** Synomys are a JSON Object **/
-        Map<String, Synonym> synonymsMaps = new HashMap<>();
+        Map<String, SynonymMapper> synonymsMaps = new HashMap<>();
 
         for (String accKey : interactionMaps.keySet()) {
 
             List<Interaction> interactions = interactionMaps.get(accKey);
 
-            interactionResult.setResource(resource);
-            interactionResult.setInteractorUrl(""); // TODO sometimes a protein interacts with chebi, consider both urls here + type in the json
+            /** Remove from output if there is no interaction **/
+            if(interactions.size() == 0) {
+                continue;
+            }
+
+            interactionMapper.setResource(resource);
+            interactionMapper.setInteractorUrl(""); // TODO sometimes a protein interacts with chebi, consider both urls here + type in the json
 
             /** Get InteractionResource that has been previously cached **/
             InteractionResource interactionResource = interactionResourceMap.get(resource.toLowerCase());
             if(interactionResource != null) {
-                interactionResult.setInteractionUrl(interactionResource.getUrl());
+                interactionMapper.setInteractionUrl(interactionResource.getUrl());
             }
 
-            Entity entity = new Entity();
+            EntityMapper entity = new EntityMapper();
             entity.setAcc(accKey.trim());
             entity.setCount(interactions.size());
 
-            List<InteractorResult> interactorsResultList = new ArrayList<>();
+            List<InteractorMapper> interactorsResultList = new ArrayList<>();
             for (Interaction interaction : interactions) {
-                InteractorResult interactor = new InteractorResult();
+                InteractorMapper interactor = new InteractorMapper();
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
 
                 if(interaction.getInteractionDetailsList().size() > 0) {
-                    interactor.setInteractionId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
+                    interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
                 }
 
                 /** Creating synonym **/
-                Synonym synonym = new Synonym();
-                synonym.setAcc(interaction.getInteractorB().getAcc());
-                synonym.setImageUrl(null); // TODO define image in the interactor ?
-                synonym.setText(interaction.getInteractorB().getAlias());
-                synonymsMaps.put(synonym.getAcc(), synonym);
+                SynonymMapper synonym = new SynonymMapper();
+                //synonym.setAcc(interaction.getInteractorB().getAcc());
+                synonym.setImageUrl(null);
+
+                List<String> geneNames = new ArrayList<>();
+                geneNames.add(interaction.getInteractorB().getAlias());
+                synonym.setText(geneNames);
+                synonymsMaps.put(interaction.getInteractorB().getAcc(), synonym);
 
                 interactorsResultList.add(interactor);
             }
@@ -226,13 +232,13 @@ public class InteractionManager {
 
             entities.add(entity);
 
-            interactionResult.setEntities(entities);
+            interactionMapper.setEntities(entities);
 
-            interactionResult.setSynonym(synonymsMaps);
+            interactionMapper.setSynonym(synonymsMaps);
 
         }
 
-        return interactionResult;
+        return interactionMapper;
 
     }
 
@@ -242,30 +248,33 @@ public class InteractionManager {
      *
      * @param summaryMap key=accession and value=total of interactions
      * @param resource resource that can be static or psicquic resource
-     * @return InteractionResult
+     * @return InteractionMapper
      */
-    public InteractionResult getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
-        InteractionResult interactionResult = new InteractionResult();
+    public InteractionMapper getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
+        InteractionMapper interactionMapper = new InteractionMapper();
 
         /** Entities are a JSON Object **/
-        List<Entity> entities = new ArrayList<>();
+        List<EntityMapper> entities = new ArrayList<>();
 
         for (String accKey : summaryMap.keySet()) {
-            Integer interactions = summaryMap.get(accKey);
+            Integer interactionsCount = summaryMap.get(accKey);
 
-            interactionResult.setResource(resource);
+            interactionMapper.setResource(resource);
 
-            Entity entity = new Entity();
+            EntityMapper entity = new EntityMapper();
             entity.setAcc(accKey.trim());
-            entity.setCount(interactions);
+            entity.setCount(interactionsCount);
 
-            entities.add(entity);
+            /** Remove from output if there is no interaction **/
+            if(interactionsCount > 0) {
+                entities.add(entity);
+            }
 
         }
 
-        interactionResult.setEntities(entities);
+        interactionMapper.setEntities(entities);
 
-        return interactionResult;
+        return interactionMapper;
 
     }
 }

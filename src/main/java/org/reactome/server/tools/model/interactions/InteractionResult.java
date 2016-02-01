@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
+@Deprecated
 public class InteractionResult {
 
     private String resource;

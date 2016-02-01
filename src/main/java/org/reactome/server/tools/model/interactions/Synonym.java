@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@Deprecated
 public class Synonym {
 
     @JsonIgnore
