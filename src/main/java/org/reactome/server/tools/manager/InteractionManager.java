@@ -7,7 +7,6 @@ import org.reactome.server.tools.interactors.exception.PsicquicInteractionCluste
 import org.reactome.server.tools.interactors.mapper.EntityMapper;
 import org.reactome.server.tools.interactors.mapper.InteractionMapper;
 import org.reactome.server.tools.interactors.mapper.InteractorMapper;
-import org.reactome.server.tools.interactors.mapper.SynonymMapper;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionResource;
 import org.reactome.server.tools.interactors.model.PsicquicResource;
@@ -181,7 +180,7 @@ public class InteractionManager {
         List<EntityMapper> entities = new ArrayList<>();
 
         /** Synomys are a JSON Object **/
-        Map<String, SynonymMapper> synonymsMaps = new HashMap<>();
+        //Map<String, SynonymMapper> synonymsMaps = new HashMap<>();
 
         for (String accKey : interactionMaps.keySet()) {
 
@@ -210,22 +209,23 @@ public class InteractionManager {
                 InteractorMapper interactor = new InteractorMapper();
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
+                interactor.setAlias(interaction.getInteractorB().getAlias());
 
                 if(interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
                 }
 
                 /** Creating synonym **/
-                SynonymMapper synonym = new SynonymMapper();
+                //SynonymMapper synonym = new SynonymMapper();
 
-                Set<String> synonymsList = new HashSet<>();
-                synonymsList.add(interaction.getInteractorB().getAlias());
+                //Set<String> synonymsList = new HashSet<>();
+                //synonymsList.add(interaction.getInteractorB().getAlias());
                 /** Aliases are being saved all in the same column using $ as unique delimiter **/
-                synonymsList.addAll(Arrays.asList(interaction.getInteractorB().getSynonyms().split("\\$")));
+                //synonymsList.addAll(Arrays.asList(interaction.getInteractorB().getSynonyms().split("\\$")));
 
-                synonym.setText(synonymsList);
+                //synonym.setText(synonymsList);
 
-                synonymsMaps.put(interaction.getInteractorB().getAcc(), synonym);
+                //synonymsMaps.put(interaction.getInteractorB().getAcc(), synonym);
 
                 interactorsResultList.add(interactor);
             }
@@ -236,7 +236,7 @@ public class InteractionManager {
 
             interactionMapper.setEntities(entities);
 
-            interactionMapper.setSynonym(synonymsMaps);
+            //interactionMapper.setSynonym(synonymsMaps);
 
         }
 
