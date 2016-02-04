@@ -1,8 +1,7 @@
-package org.reactome.server.tools.model;
+package org.reactome.server.tools.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.reactome.server.tools.exception.ContentServiceException;
 import org.springframework.http.HttpStatus;
 
 import java.util.LinkedList;

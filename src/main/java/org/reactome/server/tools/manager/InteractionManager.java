@@ -179,9 +179,6 @@ public class InteractionManager {
         /** Entities are a JSON Object **/
         List<EntityMapper> entities = new ArrayList<>();
 
-        /** Synomys are a JSON Object **/
-        //Map<String, SynonymMapper> synonymsMaps = new HashMap<>();
-
         for (String accKey : interactionMaps.keySet()) {
 
             List<Interaction> interactions = interactionMaps.get(accKey);
@@ -215,18 +212,6 @@ public class InteractionManager {
                     interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
                 }
 
-                /** Creating synonym **/
-                //SynonymMapper synonym = new SynonymMapper();
-
-                //Set<String> synonymsList = new HashSet<>();
-                //synonymsList.add(interaction.getInteractorB().getAlias());
-                /** Aliases are being saved all in the same column using $ as unique delimiter **/
-                //synonymsList.addAll(Arrays.asList(interaction.getInteractorB().getSynonyms().split("\\$")));
-
-                //synonym.setText(synonymsList);
-
-                //synonymsMaps.put(interaction.getInteractorB().getAcc(), synonym);
-
                 interactorsResultList.add(interactor);
             }
 
@@ -235,8 +220,6 @@ public class InteractionManager {
             entities.add(entity);
 
             interactionMapper.setEntities(entities);
-
-            //interactionMapper.setSynonym(synonymsMaps);
 
         }
 
