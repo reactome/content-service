@@ -217,12 +217,14 @@ public class InteractionManager {
 
                 /** Creating synonym **/
                 SynonymMapper synonym = new SynonymMapper();
-                //synonym.setAcc(interaction.getInteractorB().getAcc());
-                synonym.setImageUrl(null);
 
-                List<String> geneNames = new ArrayList<>();
-                geneNames.add(interaction.getInteractorB().getAlias());
-                synonym.setText(geneNames);
+                Set<String> synonymsList = new HashSet<>();
+                synonymsList.add(interaction.getInteractorB().getAlias());
+                /** Aliases are being saved all in the same column using $ as unique delimiter **/
+                synonymsList.addAll(Arrays.asList(interaction.getInteractorB().getSynonyms().split("\\$")));
+
+                synonym.setText(synonymsList);
+
                 synonymsMaps.put(interaction.getInteractorB().getAcc(), synonym);
 
                 interactorsResultList.add(interactor);
