@@ -4,15 +4,15 @@ import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
-import org.reactome.server.tools.interactors.mapper.EntityMapper;
-import org.reactome.server.tools.interactors.mapper.InteractionMapper;
-import org.reactome.server.tools.interactors.mapper.InteractorMapper;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionResource;
 import org.reactome.server.tools.interactors.model.PsicquicResource;
 import org.reactome.server.tools.interactors.service.InteractionResourceService;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.PsicquicService;
+import org.reactome.server.tools.model.interactors.Interactor;
+import org.reactome.server.tools.model.interactors.InteractorEntity;
+import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -62,7 +62,7 @@ public class InteractionManager {
      *
      * @return InteractionMapper
      */
-    public InteractionMapper getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
+    public Interactors getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         try {
             /** caching resources, get values from the Map **/
             cacheStaticResources();
@@ -84,7 +84,7 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public InteractionMapper getPsicquicProteinsDetails(Collection<String> accs, String resource){
+    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource){
         try {
             /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
             Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
@@ -100,7 +100,7 @@ public class InteractionManager {
      *
      * @return InteractionMapper
      */
-    public InteractionMapper getStaticProteinsSummary(Collection<String> accs, String resource) {
+    public Interactors getStaticProteinsSummary(Collection<String> accs, String resource) {
         try {
             /** Query database and get the count **/
             Map<String, Integer> interactionCountMap = interactionService.countInteractionsByAccessions(accs, resource);
@@ -118,7 +118,7 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public InteractionMapper getPsicquicProteinsSummary(Collection<String> accs, String resource){
+    public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource){
 
         /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
         Map<String, Integer> interactionMap;
@@ -173,11 +173,11 @@ public class InteractionManager {
      * @param resource resource that can be static or psicquic resource
      * @return InteractionMapper
      */
-    public InteractionMapper getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
-        InteractionMapper interactionMapper = new InteractionMapper();
+    public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
+        Interactors interactionMapper = new Interactors();
 
         /** Entities are a JSON Object **/
-        List<EntityMapper> entities = new ArrayList<>();
+        List<InteractorEntity> entities = new ArrayList<>();
 
         for (String accKey : interactionMaps.keySet()) {
 
@@ -189,26 +189,18 @@ public class InteractionManager {
             }
 
             interactionMapper.setResource(resource);
-            interactionMapper.setInteractorUrl(""); // TODO sometimes a protein interacts with chebi, consider both urls here + type in the json
-
-            /** Get InteractionResource that has been previously cached **/
-            InteractionResource interactionResource = interactionResourceMap.get(resource.toLowerCase());
-            if(interactionResource != null) {
-                interactionMapper.setInteractionUrl(interactionResource.getUrl());
-            }
-
-            EntityMapper entity = new EntityMapper();
+            
+            InteractorEntity entity = new InteractorEntity();
             entity.setAcc(accKey.trim());
             entity.setCount(interactions.size());
 
-            List<InteractorMapper> interactorsResultList = new ArrayList<>();
+            List<Interactor> interactorsResultList = new ArrayList<>();
             for (Interaction interaction : interactions) {
-                InteractorMapper interactor = new InteractorMapper();
+                Interactor interactor = new Interactor();
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
 
-                String alias = interaction.getInteractorB().getAlias().replace("_HUMAN", "").replace("_", " ");
-                interactor.setAlias(alias);
+                interactor.setAlias(interaction.getInteractorB().getAlias());
 
                 if(interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
@@ -237,18 +229,18 @@ public class InteractionManager {
      * @param resource resource that can be static or psicquic resource
      * @return InteractionMapper
      */
-    public InteractionMapper getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
-        InteractionMapper interactionMapper = new InteractionMapper();
+    public Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
+        Interactors interactionMapper = new Interactors();
 
         /** Entities are a JSON Object **/
-        List<EntityMapper> entities = new ArrayList<>();
+        List<InteractorEntity> entities = new ArrayList<>();
 
         for (String accKey : summaryMap.keySet()) {
             Integer interactionsCount = summaryMap.get(accKey);
 
             interactionMapper.setResource(resource);
 
-            EntityMapper entity = new EntityMapper();
+            InteractorEntity entity = new InteractorEntity();
             entity.setAcc(accKey.trim());
             entity.setCount(interactionsCount);
 

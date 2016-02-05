@@ -2,8 +2,8 @@ package org.reactome.server.tools.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.reactome.server.tools.interactors.mapper.InteractionMapper;
 import org.reactome.server.tools.manager.InteractionManager;
+import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,36 +26,36 @@ public class StaticInteractionsController {
     @Autowired
     private InteractionManager interactions;
 
-    @ApiOperation(value = "Retrieve a summary of a given accession", response = InteractionMapper.class)
+    @ApiOperation(value = "Retrieve a summary of a given accession", response = Interactors.class)
     @RequestMapping(value = "/protein/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public InteractionMapper getProteinSummaryByAcc(@PathVariable String acc) {
+    public Interactors getProteinSummaryByAcc(@PathVariable String acc) {
         return interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
 
-    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = InteractionMapper.class)
+    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = Interactors.class)
     @RequestMapping(value = "/protein/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public InteractionMapper getProteinDetailsByAcc(@PathVariable String acc,
+    public Interactors getProteinDetailsByAcc(@PathVariable String acc,
                                                                @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                                @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
         return interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
     }
 
-    @ApiOperation(value = "Retrieve a summary of a given accession list", response = InteractionMapper.class)
+    @ApiOperation(value = "Retrieve a summary of a given accession list", response = Interactors.class)
     @RequestMapping(value = "/proteins/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public InteractionMapper getProteinsSummaryByAccs(@RequestBody String proteins) {
+    public Interactors getProteinsSummaryByAccs(@RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         return interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
 
     }
 
-    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = InteractionMapper.class)
+    @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = Interactors.class)
     @RequestMapping(value = "/proteins/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public InteractionMapper getProteinsDetailsByAccs(@RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
+    public Interactors getProteinsDetailsByAccs(@RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize,
                                                           @RequestBody String proteins) {
         /** Split param and put into a Set to avoid duplicates **/
