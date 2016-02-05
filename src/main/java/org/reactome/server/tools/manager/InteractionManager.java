@@ -206,7 +206,9 @@ public class InteractionManager {
                 InteractorMapper interactor = new InteractorMapper();
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
-                interactor.setAlias(interaction.getInteractorB().getAlias());
+
+                String alias = interaction.getInteractorB().getAlias().replace("_HUMAN", "").replace("_", " ");
+                interactor.setAlias(alias);
 
                 if(interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
