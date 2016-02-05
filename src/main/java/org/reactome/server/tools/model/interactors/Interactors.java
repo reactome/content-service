@@ -1,5 +1,7 @@
 package org.reactome.server.tools.model.interactors;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -10,9 +12,11 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Interactors {
 
+    @ApiModelProperty(value = "This is the resource where interactors have been queried.")
     private String resource;
 
-    private List<org.reactome.server.tools.model.interactors.InteractorEntity> entities;
+    @ApiModelProperty(value = "This is the list of entities which have been requested.")
+    private List<InteractorEntity> entities;
 
     public String getResource() {
         return resource;
@@ -22,7 +26,7 @@ public class Interactors {
         this.resource = resource;
     }
 
-    public List<org.reactome.server.tools.model.interactors.InteractorEntity> getEntities() {
+    public List<InteractorEntity> getEntities() {
         return entities;
     }
 

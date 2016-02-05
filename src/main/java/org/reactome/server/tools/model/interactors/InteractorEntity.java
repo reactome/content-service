@@ -1,5 +1,7 @@
 package org.reactome.server.tools.model.interactors;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
@@ -10,9 +12,14 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class InteractorEntity {
 
+    @ApiModelProperty(value = "This is the interactor accession (or identifier).")
     private String acc;
+
+    @ApiModelProperty(value = "This is the number of interactions for the given accession.")
     private Integer count;
-    private List<org.reactome.server.tools.model.interactors.Interactor> interactors;
+
+    @ApiModelProperty(value = "List of Interactors that interacts with the given accession.")
+    private List<Interactor> interactors;
 
     public String getAcc() {
         return acc;
@@ -30,7 +37,7 @@ public class InteractorEntity {
         this.count = count;
     }
 
-    public List<org.reactome.server.tools.model.interactors.Interactor> getInteractors() {
+    public List<Interactor> getInteractors() {
         return interactors;
     }
 
