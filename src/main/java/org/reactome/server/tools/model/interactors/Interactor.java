@@ -10,14 +10,17 @@ import io.swagger.annotations.ApiModelProperty;
 @SuppressWarnings("unused")
 public class Interactor {
 
-    @ApiModelProperty(value = "This is the interactor accession (or identifier)")
+    @ApiModelProperty(value = "This is the interactor accession (or identifier).")
     private String acc;
 
+    @ApiModelProperty(value = "This is the Gene name of the given accession.")
     private String alias;
 
     /** Interaction ID **/
+    @ApiModelProperty(value = "This is the interaction ID of two accessions.")
     private String id;
 
+    @ApiModelProperty(value = "This represents the confidence value of an interaction.")
     private Double score;
 
     public String getAcc() {
