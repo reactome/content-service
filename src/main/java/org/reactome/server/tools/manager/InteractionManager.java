@@ -176,6 +176,8 @@ public class InteractionManager {
     public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
         Interactors interactionMapper = new Interactors();
 
+        interactionMapper.setResource(resource);
+
         /** Entities are a JSON Object **/
         List<InteractorEntity> entities = new ArrayList<>();
 
@@ -187,8 +189,6 @@ public class InteractionManager {
             if(interactions.size() == 0) {
                 continue;
             }
-
-            interactionMapper.setResource(resource);
             
             InteractorEntity entity = new InteractorEntity();
             entity.setAcc(accKey.trim());
