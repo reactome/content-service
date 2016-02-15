@@ -153,7 +153,10 @@ public class InteractionManager {
     public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
         Interactors interactionMapper = new Interactors();
 
-        /** Check if it as another value in the enumeration **/
+        /**
+         * Retrieve protein,chemical and interaction URL from Enumeration.
+         * Default values apply if there is no specific URL for the Resource.
+         */
         ResourceURL resourceURL = ResourceURL.getByName(resource);
         if (resourceURL != null) {
             interactionMapper.setProteinURL(resourceURL.getProtein());
@@ -164,6 +167,7 @@ public class InteractionManager {
         /** Entities are a JSON Object **/
         List<InteractorEntity> entities = new ArrayList<>();
 
+        int count = -1;
         for (String accKey : interactionMaps.keySet()) {
 
             List<Interaction> interactions = interactionMaps.get(accKey);
@@ -187,7 +191,9 @@ public class InteractionManager {
 
                 /** Set ID as first interaction identifier **/
                 if (interaction.getInteractionDetailsList().size() > 0) {
-                    interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
+                    String id = interaction.getInteractionDetailsList().get(0).getInteractionAc();
+                    if (id == null || id.isEmpty()) id = "" + count--;
+                    interactor.setId(id);
                 }
 
                 /** Set CLUSTER as the others Interactions identifiers **/
