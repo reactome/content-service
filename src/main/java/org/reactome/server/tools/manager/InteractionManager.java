@@ -153,8 +153,6 @@ public class InteractionManager {
     public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource){
         Interactors interactionMapper = new Interactors();
 
-        interactionMapper.setResource(resource);
-
         /** Check if it as another value in the enumeration **/
         ResourceURL resourceURL = ResourceURL.getByName(resource);
         if (resourceURL != null) {
@@ -203,10 +201,10 @@ public class InteractionManager {
             entity.setInteractors(interactorsResultList);
 
             entities.add(entity);
-
-            interactionMapper.setEntities(entities);
-
         }
+
+        interactionMapper.setResource(resource);
+        interactionMapper.setEntities(entities);
 
         return interactionMapper;
 
@@ -222,8 +220,6 @@ public class InteractionManager {
      */
     public Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
         Interactors interactionMapper = new Interactors();
-
-        interactionMapper.setResource(resource);
 
         /** Entities are a JSON Object **/
         List<InteractorEntity> entities = new ArrayList<>();
@@ -241,6 +237,7 @@ public class InteractionManager {
             }
         }
 
+        interactionMapper.setResource(resource);
         interactionMapper.setEntities(entities);
 
         return interactionMapper;
