@@ -19,13 +19,13 @@ public class Interactors {
      * (e.g http://identifier.org/chebi/CHEBI:##ID##)
      */
     @ApiModelProperty(value = "This is the URL for the Chemicals.")
-    private String chemicalURL = "http://identifiers.org/chebi/##ID##";
+    private String chemicalURL = "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=##ID##";
 
     /**
      *  (e.g. http://identifier.org/uniprot/##ID##)
      */
     @ApiModelProperty(value = "This is the URL for Proteins.")
-    private String proteinURL = "http://identifiers.org/uniprot/##ID##";
+    private String proteinURL = "http://www.uniprot.org/uniprot/##ID##";
 
     /**
      * (e.g. http://www.ebi.ac.uk/intact/pages/interactions/interactions.xhtml?query=##ID##)
