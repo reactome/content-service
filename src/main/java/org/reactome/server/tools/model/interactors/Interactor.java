@@ -2,6 +2,9 @@ package org.reactome.server.tools.model.interactors;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Maps an Interactor and the Interaction Id
  *
@@ -16,9 +19,14 @@ public class Interactor {
     @ApiModelProperty(value = "This is the Gene name of the given accession.")
     private String alias;
 
-    /** Interaction ID **/
+    /**
+     * Interaction ID
+     **/
     @ApiModelProperty(value = "This is the interaction ID of two accessions.")
-    private String id;
+    private String id = null;
+
+    @ApiModelProperty(value = "This is the clustered Interactions identifiers.")
+    private List<String> cluster = null;
 
     @ApiModelProperty(value = "This represents the confidence value of an interaction.")
     private Double score;
@@ -44,7 +52,17 @@ public class Interactor {
     }
 
     public void setId(String id) {
-        this.id = id;
+        if(id != null && !id.isEmpty()) {
+            this.id = id;
+        }
+    }
+
+    public List<String> getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(List<String> cluster) {
+        this.cluster = cluster;
     }
 
     public Double getScore() {
@@ -53,6 +71,16 @@ public class Interactor {
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    public void addCluster(String clusterIdentifier) {
+        if(clusterIdentifier != null && !clusterIdentifier.isEmpty()) {
+            if (cluster == null) {
+                cluster = new ArrayList<>();
+            }
+
+            cluster.add(clusterIdentifier);
+        }
     }
 
 }

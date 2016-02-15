@@ -5,11 +5,11 @@ import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
 import org.reactome.server.tools.interactors.model.Interaction;
-import org.reactome.server.tools.interactors.model.InteractionResource;
+import org.reactome.server.tools.interactors.model.InteractionDetails;
 import org.reactome.server.tools.interactors.model.PsicquicResource;
-import org.reactome.server.tools.interactors.service.InteractionResourceService;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.PsicquicService;
+import org.reactome.server.tools.interactors.util.ResourceURL;
 import org.reactome.server.tools.model.interactors.Interactor;
 import org.reactome.server.tools.model.interactors.InteractorEntity;
 import org.reactome.server.tools.model.interactors.Interactors;
@@ -31,30 +31,10 @@ public class InteractionManager {
     private InteractionService interactionService;
 
     @Autowired
-    private InteractionResourceService interactionResourceService;
-
-    @Autowired
     private PsicquicService psicquicService;
 
-    /**
-     * These attributes will be used to cache the resource
-     **/
-    private Map<String, InteractionResource> interactionResourceMap;
-
     public InteractionManager() {
-        this.interactionResourceMap = new HashMap<>();
-    }
 
-    /**
-     * Caching resources for easy access during json handling
-     *
-     * @throws SQLException
-     */
-    private void cacheStaticResources() throws SQLException {
-        List<InteractionResource> interactionResourceList = interactionResourceService.getAll();
-        for (InteractionResource interactionResource : interactionResourceList) {
-            interactionResourceMap.put(interactionResource.getName().toLowerCase(), interactionResource);
-        }
     }
 
     /**
@@ -64,9 +44,6 @@ public class InteractionManager {
      */
     public Interactors getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         try {
-            /** caching resources, get values from the Map **/
-            cacheStaticResources();
-
             /** Query database. Generic Layer. Don't need to know the DB to communicate here **/
             Map<String, List<Interaction>> interactionMaps = interactionService.getInteractions(accs, resource, page, pageSize);
 
@@ -178,6 +155,14 @@ public class InteractionManager {
 
         interactionMapper.setResource(resource);
 
+        /** Check if it as another value in the enumeration **/
+        ResourceURL resourceURL = ResourceURL.getByName(resource);
+        if (resourceURL != null) {
+            interactionMapper.setProteinURL(resourceURL.getProtein());
+            interactionMapper.setChemicalURL(resourceURL.getChemical());
+            interactionMapper.setInteractionURL(resourceURL.getInteraction());
+        }
+
         /** Entities are a JSON Object **/
         List<InteractorEntity> entities = new ArrayList<>();
 
@@ -202,8 +187,14 @@ public class InteractionManager {
 
                 interactor.setAlias(interaction.getInteractorB().getAlias());
 
-                if(interaction.getInteractionDetailsList().size() > 0) {
+                /** Set ID as first interaction identifier **/
+                if (interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setId(interaction.getInteractionDetailsList().get(0).getInteractionAc());
+                }
+
+                /** Set CLUSTER as the others Interactions identifiers **/
+                for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
+                    interactor.addCluster(interactionDetail.getInteractionAc());
                 }
 
                 interactorsResultList.add(interactor);
@@ -232,13 +223,13 @@ public class InteractionManager {
     public Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource){
         Interactors interactionMapper = new Interactors();
 
+        interactionMapper.setResource(resource);
+
         /** Entities are a JSON Object **/
         List<InteractorEntity> entities = new ArrayList<>();
 
         for (String accKey : summaryMap.keySet()) {
             Integer interactionsCount = summaryMap.get(accKey);
-
-            interactionMapper.setResource(resource);
 
             InteractorEntity entity = new InteractorEntity();
             entity.setAcc(accKey.trim());
@@ -248,7 +239,6 @@ public class InteractionManager {
             if(interactionsCount > 0) {
                 entities.add(entity);
             }
-
         }
 
         interactionMapper.setEntities(entities);
