@@ -19,17 +19,20 @@ public class Interactor {
     @ApiModelProperty(value = "This is the Gene name of the given accession.")
     private String alias;
 
-    /**
-     * Interaction ID
-     **/
-    @ApiModelProperty(value = "This is the interaction ID of two accessions.")
-    private String id = null;
+    @ApiModelProperty(value = "This is an auto increment counter which represents an unique number for the interaction.")
+    private Integer id = null;
 
-    @ApiModelProperty(value = "This is the clustered Interactions identifiers.")
-    private List<String> cluster = null;
+    @ApiModelProperty(value = "This is the Interactions identifiers evidences.")
+    private List<String> evidences = null;
 
-    @ApiModelProperty(value = "This represents the confidence value of an interaction.")
+    @ApiModelProperty(value = "This represents the confidence value (score) of an interaction.")
     private Double score;
+
+    @ApiModelProperty(value = "This represents the URL for given accession.")
+    private String accURL;
+
+    @ApiModelProperty(value = "This represents the URL for the given interactions identifiers.")
+    private String evidencesURL;
 
     public String getAcc() {
         return acc;
@@ -47,22 +50,20 @@ public class Interactor {
         this.alias = alias;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
-        if(id != null && !id.isEmpty()) {
-            this.id = id;
-        }
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public List<String> getCluster() {
-        return cluster;
+    public List<String> getEvidences() {
+        return evidences;
     }
 
-    public void setCluster(List<String> cluster) {
-        this.cluster = cluster;
+    public void setEvidences(List<String> evidences) {
+        this.evidences = evidences;
     }
 
     public Double getScore() {
@@ -73,14 +74,29 @@ public class Interactor {
         this.score = score;
     }
 
-    public void addCluster(String clusterIdentifier) {
-        if(clusterIdentifier != null && !clusterIdentifier.isEmpty()) {
-            if (cluster == null) {
-                cluster = new ArrayList<>();
+    public void addEvidence(String evidenceIdentifier) {
+        if (evidenceIdentifier != null && !evidenceIdentifier.isEmpty()) {
+            if (evidences == null) {
+                evidences = new ArrayList<>();
             }
 
-            cluster.add(clusterIdentifier);
+            evidences.add(evidenceIdentifier);
         }
     }
 
+    public String getAccURL() {
+        return accURL;
+    }
+
+    public void setAccURL(String accURL) {
+        this.accURL = accURL;
+    }
+
+    public String getEvidencesURL() {
+        return evidencesURL;
+    }
+
+    public void setEvidencesURL(String evidencesURL) {
+        this.evidencesURL = evidencesURL;
+    }
 }
