@@ -10,7 +10,6 @@
     <properties>
         <deploymentPath>/</deploymentPath>
         <spring.version>4.1.1.RELEASE</spring.version>
-        <jackson.version>1.9.13</jackson.version>
         <jdk.version>1.7</jdk.version>
     </properties>
 
