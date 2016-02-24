@@ -8,6 +8,7 @@ import org.reactome.server.tools.manager.DownloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,20 +25,22 @@ public class DownloadController {
     @Autowired
     public DownloadManager downloadManager;
 
-    //@ApiIgnore // Shall we change the url just for security ?
-    @ApiOperation(value = "Wrap interactor content into a TSV file")
-    @RequestMapping(value = "/{filename}", method = RequestMethod.POST, produces = "text/csv", headers = "Content-Type=application/x-www-form-urlencoded")
+    @ApiIgnore // Shall we change the url just for security ?
+    @ApiOperation(value = "Wrap interactor content into a CSV file")
+    @RequestMapping(value = "/{filename}", method = RequestMethod.POST, consumes = "text/plain", produces = "text/csv", headers = "Content-Type=application/x-www-form-urlencoded")
     @ResponseBody
     public FileSystemResource downloadFile(@ApiParam(value = "Interactor accessions (or identifiers)", required = true)
                                                          @RequestParam String content,
-                                                         @ApiParam(name = "filename", value = "the file name for the downloaded information", required = true, defaultValue = "result")
+                                                         @ApiParam(name = "filename", value = "the file name for the downloaded information", required = true, defaultValue = "result.csv")
                                                          @PathVariable String filename) throws IOException {
 
         String ext = FilenameUtils.getExtension(filename);
         File file = File.createTempFile(filename, ext);
         FileWriter fw = new FileWriter(file);
 
-        fw.write(content);
+        for (String line : content.split("#NL#")) {
+            fw.write(line + "\n");
+        }
 
         fw.flush();
         fw.close();
