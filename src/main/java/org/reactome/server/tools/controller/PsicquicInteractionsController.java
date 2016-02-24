@@ -40,7 +40,7 @@ public class PsicquicInteractionsController {
     }
 
     @ApiOperation(value = "Retrieve a detailed clustered interaction, sorted by score, of a given accession(s) by resource.", response = Interactors.class, produces = "application/json")
-    @RequestMapping(value = "/proteins/{resource}/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
+    @RequestMapping(value = "/molecules/{resource}/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsDetailsByResource(@ApiParam(value="PSICQUIC Resource",required = true) @PathVariable String resource,
                                                     @ApiParam(value="Accessions",required = true) @RequestBody String proteins) {
@@ -61,7 +61,7 @@ public class PsicquicInteractionsController {
     }
 
     @ApiOperation(value = "Retrieve a summary of a given accession list by resource.", response = Interactors.class, produces = "application/json")
-    @RequestMapping(value = "/proteins/{resource}/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
+    @RequestMapping(value = "/molecules/{resource}/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsSummaryByResource(@ApiParam(value="PSICQUIC Resource",required = true) @PathVariable String resource,
                                                     @ApiParam(value="Accessions",required = true) @RequestBody String proteins) {
