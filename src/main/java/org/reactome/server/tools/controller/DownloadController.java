@@ -1,6 +1,5 @@
 package org.reactome.server.tools.controller;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.FilenameUtils;
@@ -18,7 +17,7 @@ import java.io.IOException;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 @RestController
-@Api(value = "/download", description = "Download Molecule interactors")
+//@Api(value = "/download", description = "Download Molecule interactors")
 @RequestMapping("/download")
 public class DownloadController {
 
