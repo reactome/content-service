@@ -120,27 +120,6 @@ public class InteractionManager {
      */
     public List<PsicquicResource> getPsicquicResources() {
         try {
-            /**
-             * TEMPORARY SOLUTION: Remove service with issues.
-             *      Theses services are active but throwing exception. We decided to remove them from the list:
-             *      MatrixDB, I2D, Spike
-             *
-             * These services have errors in the SOAP services, now we are querying REST
-             */
-            //List<PsicquicResource> registries = psicquicService.getResources();
-
-//            Iterator<PsicquicResource> iterator = registries.iterator();
-//            while (iterator.hasNext()) {
-//                PsicquicResource registry = iterator.next();
-//
-//                if (registry.getName().equalsIgnoreCase("MatrixDB") //||
-//                        //registry.getName().equalsIgnoreCase("I2D") ||
-//                        //registry.getName().equalsIgnoreCase("Spike")
-//                        ){
-//                    iterator.remove();
-//                }
-//            }
-
             return psicquicService.getResources();
         } catch (PsicquicInteractionClusterException e) {
             throw new PsicquicContentException(e);
@@ -193,15 +172,10 @@ public class InteractionManager {
                 for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
                     String evidence = interactionDetail.getInteractionAc();
                     evidencesWithDbNames.add(evidence);
+                }
 
-                    /** If evidence has # so the client has different cross databases in its interactions **/
-                    if (evidence.contains("#")) {
-                        String[] evidences = evidence.split("#");
-                        evidence = evidences[0];
-                        //evidences[1] is the dbSource, we only need to build the url properly.
-                    }
-
-                    interactor.addEvidence(evidence);
+                if(interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
+                    interactor.setEvidences(interaction.getInteractionDetailsList().size());
                 }
 
                 /** Accession URL **/
