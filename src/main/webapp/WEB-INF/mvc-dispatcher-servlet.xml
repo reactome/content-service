@@ -32,6 +32,10 @@
 
     <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10485760"/> <!-- 10 MB  // 52428800 = 50 MB-->
+    </bean>
+
     <!-- Configuration for the Interactors-Core components -->
     <bean id="interactorsDB" class="org.reactome.server.tools.interactors.database.InteractorsDatabase">
         <constructor-arg name="fileName" value="${interactors.static.db}"/>
