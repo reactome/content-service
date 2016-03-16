@@ -169,9 +169,11 @@ public class InteractionManager {
                 List<String> evidencesWithDbNames = new ArrayList<>();
 
                 /** Set Evidences as the others Interactions identifiers **/
-                for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
-                    String evidence = interactionDetail.getInteractionAc();
-                    evidencesWithDbNames.add(evidence);
+                if(interaction.getInteractionDetailsList() != null) {
+                    for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
+                        String evidence = interactionDetail.getInteractionAc();
+                        evidencesWithDbNames.add(evidence);
+                    }
                 }
 
                 if(interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
