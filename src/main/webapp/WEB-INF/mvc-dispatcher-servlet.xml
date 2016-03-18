@@ -24,7 +24,10 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+
     <context:property-placeholder location="classpath:/service.properties" />
+
+    <mvc:resources mapping="/**" location="/resources/" />
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
@@ -56,6 +59,10 @@
     </bean>
     <bean id="interactorService" class="org.reactome.server.tools.interactors.service.InteractorService">
         <constructor-arg name="database" ref="interactorsDB"/>
+    </bean>
+
+    <bean id="templateCacher" class="org.reactome.server.tools.utils.HeaderFooterCacher">
+        <constructor-arg name="server" value="http://dev2.reactome.org/"/>
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
