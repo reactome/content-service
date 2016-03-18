@@ -21,7 +21,7 @@ import java.util.*;
  */
 
 
-@Api(value = "tuple", description = "Tuple Overlay Controller")
+@Api(tags = "tuple", description = "Tuple Overlay Controller")
 @RequestMapping(value = "/tuple")
 @RestController
 public class CustomInteractionsController {

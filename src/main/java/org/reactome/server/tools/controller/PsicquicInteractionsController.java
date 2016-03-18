@@ -17,7 +17,7 @@ import java.util.*;
  */
 
 @RestController
-@Api(value = "/interactors", description = "Molecule interactors")
+@Api(tags ="interactors", description = "Molecule interactors")
 @RequestMapping("/interactors/psicquic")
 public class PsicquicInteractionsController {
 
