@@ -14,7 +14,7 @@ import org.reactome.server.tools.model.interactors.Interactor;
 import org.reactome.server.tools.model.interactors.InteractorEntity;
 import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@Controller
+@Component
 public class InteractionManager {
     /**
      * Holds the services that query the DB

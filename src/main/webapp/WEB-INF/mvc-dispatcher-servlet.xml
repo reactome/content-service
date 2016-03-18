@@ -9,13 +9,14 @@
 
     <context:component-scan base-package="org.reactome.server"/>
 
+    <!-- Standard xml based mvc config-->
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="objectMapper">
                     <bean class="com.fasterxml.jackson.databind.ObjectMapper">
                         <property name="serializationInclusion">
-                            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                            <value>NON_NULL</value>
                         </property>
                     </bean>
                 </property>
@@ -54,4 +55,13 @@
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
+
+    <!-- Enables swgger ui-->
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+
+    <!-- Include a swagger configuration-->
+    <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
+
+
 </beans>

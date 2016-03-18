@@ -11,7 +11,7 @@ import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.util.InteractorConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@Controller
+@Component
 public class DownloadManager {
 
     /**
