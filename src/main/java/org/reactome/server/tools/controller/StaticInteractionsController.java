@@ -19,7 +19,7 @@ import java.util.Set;
  */
 
 @RestController
-@Api(value = "/interactors", description = "Molecule interactors")
+@Api(tags = "interactors", description = "Molecule interactors")
 @RequestMapping("/interactors/static")
 public class StaticInteractionsController {
 

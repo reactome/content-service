@@ -69,4 +69,33 @@ public class CustomInteractionsController {
         return summary;
 
     }
+
+    @RequestMapping(value = "/token/{token}", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
+    @ResponseBody
+    public Interactors getInteractors(@ApiParam(name = "token", required = true, value = "A token associated with you data submission")
+                                      @PathVariable String token,
+                                      @ApiParam(value = "Interactor accessions", required = true)
+                                      @RequestBody String proteins) {
+
+        /** Split param and put into a Set to avoid duplicates **/
+        Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
+
+        Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
+
+        return interactionManager.getDetailInteractionResult(interactionMap, "custom");
+
+    }
+
+    @RequestMapping(value = "/token/listall", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<Token> listAllTokens() {
+        List<Token> tokens = new ArrayList<>();
+
+        Map<Token, Summary> all = CustomInteractionManager.tokenMap;
+        for (Token token : all.keySet()) {
+            tokens.add(token);
+        }
+
+       return tokens;
+    }
 }
