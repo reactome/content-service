@@ -2,14 +2,18 @@ package org.reactome.server.tools.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.tuple.model.Summary;
+import org.reactome.server.tools.interactors.tuple.token.Token;
 import org.reactome.server.tools.manager.CustomInteractionManager;
 import org.reactome.server.tools.manager.InteractionManager;
+import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.*;
 
 
 /**
@@ -96,6 +100,6 @@ public class CustomInteractionsController {
             tokens.add(token);
         }
 
-       return tokens;
+        return tokens;
     }
 }
