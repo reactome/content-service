@@ -100,6 +100,6 @@ public class CustomInteractionsController {
             tokens.add(token);
         }
 
-       return tokens;
+        return tokens;
     }
 }
