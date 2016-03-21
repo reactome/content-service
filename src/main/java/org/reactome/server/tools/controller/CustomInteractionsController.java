@@ -2,18 +2,14 @@ package org.reactome.server.tools.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.tuple.model.Summary;
-import org.reactome.server.tools.interactors.tuple.token.Token;
 import org.reactome.server.tools.manager.CustomInteractionManager;
 import org.reactome.server.tools.manager.InteractionManager;
-import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
 
 
 /**
@@ -21,8 +17,8 @@ import java.util.*;
  */
 
 
-@Api(value = "tuple", description = "Tuple Overlay Controller")
-@RequestMapping(value = "/tuple")
+@Api(value = "interactors", description = "Tuple Overlay Controller")
+@RequestMapping(value = "/interactors/upload/tuple")
 @RestController
 public class CustomInteractionsController {
 
@@ -46,7 +42,7 @@ public class CustomInteractionsController {
         return summary;
     }
 
-    @RequestMapping(value = "/file", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
+    @RequestMapping(value = "/content", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
     public Summary getPostFileContent(@ApiParam(name = "file content", value = "The file content with data to be analysed", required = true)
                                       @RequestBody String fileContent) {
@@ -72,34 +68,5 @@ public class CustomInteractionsController {
 
         return summary;
 
-    }
-
-    @RequestMapping(value = "/token/{token}", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
-    @ResponseBody
-    public Interactors getInteractors(@ApiParam(name = "token", required = true, value = "A token associated with you data submission")
-                                      @PathVariable String token,
-                                      @ApiParam(value = "Interactor accessions", required = true)
-                                      @RequestBody String proteins) {
-
-        /** Split param and put into a Set to avoid duplicates **/
-        Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-
-        Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
-
-        return interactionManager.getDetailInteractionResult(interactionMap, "custom");
-
-    }
-
-    @RequestMapping(value = "/token/listall", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public List<Token> listAllTokens() {
-        List<Token> tokens = new ArrayList<>();
-
-        Map<Token, Summary> all = CustomInteractionManager.tokenMap;
-        for (Token token : all.keySet()) {
-            tokens.add(token);
-        }
-
-       return tokens;
     }
 }
