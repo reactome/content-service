@@ -42,7 +42,7 @@ public class TokenController {
 
         Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
 
-        return interactionManager.getDetailInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME);
+        return interactionManager.getCustomInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME, token);
     }
 
     @RequestMapping(value = "/token/listall", method = RequestMethod.GET, produces = "application/json")
