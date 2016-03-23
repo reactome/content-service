@@ -38,7 +38,7 @@ public class HeaderFooterCacher extends Thread {
     public HeaderFooterCacher(String server) {
         if(server!=null && !server.isEmpty()) {
             this.server = server;
-            logger.info("Thread to keep the header/footer updated started");
+            logger.debug("Thread to keep the header/footer updated started");
             start();
         }
     }
@@ -73,7 +73,7 @@ public class HeaderFooterCacher extends Thread {
             FileOutputStream out = new FileOutputStream(file);
             out.write(content.getBytes());
             out.close();
-            logger.info(file + " updated succesfully");
+            logger.debug(file + " updated succesfully");
         } catch (Exception e) {
             logger.error("Error updating " + fileName, e);
         }

@@ -1,38 +1,40 @@
 package org.reactome.server.tools.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.reactome.server.tools.interactors.model.Interaction;
-import org.reactome.server.tools.interactors.tuple.model.Summary;
-import org.reactome.server.tools.interactors.tuple.token.Token;
-import org.reactome.server.tools.manager.CustomInteractionManager;
+import org.reactome.server.tools.interactors.tuple.model.CustomInteractorRepository;
+import org.reactome.server.tools.manager.CustomInteractorManager;
 import org.reactome.server.tools.manager.InteractionManager;
 import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.*;
 
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
-@Api(value = "interactors", description = "Tuple Overlay Controller")
+@Api(tags = "interactors", description = "Molecule interactors")
 @RequestMapping(value = "/interactors/token")
 @RestController
-public class CustomInteractors {
+public class TokenController {
+
+    private static final String CUSTOM_RESOURCE_NAME = "custom";
 
     @Autowired
-    public CustomInteractionManager customInteractionManager;
+    public CustomInteractorManager customInteractionManager;
 
     @Autowired
     public InteractionManager interactionManager;
 
+    @ApiOperation(value = "Retrieve custom interactions associated with a token", response = Interactors.class, produces = "application/json")
     @RequestMapping(value = "/{token}", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
-    public Interactors getInteractors(@ApiParam(name = "token", required = true, value = "A token associated with you data submission")
+    public Interactors getInteractors(@ApiParam(value = "A token associated with a data submission", required = true)
                                       @PathVariable String token,
-                                      @ApiParam(value = "Interactor accessions", required = true)
+                                      @ApiParam(value = "Interactors accessions", required = true)
                                       @RequestBody String proteins) {
 
         /** Split param and put into a Set to avoid duplicates **/
@@ -40,22 +42,13 @@ public class CustomInteractors {
 
         Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
 
-        return interactionManager.getDetailInteractionResult(interactionMap, "custom");
-
+        return interactionManager.getDetailInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME);
     }
 
-    @ApiIgnore
-    @RequestMapping(value = "/listall", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/token/listall", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     @Deprecated
-    public List<Token> listAllTokens() {
-        List<Token> tokens = new ArrayList<>();
-
-        Map<Token, Summary> all = CustomInteractionManager.tokenMap;
-        for (Token token : all.keySet()) {
-            tokens.add(token);
-        }
-
-        return tokens;
+    public Set<String> listAllTokens() {
+        return CustomInteractorRepository.getKeys();
     }
 }

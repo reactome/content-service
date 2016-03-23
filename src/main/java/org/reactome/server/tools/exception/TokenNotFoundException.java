@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 
 public class TokenNotFoundException  extends ContentServiceException {
 
-    public TokenNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "Token not found");
+    public TokenNotFoundException(String token) {
+        super(HttpStatus.NOT_FOUND, "Token [" + token + "] not found");
     }
 
 }

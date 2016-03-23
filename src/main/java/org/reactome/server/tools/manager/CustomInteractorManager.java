@@ -1,5 +1,6 @@
 package org.reactome.server.tools.manager;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -10,9 +11,9 @@ import org.reactome.server.tools.interactors.model.Interactor;
 import org.reactome.server.tools.interactors.tuple.exception.ParserException;
 import org.reactome.server.tools.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.tools.interactors.tuple.model.CustomInteraction;
-import org.reactome.server.tools.interactors.tuple.model.Summary;
+import org.reactome.server.tools.interactors.tuple.model.CustomInteractorRepository;
+import org.reactome.server.tools.interactors.tuple.model.TupleResult;
 import org.reactome.server.tools.interactors.tuple.model.UserDataContainer;
-import org.reactome.server.tools.interactors.tuple.token.Token;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
 import org.reactome.server.tools.interactors.util.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyManagementException;
@@ -34,19 +36,17 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 @Controller
-public class CustomInteractionManager {
+public class CustomInteractorManager {
 
-    private static Logger logger = Logger.getLogger(CustomInteractionManager.class);
-
-    public static Map<Token, Summary> tokenMap = new HashMap<>();
+    private static Logger logger = Logger.getLogger(CustomInteractorManager.class);
 
     @Autowired
     CommonsMultipartResolver multipartResolver;
 
-    public Summary getUserDataContainer(InputStream is) {
-        Summary summary = null;
+    public TupleResult getUserDataContainer(String name, String filename, InputStream is) {
+        TupleResult result = null;
         try {
-            summary = ParserUtils.getUserDataContainer(is);
+            result = ParserUtils.getUserDataContainer(name, filename, is);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TupleParserException e) {
@@ -55,25 +55,14 @@ public class CustomInteractionManager {
             throw new DataFormatException(e.getMessage());
         }
 
-        return summary;
+        return result;
     }
 
-    public Summary getUserDataContainer(String input) {
-        Summary summary = null;
-        try {
-            summary = ParserUtils.getUserDataContainer(IOUtils.toInputStream(input));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TupleParserException e) {
-            throw new DataFormatException(e.getErrorMessages());
-        } catch (ParserException e) {
-            throw new DataFormatException(e.getMessage());
-        }
-
-        return summary;
+    public TupleResult getUserDataContainer(String name, String filename, String input) {
+        return getUserDataContainer(name, filename, IOUtils.toInputStream(input));
     }
 
-    public Summary getUserDataContainerFromURL(String url) {
+    public TupleResult getUserDataContainerFromURL(String name, String filename, String url) {
         if (url != null && !url.isEmpty()) {
             InputStream is;
             try {
@@ -104,7 +93,7 @@ public class CustomInteractionManager {
 
 
             try {
-                return ParserUtils.getUserDataContainer(is);
+                return ParserUtils.getUserDataContainer(name, filename, is);
             } catch (IOException e) {
                 throw new UnsupportedMediaTypeException();
             } catch (TupleParserException e) {
@@ -122,7 +111,8 @@ public class CustomInteractionManager {
     }
 
     /**
-     * Copied from analysis project.
+     * Accepts certificate in case user provides a https url
+     * REMARKED: Copied from Analysis project.
      */
     private void doTrustToCertificates() throws NoSuchAlgorithmException, KeyManagementException {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
@@ -163,6 +153,7 @@ public class CustomInteractionManager {
         for (CustomInteraction customInteraction : customInteractionSet) {
             Interaction interaction = new Interaction();
 
+            /** create interactor A **/
             Interactor interactorA = new Interactor();
             interactorA.setAcc(customInteraction.getInteractorIdA());
             interactorA.setAlias(customInteraction.getAliasInteractorA());
@@ -171,6 +162,7 @@ public class CustomInteractionManager {
             }
             interactorA.setSynonyms(customInteraction.getAlternativeInteractorA());
 
+            /** create interactor A **/
             Interactor interactorB = new Interactor();
             interactorB.setAcc(customInteraction.getInteractorIdB());
             interactorB.setAlias(customInteraction.getAliasInteractorB());
@@ -179,15 +171,18 @@ public class CustomInteractionManager {
             }
             interactorB.setSynonyms(customInteraction.getAlternativeInteractorB());
 
+            /** set interactor A and B in the interaction **/
             interaction.setInteractorA(interactorA);
             interaction.setInteractorB(interactorB);
 
+            /** set score **/
             if (StringUtils.isNotEmpty(customInteraction.getConfidenceValue())) {
                 if (Toolbox.isNumeric(customInteraction.getConfidenceValue())) {
                     interaction.setIntactScore(Double.parseDouble(customInteraction.getConfidenceValue()));
                 }
             }
 
+            /** set evidences list **/
             if (StringUtils.isNotEmpty(customInteraction.getInteractionIdentifier())) {
                 InteractionDetails evidences = new InteractionDetails();
                 evidences.setInteractionAc(customInteraction.getInteractionIdentifier());
@@ -195,6 +190,7 @@ public class CustomInteractionManager {
                 interaction.addInteractionDetails(evidences);
             }
 
+            /** add into interactions list **/
             interactions.add(interaction);
 
         }
@@ -202,7 +198,6 @@ public class CustomInteractionManager {
         return interactions;
 
     }
-
 
     /**
      * Of a given token and (list) proteins retrieve all interactions.
@@ -216,25 +211,18 @@ public class CustomInteractionManager {
         // The return can be a list of something
         Set<CustomInteraction> customInteractionSet = new HashSet<>();
 
-
-        Token token = new Token(tokenStr);
-
-        if (!tokenMap.containsKey(token)) {
-            throw new TokenNotFoundException();
+        /**
+         * Check if token exists in the Repository.
+         */
+        if (!CustomInteractorRepository.getKeys().contains(tokenStr)) {
+            throw new TokenNotFoundException(tokenStr);
         }
 
-        //if(!TokenUtil.isValid(token)) {
-        //throw new TokenExpiredException();
-        //}
-
         /** Retrieve stored summary associated with given token **/
-        Summary summary = tokenMap.get(token);
-
-        /** Get user data **/
-        UserDataContainer data = summary.getData();
+        UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
 
         /** Get custom interactions **/
-        Set<CustomInteraction> allInteractions = data.getCustomInteractions();
+        Set<CustomInteraction> allInteractions = udc.getCustomInteractions();
 
         for (String singleAccession : proteins) {
             // Check if singleAccession contains in A or B in the Interaction List
@@ -255,8 +243,21 @@ public class CustomInteractionManager {
         return interactionMap;
     }
 
-    public void saveToken(Summary summary) {
-        tokenMap.put(summary.getToken(), summary);
+    /**
+     * Retrieve the filename of a given url
+     *
+     * @return String as filename
+     */
+    public String getFileNameFromURL(String url) {
+        String name = "";
+        if (url != null && !url.isEmpty()) {
+            try {
+                name = FilenameUtils.getName((new URL(url)).getFile());
+            } catch (MalformedURLException e) {
+                /*Nothing here*/
+            }
+        }
+        return name;
     }
 
 }

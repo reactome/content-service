@@ -1,0 +1,125 @@
+/*/!* http://meyerweb.com/eric/tools/css/reset/ v2.0 | 20110126 *!/*/
+html,
+body,
+.reset-swagger div,
+.reset-swagger span,
+.reset-swagger applet,
+.reset-swagger object,
+.reset-swagger iframe,
+.reset-swagger h1,
+.reset-swagger h2,
+.reset-swagger h3,
+.reset-swagger h4,
+.reset-swagger h5,
+.reset-swagger h6,
+.reset-swagger p,
+.reset-swagger blockquote,
+.reset-swagger a,
+.reset-swagger abbr,
+.reset-swagger acronym,
+.reset-swagger address,
+.reset-swagger big,
+.reset-swagger cite,
+.reset-swagger code,
+.reset-swagger del,
+.reset-swagger dfn,
+.reset-swagger em,
+.reset-swagger img,
+.reset-swagger ins,
+.reset-swagger kbd,
+.reset-swagger q,
+.reset-swagger s,
+.reset-swagger samp,
+.reset-swagger small,
+.reset-swagger strike,
+.reset-swagger strong,
+.reset-swagger sub,
+.reset-swagger sup,
+.reset-swagger tt,
+.reset-swagger var,
+.reset-swagger b,
+.reset-swagger u,
+.reset-swagger i,
+.reset-swagger center,
+.reset-swagger dl,
+.reset-swagger dt,
+.reset-swagger dd,
+.reset-swagger ol,
+.reset-swagger ul,
+.reset-swagger li,
+.reset-swagger fieldset,
+.reset-swagger form,
+.reset-swagger label,
+.reset-swagger legend,
+.reset-swagger table,
+.reset-swagger caption,
+.reset-swagger tbody,
+.reset-swagger tfoot,
+.reset-swagger thead,
+.reset-swagger tr,
+.reset-swagger th,
+.reset-swagger td,
+.reset-swagger article,
+.reset-swagger aside,
+.reset-swagger canvas,
+.reset-swagger details,
+.reset-swagger embed,
+.reset-swagger figure,
+.reset-swagger figcaption,
+.reset-swagger footer,
+.reset-swagger header,
+.reset-swagger hgroup,
+.reset-swagger menu,
+.reset-swagger nav,
+.reset-swagger output,
+.reset-swagger ruby,
+.reset-swagger section,
+.reset-swagger summary,
+.reset-swagger time,
+.reset-swagger mark,
+.reset-swagger audio,
+.reset-swagger video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+ /*HTML5 display-role reset for older browsers*/
+.reset-swagger article,
+.reset-swagger aside,
+.reset-swagger details,
+.reset-swagger figcaption,
+.reset-swagger figure,
+.reset-swagger footer,
+.reset-swagger header,
+.reset-swagger hgroup,
+.reset-swagger menu,
+.reset-swagger nav,
+.reset-swagger section {
+  display: block;
+}
+.reset-swagger body {
+  line-height: 1;
+}
+.reset-swagger ol,
+.reset-swagger ul {
+  list-style: none;
+}
+.reset-swagger blockquote,
+.reset-swagger q {
+  quotes: none;
+}
+.reset-swagger blockquote:before,
+.reset-swagger blockquote:after,
+.reset-swagger q:before,
+.reset-swagger q:after {
+  content: '';
+  content: none;
+}
+.reset-swagger table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
