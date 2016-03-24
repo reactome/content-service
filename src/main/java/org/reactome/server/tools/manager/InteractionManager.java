@@ -123,7 +123,7 @@ public class InteractionManager {
         try {
             return psicquicService.getResources();
         } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+            throw new PsicquicContentException("Couldn't load PSICQUIC Resources");
         }
     }
 

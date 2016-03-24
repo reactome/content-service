@@ -38,7 +38,7 @@ public class CustomInteractorsController {
                                 @ApiParam(name = "file", required = true, value = "Upload your custom interactor file")
                                 @RequestPart(required = true) MultipartFile file) throws IOException {
 
-        return customInteractionManager.getUserDataContainer(name, file.getName(), file.getInputStream());
+        return customInteractionManager.getUserDataContainer(name, file.getOriginalFilename(), file.getInputStream());
     }
 
     @ApiOperation(value = "Paste file content and get a summary associated with a token", response = TupleResult.class, produces = "application/json")

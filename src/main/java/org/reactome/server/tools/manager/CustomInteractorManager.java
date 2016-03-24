@@ -147,7 +147,7 @@ public class CustomInteractorManager {
     /**
      * Gets CustomInteraction set and convert it into Interactions
      */
-    private List<Interaction> converteCustomInteraction(Set<CustomInteraction> customInteractionSet) {
+    private List<Interaction> converteCustomInteraction(String searchTerm, Set<CustomInteraction> customInteractionSet) {
         List<Interaction> interactions = new ArrayList<>(customInteractionSet.size());
 
         for (CustomInteraction customInteraction : customInteractionSet) {
@@ -171,9 +171,14 @@ public class CustomInteractorManager {
             }
             interactorB.setSynonyms(customInteraction.getAlternativeInteractorB());
 
-            /** set interactor A and B in the interaction **/
-            interaction.setInteractorA(interactorA);
-            interaction.setInteractorB(interactorB);
+            /** keep the search term, always in side A **/
+            if(searchTerm.equals(interactorA.getAcc())) {
+                interaction.setInteractorA(interactorA);
+                interaction.setInteractorB(interactorB);
+            }else {
+                interaction.setInteractorA(interactorB);
+                interaction.setInteractorB(interactorA);
+            }
 
             /** set score **/
             if (StringUtils.isNotEmpty(customInteraction.getConfidenceValue())) {
@@ -194,6 +199,9 @@ public class CustomInteractorManager {
             interactions.add(interaction);
 
         }
+
+        Collections.sort(interactions);
+        Collections.reverse(interactions);
 
         return interactions;
 
@@ -235,7 +243,9 @@ public class CustomInteractorManager {
                 }
             }
 
-            List<Interaction> interactions = converteCustomInteraction(customInteractionSet);
+            List<Interaction> interactions = converteCustomInteraction(singleAccession, customInteractionSet);
+
+
             interactionMap.put(singleAccession, interactions);
 
         }
