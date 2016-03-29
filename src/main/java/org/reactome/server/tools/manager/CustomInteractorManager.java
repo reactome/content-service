@@ -257,7 +257,7 @@ public class CustomInteractorManager {
             throw new TokenNotFoundException(tokenStr);
         }
 
-        if (tokenStr.startsWith("{PSI}")) {
+        if (tokenStr.startsWith("PSI")) {
             interactionMap = getInteractorFromCustomPsicquic(tokenStr, proteins);
         } else {
             interactionMap = getInteractorFromCustomDataSubmission(tokenStr, proteins);
