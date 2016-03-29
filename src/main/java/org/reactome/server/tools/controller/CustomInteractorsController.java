@@ -17,7 +17,6 @@ import java.io.IOException;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 
-
 @Api(tags = "interactors", description = "Molecule interactors")
 @RequestMapping(value = "/interactors/upload/tuple")
 @RestController

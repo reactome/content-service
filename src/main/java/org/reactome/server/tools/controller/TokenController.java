@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.tuple.model.CustomInteractorRepository;
+import org.reactome.server.tools.interactors.tuple.model.CustomPsicquicRepository;
 import org.reactome.server.tools.manager.CustomInteractorManager;
 import org.reactome.server.tools.manager.InteractionManager;
 import org.reactome.server.tools.model.interactors.Interactors;
@@ -50,5 +51,19 @@ public class TokenController {
     @Deprecated
     public Set<String> listAllTokens() {
         return CustomInteractorRepository.getKeys();
+    }
+
+    @RequestMapping(value = "/token/listallpsicq", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    @Deprecated
+    public Set<String> listAllTokensPsicquic() {
+        return CustomPsicquicRepository.getKeys();
+    }
+
+    @RequestMapping(value = "/token/listpsicquicrepo", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    @Deprecated
+    public Map<String, String> listPsicquicRepo() {
+        return CustomPsicquicRepository.getAll();
     }
 }

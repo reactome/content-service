@@ -5,15 +5,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.reactome.server.tools.exception.*;
+import org.reactome.server.tools.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
 import org.reactome.server.tools.interactors.model.Interactor;
+import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.tuple.exception.ParserException;
 import org.reactome.server.tools.interactors.tuple.exception.TupleParserException;
-import org.reactome.server.tools.interactors.tuple.model.CustomInteraction;
-import org.reactome.server.tools.interactors.tuple.model.CustomInteractorRepository;
-import org.reactome.server.tools.interactors.tuple.model.TupleResult;
-import org.reactome.server.tools.interactors.tuple.model.UserDataContainer;
+import org.reactome.server.tools.interactors.tuple.model.*;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
 import org.reactome.server.tools.interactors.util.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,9 @@ import java.util.*;
 public class CustomInteractorManager {
 
     private static Logger logger = Logger.getLogger(CustomInteractorManager.class);
+
+    @Autowired
+    PsicquicService psicquicService;
 
     @Autowired
     CommonsMultipartResolver multipartResolver;
@@ -104,6 +106,38 @@ public class CustomInteractorManager {
         }
 
         throw new UnsupportedMediaTypeException();
+    }
+
+    public TupleResult registryCustomPsicquic(String name, String psicquicURL) {
+        //InputStream is;
+        try {
+            HttpURLConnection conn;
+            URL aux = new URL(psicquicURL);
+            if (aux.getProtocol().contains("https")) {
+                doTrustToCertificates(); //accepting the certificate by default
+                conn = (HttpsURLConnection) aux.openConnection();
+                //conn = tmpConn;
+            } else {
+                URLConnection tmpConn = aux.openConnection();
+                conn = (HttpURLConnection) tmpConn;
+            }
+
+            // THIS VALIDATION IS NOT WORKING. PSIQUIC Service does not have landing page, then it returns 404
+            /*if (conn.getResponseCode() != HttpStatus.OK.value()) {
+                throw new UnreachableException(conn.getResponseCode());
+            }*/
+
+        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+            throw new UnprocessableEntityException();
+        }
+
+        try {
+            return ParserUtils.processCustomPsicquic(name, psicquicURL);
+        } catch (TupleParserException e) {
+            throw new DataFormatException(e.getErrorMessages());
+        } catch (ParserException e) {
+            throw new DataFormatException(e.getMessage());
+        }
     }
 
     private boolean isAcceptedContentType(String contentType) {
@@ -172,10 +206,10 @@ public class CustomInteractorManager {
             interactorB.setSynonyms(customInteraction.getAlternativeInteractorB());
 
             /** keep the search term, always in side A **/
-            if(searchTerm.equals(interactorA.getAcc())) {
+            if (searchTerm.equals(interactorA.getAcc())) {
                 interaction.setInteractorA(interactorA);
                 interaction.setInteractorB(interactorB);
-            }else {
+            } else {
                 interaction.setInteractorA(interactorB);
                 interaction.setInteractorB(interactorA);
             }
@@ -214,17 +248,28 @@ public class CustomInteractorManager {
      * @return for a given pr
      */
     public Map<String, List<Interaction>> getInteractionsByTokenAndProteins(String tokenStr, Set<String> proteins) {
-        Map<String, List<Interaction>> interactionMap = new HashMap<>();
-
-        // The return can be a list of something
-        Set<CustomInteraction> customInteractionSet = new HashSet<>();
+        Map<String, List<Interaction>> interactionMap;
 
         /**
          * Check if token exists in the Repository.
          */
-        if (!CustomInteractorRepository.getKeys().contains(tokenStr)) {
+        if (!CustomInteractorRepository.getKeys().contains(tokenStr) && !CustomPsicquicRepository.getKeys().contains(tokenStr)) {
             throw new TokenNotFoundException(tokenStr);
         }
+
+        if (tokenStr.startsWith("{PSI}")) {
+            interactionMap = getInteractorFromCustomPsicquic(tokenStr, proteins);
+        } else {
+            interactionMap = getInteractorFromCustomDataSubmission(tokenStr, proteins);
+        }
+
+        return interactionMap;
+    }
+
+    private Map<String, List<Interaction>> getInteractorFromCustomDataSubmission(String tokenStr, Set<String> proteins) {
+        Map<String, List<Interaction>> interactionMap = new HashMap<>();
+
+        Set<CustomInteraction> customInteractionSet = new HashSet<>();
 
         /** Retrieve stored summary associated with given token **/
         UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
@@ -245,9 +290,23 @@ public class CustomInteractorManager {
 
             List<Interaction> interactions = converteCustomInteraction(singleAccession, customInteractionSet);
 
-
             interactionMap.put(singleAccession, interactions);
 
+        }
+
+        return interactionMap;
+    }
+
+    private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String tokenStr, Set<String> proteins) {
+        Map<String, List<Interaction>> interactionMap;
+
+        /** Retrieve stored summary associated with given token **/
+        String url = CustomPsicquicRepository.getByToken(tokenStr);
+
+        try {
+            interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);
+        } catch (CustomPsicquicInteractionClusterException e) {
+            throw new PsicquicContentException("Error querying your PSICQUIC Resource.");
         }
 
         return interactionMap;
