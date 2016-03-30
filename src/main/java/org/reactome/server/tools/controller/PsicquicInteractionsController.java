@@ -17,7 +17,7 @@ import java.util.*;
  */
 
 @RestController
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags ="interactors", description = "Molecule interactors")
 @RequestMapping("/interactors/psicquic")
 public class PsicquicInteractionsController {
 
@@ -34,7 +34,7 @@ public class PsicquicInteractionsController {
         return interactions.getPsicquicResources();
     }
 
-    @ApiOperation(value = "Retrieve a detailed clustered interaction, sorted by score, of a given accession by resource.", response = Interactors.class, produces = "application/json")
+    @ApiOperation(value = "Retrieve clustered interaction, sorted by score, of a given accession by resource.", response = Interactors.class, produces = "application/json")
     @RequestMapping(value = "/{resource}/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Interactors getProteinDetailsByResource(@ApiParam(value="PSICQUIC Resource",required = true) @PathVariable String resource,
@@ -43,7 +43,7 @@ public class PsicquicInteractionsController {
         return interactions.getPsicquicProteinsDetails(Collections.singletonList(acc), resource);
     }
 
-    @ApiOperation(value = "Retrieve a detailed clustered interaction, sorted by score, of a given accession(s) by resource.", response = Interactors.class, produces = "application/json")
+    @ApiOperation(value = "Retrieve clustered interaction, sorted by score, of a given accession(s) by resource.", response = Interactors.class, produces = "application/json")
     @RequestMapping(value = "/molecules/{resource}/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsDetailsByResource(@ApiParam(value="PSICQUIC Resource",required = true) @PathVariable String resource,

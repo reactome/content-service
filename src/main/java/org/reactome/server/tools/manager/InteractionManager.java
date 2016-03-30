@@ -1,5 +1,6 @@
 package org.reactome.server.tools.manager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
@@ -122,7 +123,7 @@ public class InteractionManager {
         try {
             return psicquicService.getResources();
         } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+            throw new PsicquicContentException("Couldn't load PSICQUIC Resources");
         }
     }
 
@@ -135,6 +136,14 @@ public class InteractionManager {
      * @return InteractionMapper
      */
     public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource) {
+        return getInteractionResult(interactionMaps, resource, null);
+    }
+
+    public Interactors getCustomInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
+        return getInteractionResult(interactionMaps, resource, token);
+    }
+
+    private Interactors getInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
         Interactors interactionMapper = new Interactors();
 
         /** Entities are a JSON Object **/
@@ -169,9 +178,11 @@ public class InteractionManager {
                 List<String> evidencesWithDbNames = new ArrayList<>();
 
                 /** Set Evidences as the others Interactions identifiers **/
-                for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
-                    String evidence = interactionDetail.getInteractionAc();
-                    evidencesWithDbNames.add(evidence);
+                if(interaction.getInteractionDetailsList() != null) {
+                    for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
+                        String evidence = interactionDetail.getInteractionAc();
+                        evidencesWithDbNames.add(evidence);
+                    }
                 }
 
                 if(interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
@@ -193,6 +204,12 @@ public class InteractionManager {
         }
 
         interactionMapper.setResource(resource);
+
+        // THis is needed for the custom interaction
+        if(StringUtils.isNotEmpty(token)) {
+            interactionMapper.setResource(token);
+        }
+
         interactionMapper.setEntities(entities);
 
         return interactionMapper;

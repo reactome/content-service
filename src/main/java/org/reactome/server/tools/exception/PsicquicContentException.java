@@ -10,4 +10,8 @@ public class PsicquicContentException extends ContentServiceException {
     public PsicquicContentException(Throwable t) {
         super(HttpStatus.INTERNAL_SERVER_ERROR, "Exception while querying PSICQUIC: " + t.getMessage());
     }
+
+    public PsicquicContentException(String message) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
 }
