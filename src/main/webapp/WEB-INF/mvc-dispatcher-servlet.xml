@@ -34,13 +34,6 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!-- Enables swgger ui-->
-    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
-    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
-
-    <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
-
     <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
@@ -102,4 +95,5 @@
             </list>
         </property>
     </bean>
+
 </beans>
