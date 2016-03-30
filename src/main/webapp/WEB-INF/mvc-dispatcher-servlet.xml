@@ -7,7 +7,7 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="org.reactome.server"/>
+    <context:component-scan base-package="org.reactome.server, uk.ac.ebi.reactome"/>
 
     <!-- Standard xml based mvc config-->
     <mvc:annotation-driven>
@@ -30,6 +30,13 @@
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+
+    <!-- Enables swgger ui-->
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+
+    <!-- Include a swagger configuration-->
+    <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
 
     <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
 
@@ -56,12 +63,26 @@
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
 
-    <!-- Enables swgger ui-->
-    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
-    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
+                <value>neo4j.user</value>
+                <value>${neo4j.user}</value>
+            </list>
+        </property>
+    </bean>
 
-    <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
-
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
+                <value>neo4j.password</value>
+                <value>${neo4j.password}</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>

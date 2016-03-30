@@ -34,7 +34,13 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>0.0.9-SNAPSHOT</version>
+            <version>0.0.10-SNAPSHOT</version>
+        </dependency>
+        <!--Graph Core-->
+        <dependency>
+            <groupId>org.reactome.server.tools</groupId>
+            <artifactId>graph-core</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         <!--Spring-->
         <dependency>
