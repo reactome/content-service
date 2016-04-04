@@ -14,6 +14,7 @@ import org.reactome.server.tools.interactors.tuple.exception.ParserException;
 import org.reactome.server.tools.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.tools.interactors.tuple.model.*;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
+import org.reactome.server.tools.interactors.util.InteractorConstant;
 import org.reactome.server.tools.interactors.util.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -257,7 +258,7 @@ public class CustomInteractorManager {
             throw new TokenNotFoundException(tokenStr);
         }
 
-        if (tokenStr.startsWith("PSI")) {
+        if (tokenStr.startsWith(InteractorConstant.TUPLE_PREFIX)) {
             interactionMap = getInteractorFromCustomPsicquic(tokenStr, proteins);
         } else {
             interactionMap = getInteractorFromCustomDataSubmission(tokenStr, proteins);
