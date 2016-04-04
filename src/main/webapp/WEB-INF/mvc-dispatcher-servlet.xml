@@ -67,12 +67,23 @@
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
 
-    <!-- Enables swgger ui-->
+    <!-- Enables swagger ui-->
     <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
     <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
     <!-- Include a swagger configuration-->
     <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
 
+    <bean id="fileCheckerController" class="org.reactome.server.tools.utils.TuplesFileCheckerController">
+        <property name="pathDirectory" value="${tuples.custom.folder}"/>
+        <property name="maxSize" value="2684354560"/> <!-- 2684354560 = 2.5GB // 5368709120 = 5 GB // 10737418240 = 10GB -->
+        <property name="threshold" value="524288000"/> <!-- 10485760 = 10MB // 524288000 = 500MB // 1073741824 = 1GB -->
+        <property name="time" value="10000"/> <!-- 10 sec -->
+        <property name="ttl" value="604800000"/> <!-- 1 week (SAB suggestion) -->
+    </bean>
+
+    <bean id="analysisHelper" class="org.reactome.server.tools.utils.TuplesFilesManager">
+        <property name="pathDirectory" value="${tuples.custom.folder}"/>
+    </bean>
 
 </beans>
