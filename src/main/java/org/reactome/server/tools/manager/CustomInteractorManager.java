@@ -270,7 +270,7 @@ public class CustomInteractorManager {
     private Map<String, List<Interaction>> getInteractorFromCustomDataSubmission(String tokenStr, Set<String> proteins) {
         Map<String, List<Interaction>> interactionMap = new HashMap<>();
 
-        Set<CustomInteraction> customInteractionSet = new HashSet<>();
+        Set<CustomInteraction> customInteractionSet;
 
         /** Retrieve stored summary associated with given token **/
         UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
@@ -279,6 +279,8 @@ public class CustomInteractorManager {
         Set<CustomInteraction> allInteractions = udc.getCustomInteractions();
 
         for (String singleAccession : proteins) {
+            customInteractionSet = new HashSet<>();
+
             // Check if singleAccession contains in A or B in the Interaction List
             for (CustomInteraction cust : allInteractions) {
                 if (singleAccession.equals(cust.getInteractorIdA()) ||
