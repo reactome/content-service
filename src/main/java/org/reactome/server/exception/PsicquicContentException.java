@@ -1,0 +1,17 @@
+package org.reactome.server.exception;
+
+import org.springframework.http.HttpStatus;
+
+/**
+ * @author Antonio Fabregat <fabregat@ebi.ac.uk>
+ */
+public class PsicquicContentException extends ContentServiceException {
+
+    public PsicquicContentException(Throwable t) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "Exception while querying PSICQUIC: " + t.getMessage());
+    }
+
+    public PsicquicContentException(String message) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
+}

@@ -7,7 +7,8 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="org.reactome.server, uk.ac.ebi.reactome"/>
+    <context:component-scan base-package="org.reactome.server"/>
+    <context:property-placeholder location="classpath:/core.properties" />
 
     <!-- Standard xml based mvc config-->
     <mvc:annotation-driven>
@@ -24,17 +25,21 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
-
-    <context:property-placeholder location="classpath:/service.properties" />
-
     <mvc:resources mapping="/**" location="/resources/" />
+
+    <!-- Enables swgger ui-->
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
+    <!-- Include a swagger configuration-->
+    <bean name="/applicationSwaggerConfig" class="org.reactome.server.config.SwaggerConfig"/>
+
+    <bean class= "org.reactome.server.handler.HandlerExceptionResolverImpl" />
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="209715200"/> <!-- 10 MB  // 52428800 = 50 MB // 209715200 = 200MB  -->
@@ -61,18 +66,11 @@
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
-    <bean id="templateCacher" class="org.reactome.server.tools.utils.HeaderFooterCacher">
+    <bean id="templateCacher" class="org.reactome.server.utils.HeaderFooterCacher">
         <constructor-arg name="server" value="http://dev2.reactome.org/"/>
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
-
-    <!-- Enables swgger ui-->
-    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
-    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
-
-    <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="targetClass" value="java.lang.System"/>

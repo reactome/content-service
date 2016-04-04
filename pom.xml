@@ -22,6 +22,12 @@
             <email>gviteri@ebi.ac.uk</email>
             <organization>http://www.ebi.ac.uk/</organization>
         </developer>
+        <developer>
+            <id>fkorn</id>
+            <name>Florian Korninger</name>
+            <email>fkorn@ebi.ac.uk</email>
+            <organization>http://www.ebi.ac.uk/</organization>
+        </developer>
     </developers>
 
     <properties>
@@ -43,6 +49,12 @@
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>graph-core</artifactId>
             <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+        <!--Reactome search-->
+        <dependency>
+            <groupId>org.reactome.server.tools</groupId>
+            <artifactId>search-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <!--Spring-->
         <dependency>
