@@ -62,7 +62,7 @@
     </bean>
 
     <bean id="templateCacher" class="org.reactome.server.tools.utils.HeaderFooterCacher">
-        <constructor-arg name="server" value="http://dev2.reactome.org/"/>
+        <constructor-arg name="server" value="${template.server}"/>
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
