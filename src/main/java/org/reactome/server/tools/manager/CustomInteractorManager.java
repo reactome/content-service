@@ -15,7 +15,6 @@ import org.reactome.server.tools.interactors.tuple.exception.TupleParserExceptio
 import org.reactome.server.tools.interactors.tuple.model.*;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
 import org.reactome.server.tools.interactors.util.InteractorConstant;
-import org.reactome.server.tools.interactors.util.Toolbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -182,7 +181,7 @@ public class CustomInteractorManager {
     /**
      * Gets CustomInteraction set and convert it into Interactions
      */
-    private List<Interaction> converteCustomInteraction(String searchTerm, Set<CustomInteraction> customInteractionSet) {
+    private List<Interaction> convertCustomInteraction(String searchTerm, Set<CustomInteraction> customInteractionSet) {
         List<Interaction> interactions = new ArrayList<>(customInteractionSet.size());
 
         for (CustomInteraction customInteraction : customInteractionSet) {
@@ -216,16 +215,14 @@ public class CustomInteractorManager {
             }
 
             /** set score **/
-            if (StringUtils.isNotEmpty(customInteraction.getConfidenceValue())) {
-                if (Toolbox.isNumeric(customInteraction.getConfidenceValue())) {
-                    interaction.setIntactScore(Double.parseDouble(customInteraction.getConfidenceValue()));
-                }
+            if (customInteraction.getConfidenceValue() != null) {
+                interaction.setIntactScore(customInteraction.getConfidenceValue());
             }
 
             /** set evidences list **/
-            if (StringUtils.isNotEmpty(customInteraction.getInteractionIdentifier())) {
+            if (StringUtils.isNotEmpty(customInteraction.getInteractionEvidence())) {
                 InteractionDetails evidences = new InteractionDetails();
-                evidences.setInteractionAc(customInteraction.getInteractionIdentifier());
+                evidences.setInteractionAc(customInteraction.getInteractionEvidence());
 
                 interaction.addInteractionDetails(evidences);
             }
@@ -276,7 +273,7 @@ public class CustomInteractorManager {
         UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
 
         /** Get custom interactions **/
-        Set<CustomInteraction> allInteractions = udc.getCustomInteractions();
+        Collection<CustomInteraction> allInteractions = udc.getCustomInteractions();
 
         for (String singleAccession : proteins) {
             customInteractionSet = new HashSet<>();
@@ -291,7 +288,7 @@ public class CustomInteractorManager {
                 }
             }
 
-            List<Interaction> interactions = converteCustomInteraction(singleAccession, customInteractionSet);
+            List<Interaction> interactions = convertCustomInteraction(singleAccession, customInteractionSet);
 
             interactionMap.put(singleAccession, interactions);
 
