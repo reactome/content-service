@@ -77,6 +77,17 @@
         <property name="targetMethod" value="setProperty"/>
         <property name="arguments">
             <list>
+                <value>neo4j.host</value>
+                <value>${neo4j.host}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System"/>
+        <property name="targetMethod" value="setProperty"/>
+        <property name="arguments">
+            <list>
                 <value>neo4j.user</value>
                 <value>${neo4j.user}</value>
             </list>
