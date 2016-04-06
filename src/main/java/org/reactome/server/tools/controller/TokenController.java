@@ -6,11 +6,13 @@ import io.swagger.annotations.ApiParam;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.tuple.model.CustomInteractorRepository;
 import org.reactome.server.tools.interactors.tuple.model.CustomPsicquicRepository;
+import org.reactome.server.tools.interactors.tuple.model.UserDataContainer;
 import org.reactome.server.tools.manager.CustomInteractorManager;
 import org.reactome.server.tools.manager.InteractionManager;
 import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.*;
 
@@ -46,24 +48,36 @@ public class TokenController {
         return interactionManager.getCustomInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME, token);
     }
 
-    @RequestMapping(value = "/token/listall", method = RequestMethod.GET, produces = "application/json")
+    @ApiIgnore
+    @RequestMapping(value = "/listall", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     @Deprecated
     public Set<String> listAllTokens() {
         return CustomInteractorRepository.getKeys();
     }
 
-    @RequestMapping(value = "/token/listallpsicq", method = RequestMethod.GET, produces = "application/json")
+    @ApiIgnore
+    @RequestMapping(value = "/listallpsicq", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     @Deprecated
     public Set<String> listAllTokensPsicquic() {
         return CustomPsicquicRepository.getKeys();
     }
 
-    @RequestMapping(value = "/token/listpsicquicrepo", method = RequestMethod.GET, produces = "application/json")
+    @ApiIgnore
+    @RequestMapping(value = "/listpsicquicrepo", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     @Deprecated
     public Map<String, String> listPsicquicRepo() {
         return CustomPsicquicRepository.getAll();
     }
+
+    @ApiIgnore
+    @RequestMapping(value = "/listStoredData/{token}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    @Deprecated
+    public UserDataContainer listStoredData(@PathVariable String token) {
+        return CustomInteractorRepository.getByToken(token);
+    }
+
 }
