@@ -4,6 +4,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MimeTypes;
 import org.reactome.server.tools.exception.*;
 import org.reactome.server.tools.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.tools.interactors.model.Interaction;
@@ -14,18 +19,16 @@ import org.reactome.server.tools.interactors.tuple.exception.ParserException;
 import org.reactome.server.tools.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.tools.interactors.tuple.model.*;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
-import org.reactome.server.tools.interactors.util.Toolbox;
+import org.reactome.server.tools.interactors.util.InteractorConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -45,7 +48,7 @@ public class CustomInteractorManager {
     @Autowired
     CommonsMultipartResolver multipartResolver;
 
-    public TupleResult getUserDataContainer(String name, String filename, InputStream is) {
+    private TupleResult getUserDataContainer(String name, String filename, InputStream is) {
         TupleResult result = null;
         try {
             result = ParserUtils.getUserDataContainer(name, filename, is);
@@ -60,16 +63,47 @@ public class CustomInteractorManager {
         return result;
     }
 
-    public TupleResult getUserDataContainer(String name, String filename, String input) {
-        return getUserDataContainer(name, filename, IOUtils.toInputStream(input));
+    public TupleResult getUserDataContainerFromContent(String name, String input) {
+        return getUserDataContainer(name, null, IOUtils.toInputStream(input));
+    }
+
+    public TupleResult getUserDataContainerFromFile(String name, MultipartFile file) {
+        if (!file.isEmpty()) {
+            try {
+                String mimeType = detectMimeType(TikaInputStream.get(file.getInputStream()));
+
+                if (!isAcceptedContentType(mimeType)) {
+                    throw new UnsupportedMediaTypeException();
+                }
+
+                return getUserDataContainer(name, file.getOriginalFilename(), file.getInputStream());
+
+            } catch (IOException | NoSuchMethodError e) {
+                throw new UnsupportedMediaTypeException();
+            }
+        }
+
+        throw new UnsupportedMediaTypeException();
+
     }
 
     public TupleResult getUserDataContainerFromURL(String name, String filename, String url) {
         if (url != null && !url.isEmpty()) {
             InputStream is;
             try {
+                /** Check in the URL if the filename is encoded **/
+                String decodeFilename = URLDecoder.decode(filename, "UTF-8");
+                boolean encoded = !filename.equals(decodeFilename);
+
+                if (!encoded) {
+                    String encodeFilename = URLEncoder.encode(filename, "UTF-8");
+                    encodeFilename = encodeFilename.replaceAll("\\+", "%20");
+                    url = url.replace(filename, encodeFilename);
+                }
+
                 HttpURLConnection conn;
                 URL aux = new URL(url);
+
                 if (aux.getProtocol().contains("https")) {
                     doTrustToCertificates(); //accepting the certificate by default
                     HttpsURLConnection tmpConn = (HttpsURLConnection) aux.openConnection();
@@ -85,24 +119,18 @@ public class CustomInteractorManager {
                     throw new RequestEntityTooLargeException();
                 }
 
-                if (!isAcceptedContentType(conn.getContentType())) {
+                String mimeType = detectMimeType(TikaInputStream.get(aux));
+                if (!isAcceptedContentType(mimeType)) {
                     throw new UnsupportedMediaTypeException();
                 }
 
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+                e.printStackTrace();
                 throw new UnprocessableEntityException();
             }
 
+            return getUserDataContainer(name, filename, is);
 
-            try {
-                return ParserUtils.getUserDataContainer(name, filename, is);
-            } catch (IOException e) {
-                throw new UnsupportedMediaTypeException();
-            } catch (TupleParserException e) {
-                throw new DataFormatException(e.getErrorMessages());
-            } catch (ParserException e) {
-                throw new DataFormatException(e.getMessage());
-            }
         }
 
         throw new UnsupportedMediaTypeException();
@@ -138,10 +166,6 @@ public class CustomInteractorManager {
         } catch (ParserException e) {
             throw new DataFormatException(e.getMessage());
         }
-    }
-
-    private boolean isAcceptedContentType(String contentType) {
-        return contentType.contains("text/plain") || contentType.contains("text/csv");
     }
 
     /**
@@ -181,7 +205,7 @@ public class CustomInteractorManager {
     /**
      * Gets CustomInteraction set and convert it into Interactions
      */
-    private List<Interaction> converteCustomInteraction(String searchTerm, Set<CustomInteraction> customInteractionSet) {
+    private List<Interaction> convertCustomInteraction(String searchTerm, Set<CustomInteraction> customInteractionSet) {
         List<Interaction> interactions = new ArrayList<>(customInteractionSet.size());
 
         for (CustomInteraction customInteraction : customInteractionSet) {
@@ -215,16 +239,14 @@ public class CustomInteractorManager {
             }
 
             /** set score **/
-            if (StringUtils.isNotEmpty(customInteraction.getConfidenceValue())) {
-                if (Toolbox.isNumeric(customInteraction.getConfidenceValue())) {
-                    interaction.setIntactScore(Double.parseDouble(customInteraction.getConfidenceValue()));
-                }
+            if (customInteraction.getConfidenceValue() != null) {
+                interaction.setIntactScore(customInteraction.getConfidenceValue());
             }
 
             /** set evidences list **/
-            if (StringUtils.isNotEmpty(customInteraction.getInteractionIdentifier())) {
+            if (StringUtils.isNotEmpty(customInteraction.getInteractionEvidence())) {
                 InteractionDetails evidences = new InteractionDetails();
-                evidences.setInteractionAc(customInteraction.getInteractionIdentifier());
+                evidences.setInteractionAc(customInteraction.getInteractionEvidence());
 
                 interaction.addInteractionDetails(evidences);
             }
@@ -257,7 +279,7 @@ public class CustomInteractorManager {
             throw new TokenNotFoundException(tokenStr);
         }
 
-        if (tokenStr.startsWith("PSI")) {
+        if (tokenStr.startsWith(InteractorConstant.TUPLE_PREFIX)) {
             interactionMap = getInteractorFromCustomPsicquic(tokenStr, proteins);
         } else {
             interactionMap = getInteractorFromCustomDataSubmission(tokenStr, proteins);
@@ -269,15 +291,15 @@ public class CustomInteractorManager {
     private Map<String, List<Interaction>> getInteractorFromCustomDataSubmission(String tokenStr, Set<String> proteins) {
         Map<String, List<Interaction>> interactionMap = new HashMap<>();
 
-        Set<CustomInteraction> customInteractionSet = new HashSet<>();
-
         /** Retrieve stored summary associated with given token **/
         UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
 
         /** Get custom interactions **/
-        Set<CustomInteraction> allInteractions = udc.getCustomInteractions();
+        Collection<CustomInteraction> allInteractions = udc.getCustomInteractions();
 
         for (String singleAccession : proteins) {
+            Set<CustomInteraction> customInteractionSet = new HashSet<>();
+
             // Check if singleAccession contains in A or B in the Interaction List
             for (CustomInteraction cust : allInteractions) {
                 if (singleAccession.equals(cust.getInteractorIdA()) ||
@@ -288,7 +310,7 @@ public class CustomInteractorManager {
                 }
             }
 
-            List<Interaction> interactions = converteCustomInteraction(singleAccession, customInteractionSet);
+            List<Interaction> interactions = convertCustomInteraction(singleAccession, customInteractionSet);
 
             interactionMap.put(singleAccession, interactions);
 
@@ -327,6 +349,28 @@ public class CustomInteractorManager {
             }
         }
         return name;
+    }
+
+    /**
+     * Detect MimeType using apache tika.
+     * jMimeMagic has failed when analysing the PSIMITAB .txt file export from IntAct page
+     *
+     * @throws IOException
+     */
+    public String detectMimeType(TikaInputStream tikaInputStream) throws IOException {
+        final Detector DETECTOR = new DefaultDetector(MimeTypes.getDefaultMimeTypes());
+
+        try {
+            return DETECTOR.detect(tikaInputStream, new Metadata()).toString();
+        } finally {
+            if (tikaInputStream != null) {
+                tikaInputStream.close();
+            }
+        }
+    }
+
+    private boolean isAcceptedContentType(String contentType) {
+        return contentType.contains("text/plain") || contentType.contains("text/csv");
     }
 
 }
