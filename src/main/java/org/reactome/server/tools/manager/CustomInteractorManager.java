@@ -11,17 +11,21 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MimeTypes;
 import org.reactome.server.tools.exception.*;
 import org.reactome.server.tools.interactors.exception.CustomPsicquicInteractionClusterException;
+import org.reactome.server.tools.interactors.model.CustomPsicquicResource;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
 import org.reactome.server.tools.interactors.model.Interactor;
 import org.reactome.server.tools.interactors.service.PsicquicService;
+import org.reactome.server.tools.interactors.tuple.custom.CustomResource;
 import org.reactome.server.tools.interactors.tuple.exception.ParserException;
 import org.reactome.server.tools.interactors.tuple.exception.TupleParserException;
-import org.reactome.server.tools.interactors.tuple.model.*;
+import org.reactome.server.tools.interactors.tuple.model.CustomInteraction;
+import org.reactome.server.tools.interactors.tuple.model.TupleResult;
 import org.reactome.server.tools.interactors.tuple.util.ParserUtils;
-import org.reactome.server.tools.interactors.util.InteractorConstant;
+import org.reactome.server.tools.utils.TupleManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
@@ -48,23 +52,34 @@ public class CustomInteractorManager {
     @Autowired
     CommonsMultipartResolver multipartResolver;
 
-    private TupleResult getUserDataContainer(String name, String filename, InputStream is) {
-        TupleResult result = null;
+    @Autowired
+    TupleManager tupleManager;
+
+    private TupleResult getUserDataContainer(String name, String filename, String file) {
         try {
-            result = ParserUtils.getUserDataContainer(name, filename, is);
-        } catch (IOException e) {
+            String raw = name + file;
+            String token = DigestUtils.md5DigestAsHex(raw.getBytes());
+            TupleResult result = (TupleResult) tupleManager.readToken(token);
+            if (result == null) {
+                InputStream is = IOUtils.toInputStream(file);
+                //We only parse the data the first time it is sent
+                result = ParserUtils.getUserDataContainer(name, filename, is);
+                result.getSummary().setToken(token);
+                tupleManager.saveToken(token, result);
+            }
+            return result;
+        } catch (IOException | ClassCastException e) {
             e.printStackTrace();
+            throw new UnprocessableEntityException(); //TODO: Place the right exception here
         } catch (TupleParserException e) {
             throw new DataFormatException(e.getErrorMessages());
         } catch (ParserException e) {
             throw new DataFormatException(e.getMessage());
         }
-
-        return result;
     }
 
     public TupleResult getUserDataContainerFromContent(String name, String input) {
-        return getUserDataContainer(name, null, IOUtils.toInputStream(input));
+        return getUserDataContainer(name, null, input);
     }
 
     public TupleResult getUserDataContainerFromFile(String name, MultipartFile file) {
@@ -76,7 +91,12 @@ public class CustomInteractorManager {
                     throw new UnsupportedMediaTypeException();
                 }
 
-                return getUserDataContainer(name, file.getOriginalFilename(), file.getInputStream());
+                try {
+                    return getUserDataContainer(name, file.getOriginalFilename(), IOUtils.toString(file.getInputStream()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new UnprocessableEntityException();
+                }
 
             } catch (IOException | NoSuchMethodError e) {
                 throw new UnsupportedMediaTypeException();
@@ -129,25 +149,25 @@ public class CustomInteractorManager {
                 throw new UnprocessableEntityException();
             }
 
-            return getUserDataContainer(name, filename, is);
-
+            try {
+                return getUserDataContainer(name, filename, IOUtils.toString(is));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new UnprocessableEntityException();
+            }
         }
 
         throw new UnsupportedMediaTypeException();
     }
 
-    public TupleResult registryCustomPsicquic(String name, String psicquicURL) {
+    public CustomPsicquicResource registryCustomPsicquic(String name, String psicquicURL) {
         //InputStream is;
         try {
-            HttpURLConnection conn;
             URL aux = new URL(psicquicURL);
             if (aux.getProtocol().contains("https")) {
                 doTrustToCertificates(); //accepting the certificate by default
-                conn = (HttpsURLConnection) aux.openConnection();
-                //conn = tmpConn;
             } else {
-                URLConnection tmpConn = aux.openConnection();
-                conn = (HttpURLConnection) tmpConn;
+                aux.openConnection();
             }
 
             // THIS VALIDATION IS NOT WORKING. PSIQUIC Service does not have landing page, then it returns 404
@@ -160,7 +180,9 @@ public class CustomInteractorManager {
         }
 
         try {
-            return ParserUtils.processCustomPsicquic(name, psicquicURL);
+            CustomPsicquicResource cpr = ParserUtils.processCustomPsicquic(name, psicquicURL);
+            tupleManager.saveToken(cpr.getSummary().getToken(), cpr);
+            return cpr;
         } catch (TupleParserException e) {
             throw new DataFormatException(e.getErrorMessages());
         } catch (ParserException e) {
@@ -214,7 +236,7 @@ public class CustomInteractorManager {
             /** create interactor A **/
             Interactor interactorA = new Interactor();
             interactorA.setAcc(customInteraction.getInteractorIdA());
-            interactorA.setAlias(customInteraction.getAliasInteractorA());
+            interactorA.setAlias(customInteraction.getInteractorAliasA());
             if (StringUtils.isNotEmpty(customInteraction.getTaxonomyIdInteractorA())) {
                 interactorA.setTaxid(Integer.parseInt(customInteraction.getTaxonomyIdInteractorA()));
             }
@@ -223,7 +245,7 @@ public class CustomInteractorManager {
             /** create interactor A **/
             Interactor interactorB = new Interactor();
             interactorB.setAcc(customInteraction.getInteractorIdB());
-            interactorB.setAlias(customInteraction.getAliasInteractorB());
+            interactorB.setAlias(customInteraction.getInteractorAliasB());
             if (StringUtils.isNotEmpty(customInteraction.getTaxonomyIdInteractorB())) {
                 interactorB.setTaxid(Integer.parseInt(customInteraction.getTaxonomyIdInteractorB()));
             }
@@ -270,38 +292,30 @@ public class CustomInteractorManager {
      * @return for a given pr
      */
     public Map<String, List<Interaction>> getInteractionsByTokenAndProteins(String tokenStr, Set<String> proteins) {
-        Map<String, List<Interaction>> interactionMap;
-
         /**
          * Check if token exists in the Repository.
          */
-        if (!CustomInteractorRepository.getKeys().contains(tokenStr) && !CustomPsicquicRepository.getKeys().contains(tokenStr)) {
-            throw new TokenNotFoundException(tokenStr);
+        Object token = tupleManager.readToken(tokenStr);
+        if (token != null) {
+            if (token instanceof TupleResult) {
+                TupleResult tupleResult = (TupleResult) token;
+                return getInteractorFromCustomResource(tupleResult.getCustomResource(), proteins);
+            } else {
+                CustomPsicquicResource customResource = (CustomPsicquicResource) token;
+                return getInteractorFromCustomPsicquic(customResource.getUrl(), proteins);
+            }
         }
-
-        if (tokenStr.startsWith(InteractorConstant.TUPLE_PREFIX)) {
-            interactionMap = getInteractorFromCustomPsicquic(tokenStr, proteins);
-        } else {
-            interactionMap = getInteractorFromCustomDataSubmission(tokenStr, proteins);
-        }
-
-        return interactionMap;
+        throw new TokenNotFoundException(tokenStr);
     }
 
-    private Map<String, List<Interaction>> getInteractorFromCustomDataSubmission(String tokenStr, Set<String> proteins) {
+    private Map<String, List<Interaction>> getInteractorFromCustomResource(CustomResource customResource, Set<String> proteins) {
         Map<String, List<Interaction>> interactionMap = new HashMap<>();
-
-        /** Retrieve stored summary associated with given token **/
-        UserDataContainer udc = CustomInteractorRepository.getByToken(tokenStr);
-
-        /** Get custom interactions **/
-        Collection<CustomInteraction> allInteractions = udc.getCustomInteractions();
 
         for (String singleAccession : proteins) {
             Set<CustomInteraction> customInteractionSet = new HashSet<>();
 
             // Check if singleAccession contains in A or B in the Interaction List
-            for (CustomInteraction cust : allInteractions) {
+            for (CustomInteraction cust : customResource.get(singleAccession)) {
                 if (singleAccession.equals(cust.getInteractorIdA()) ||
                         singleAccession.equals(cust.getInteractorIdB())) {
 
@@ -319,11 +333,8 @@ public class CustomInteractorManager {
         return interactionMap;
     }
 
-    private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String tokenStr, Set<String> proteins) {
+    private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String url, Set<String> proteins) {
         Map<String, List<Interaction>> interactionMap;
-
-        /** Retrieve stored summary associated with given token **/
-        String url = CustomPsicquicRepository.getByToken(tokenStr);
 
         try {
             interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);

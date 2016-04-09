@@ -82,7 +82,7 @@
         <property name="ttl" value="604800000"/> <!-- 1 week (SAB suggestion) -->
     </bean>
 
-    <bean id="analysisHelper" class="org.reactome.server.tools.utils.TuplesFilesManager">
+    <bean id="tupleManager" class="org.reactome.server.tools.utils.TupleManager">
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
     </bean>
 
