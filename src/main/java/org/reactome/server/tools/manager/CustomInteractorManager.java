@@ -2,7 +2,6 @@ package org.reactome.server.tools.manager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
@@ -237,19 +236,11 @@ public class CustomInteractorManager {
             Interactor interactorA = new Interactor();
             interactorA.setAcc(customInteraction.getInteractorIdA());
             interactorA.setAlias(customInteraction.getInteractorAliasA());
-            if (StringUtils.isNotEmpty(customInteraction.getTaxonomyIdInteractorA())) {
-                interactorA.setTaxid(Integer.parseInt(customInteraction.getTaxonomyIdInteractorA()));
-            }
-            interactorA.setSynonyms(customInteraction.getAlternativeInteractorA());
 
-            /** create interactor A **/
+            /** create interactor B **/
             Interactor interactorB = new Interactor();
             interactorB.setAcc(customInteraction.getInteractorIdB());
             interactorB.setAlias(customInteraction.getInteractorAliasB());
-            if (StringUtils.isNotEmpty(customInteraction.getTaxonomyIdInteractorB())) {
-                interactorB.setTaxid(Integer.parseInt(customInteraction.getTaxonomyIdInteractorB()));
-            }
-            interactorB.setSynonyms(customInteraction.getAlternativeInteractorB());
 
             /** keep the search term, always in side A **/
             if (searchTerm.equals(interactorA.getAcc())) {
@@ -266,11 +257,10 @@ public class CustomInteractorManager {
             }
 
             /** set evidences list **/
-            if (StringUtils.isNotEmpty(customInteraction.getInteractionEvidence())) {
-                InteractionDetails evidences = new InteractionDetails();
-                evidences.setInteractionAc(customInteraction.getInteractionEvidence());
-
-                interaction.addInteractionDetails(evidences);
+            if (customInteraction.getEvidence() != null && customInteraction.getEvidence().size() > 0) {
+                for (String evidence : customInteraction.getEvidence()) {
+                    interaction.addInteractionDetails(new InteractionDetails(evidence));
+                }
             }
 
             /** add into interactions list **/

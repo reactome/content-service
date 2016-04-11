@@ -43,37 +43,4 @@ public class TokenController {
 
         return interactionManager.getCustomInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME, token);
     }
-
-//    @ApiIgnore
-//    @RequestMapping(value = "/listall", method = RequestMethod.GET, produces = "application/json")
-//    @ResponseBody
-//    @Deprecated
-//    public Set<String> listAllTokens() {
-//        return CustomResource.getKeys();
-//    }
-
-//    @ApiIgnore
-//    @RequestMapping(value = "/listallpsicq", method = RequestMethod.GET, produces = "application/json")
-//    @ResponseBody
-//    @Deprecated
-//    public Set<String> listAllTokensPsicquic() {
-//        return CustomPsicquicRepository.getKeys();
-//    }
-
-//    @ApiIgnore
-//    @RequestMapping(value = "/listpsicquicrepo", method = RequestMethod.GET, produces = "application/json")
-//    @ResponseBody
-//    @Deprecated
-//    public Map<String, String> listPsicquicRepo() {
-//        return CustomPsicquicRepository.getAll();
-//    }
-
-//    @ApiIgnore
-//    @RequestMapping(value = "/listStoredData/{token}", method = RequestMethod.GET, produces = "application/json")
-//    @ResponseBody
-//    @Deprecated
-//    public UserDataContainer listStoredData(@PathVariable String token) {
-//        return CustomResource.getByToken(token);
-//    }
-
 }
