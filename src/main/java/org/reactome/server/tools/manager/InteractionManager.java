@@ -7,7 +7,6 @@ import org.reactome.server.tools.interactors.exception.InvalidInteractionResourc
 import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
-import org.reactome.server.tools.interactors.model.PsicquicResource;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.util.Toolbox;
@@ -117,17 +116,6 @@ public class InteractionManager {
     }
 
     /**
-     * Call psicquic REST service and retrieve all Resources.
-     */
-    public List<PsicquicResource> getPsicquicResources() {
-        try {
-            return psicquicService.getResources();
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException("Couldn't load PSICQUIC Resources");
-        }
-    }
-
-    /**
      * Set up the InteractionResult object of a given map of interactions and Resource.
      * This method is able to parse for static resource and psicquic.
      *
@@ -178,14 +166,14 @@ public class InteractionManager {
                 List<String> evidencesWithDbNames = new ArrayList<>();
 
                 /** Set Evidences as the others Interactions identifiers **/
-                if(interaction.getInteractionDetailsList() != null) {
+                if (interaction.getInteractionDetailsList() != null) {
                     for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
                         String evidence = interactionDetail.getInteractionAc();
                         evidencesWithDbNames.add(evidence);
                     }
                 }
 
-                if(interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
+                if (interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setEvidences(interaction.getInteractionDetailsList().size());
                 }
 
@@ -206,7 +194,7 @@ public class InteractionManager {
         interactionMapper.setResource(resource);
 
         // THis is needed for the custom interaction
-        if(StringUtils.isNotEmpty(token)) {
+        if (StringUtils.isNotEmpty(token)) {
             interactionMapper.setResource(token);
         }
 
