@@ -1,10 +1,11 @@
 package org.reactome.server.tools.manager;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
-import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
+import org.reactome.server.tools.interactors.exception.PsicquicQueryException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
 import org.reactome.server.tools.interactors.service.InteractionService;
@@ -15,6 +16,7 @@ import org.reactome.server.tools.model.interactors.InteractorEntity;
 import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import psidev.psi.mi.tab.PsimiTabException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -71,8 +73,12 @@ public class InteractionManager {
             Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
 
             return getDetailInteractionResult(interactionMap, resource);
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+        } catch (PsicquicQueryException e) {
+            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
+        } catch (PsimiTabException e) {
+            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
+        } catch (PsicquicRegistryClientException e) {
+            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
         }
     }
 
@@ -107,9 +113,12 @@ public class InteractionManager {
 
         try {
             interactionMap = psicquicService.countInteraction(resource, accs);
-
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+        } catch (PsicquicQueryException e) {
+            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
+        } catch (PsimiTabException e) {
+            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
+        } catch (PsicquicRegistryClientException e) {
+            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
         }
 
         return getSummaryInteractionResult(interactionMap, resource);
