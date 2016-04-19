@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>0.0.9-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Jackson JSON Processor -->
@@ -93,11 +93,25 @@
             <version>2.4.0</version>
         </dependency>
 
+        <!-- Apache Tika - Apache Tika™ toolkit detects and extracts metadata and text from over a thousand different file types -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.12</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Reactome files-storage LRU -->
+        <dependency>
+            <groupId>org.reactome.server.lru</groupId>
+            <artifactId>reactome-lru</artifactId>
+            <version>1.4-SNAPSHOT</version>
         </dependency>
 
         <!-- Pride Utils -->
@@ -116,6 +130,13 @@
                     <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Kryo serializer -->
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+            <version>2.22</version>
         </dependency>
 
     </dependencies>
