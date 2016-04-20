@@ -3,17 +3,18 @@ package org.reactome.server.controller.graph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.reactome.server.tools.domain.model.*;
+import org.reactome.server.tools.domain.result.Participant;
+import org.reactome.server.tools.service.DatabaseObjectService;
+import org.reactome.server.tools.service.GeneralService;
+import org.reactome.server.tools.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-import org.reactome.server.tools.domain.model.DatabaseObject;
-import org.reactome.server.tools.domain.model.Pathway;
-import org.reactome.server.tools.domain.model.PhysicalEntity;
-import org.reactome.server.tools.domain.model.Species;
-import org.reactome.server.tools.domain.result.Participant;
-import org.reactome.server.tools.service.DatabaseObjectService;
-import org.reactome.server.tools.service.GenericService;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -30,52 +31,77 @@ public class GraphController {
     @Autowired
     private DatabaseObjectService databaseObjectService;
     @Autowired
-    private GenericService genericService;
+    private GeneralService generalService;
+    @Autowired
+    private ParticipantService participantService;
 //    @Autowired
 //    private EventService eventService;
 //    @Autowired
 //    private PhysicalEntityService physicalEntityService;
 
+    private FileWriter writer;
+
+    public GraphController() throws IOException {
+        writer = new FileWriter(new File("test.txt"));
+    }
+
     @ApiOperation(value = "Retrieves all Reactome top level pathways",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/topLevelPathway", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Pathway> getTopLevelPathways()  {
-        return genericService.getTopLevelPathways();
+    public Collection<TopLevelPathway> getTopLevelPathways()  {
+        return generalService.getTopLevelPathways();
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways for given species name",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/topLevelPathway/{speciesName}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Pathway> getTopLevelPathways(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
-        return genericService.getTopLevelPathways(speciesName);
+    public Collection<TopLevelPathway> getTopLevelPathways(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
+        return generalService.getTopLevelPathways(speciesName);
     }
 
     @ApiOperation(value = "Retrieves all species",response = Species.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/species", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Species> getSpecies()  {
-        return genericService.getSpecies();
+        return generalService.getAllSpecies();
     }
 
     @ApiOperation(value = "Retrieves details of a databaseObject",response = DatabaseObject.class, produces = "application/json")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject queryById(@ApiParam(defaultValue = "R-HSA-1640170",required = true) @PathVariable String id)  {
-        return databaseObjectService.findById(id);
+    public DatabaseObject queryById(@ApiParam(defaultValue = "R-HSA-1640170",required = true) @PathVariable String id) throws IOException {
+        Long start, time;
+        start = System.currentTimeMillis();
+
+        DatabaseObject databaseObject = databaseObjectService.findById(id);
+//        DatabaseObject databaseObject  = new Pathway();
+//        databaseObject.setDbId(123l);
+        time = System.currentTimeMillis() - start;
+
+        writer.write(time.toString() + "\n");
+        writer.flush();
+        return databaseObject;
     }
 
     @ApiOperation(value = "Retrieves a list of participants for a given pathway",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/detail/{id}/participants", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/detail/{id}/participatingPhysicalEntities", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<PhysicalEntity> getParticipatingPhysicalEntities(@ApiParam(defaultValue = "R-HSA-5205685",required = true) @PathVariable String id)  {
-        return databaseObjectService.getParticipatingMolecules4(id);
+        return participantService.getParticipatingPhysicalEntities(id);
     }
 
     @ApiOperation(value = "Retrieves a list of participants for a given pathway",response = Participant.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/detail/{id}/participants2", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/detail/{id}/participants", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Participant> getParticipatingPhysicalEntities2(@ApiParam(defaultValue = "5205685",required = true) @PathVariable Long id)  {
-        return databaseObjectService.getParticipatingMolecules3(id);
+        return participantService.getParticipants(id);
+    }
+
+    @ApiOperation(value = "Retrieves a list of participants for a given pathway",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @RequestMapping(value = "/detail/{id}/participatingReferenceEntities", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<ReferenceEntity> getParticipationgReferenceEntities(@ApiParam(defaultValue = "5205685",required = true) @PathVariable Long id)  {
+        return participantService.getParticipatingReferenceEntities(id);
     }
 
     @ApiOperation(value = "Retrieves a list of databaseObjects for given class name",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
@@ -84,15 +110,14 @@ public class GraphController {
     public Collection<DatabaseObject> getDatabaseObjectsForClassName(@ApiParam(defaultValue = "Species",required = true) @PathVariable String className,
                                                                @ApiParam(defaultValue = "1", required = true) @RequestParam(required = true) Integer page,
                                                                @ApiParam(defaultValue = "25", required = true) @RequestParam(required = true) Integer offset) throws ClassNotFoundException {
-        return genericService.getObjectsByClassName(className,page,offset);
-
+        return generalService.findObjectsByClassName(className,page,offset);
     }
 
     @ApiIgnore
     @RequestMapping(value = "/details/legacy/{className:.*}", method = RequestMethod.GET)
     @ResponseBody
     public Collection<DatabaseObject> getDatabaseObjectsForClassNameLegacy(@PathVariable String className) throws ClassNotFoundException {
-        return genericService.getObjectsByClassName(className,1, 2000000); //Integer.MAX_VALUE is too big for neo4j
+        return generalService.findObjectsByClassName(className,1, 2000000); //Integer.MAX_VALUE is too big for neo4j
     }
 
 //    @ApiOperation(value = "Retrieves details of a databaseObject",response = DatabaseObject.class, produces = "application/json")
