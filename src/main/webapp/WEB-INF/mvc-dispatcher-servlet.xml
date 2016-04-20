@@ -41,40 +41,40 @@
     </bean>
 
     <!-- Include a swagger configuration-->
-    <bean name="/applicationSwaggerConfig" class="org.reactome.server.config.SwaggerConfig"/>
+    <bean name="/applicationSwaggerConfig" class="org.reactome.server.service.config.SwaggerConfig"/>
 
-    <bean class= "org.reactome.server.handler.HandlerExceptionResolverImpl" />
+    <bean class= "org.reactome.server.service.handler.HandlerExceptionResolverImpl" />
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="52428800"/> <!-- 10 MB  // 52428800 = 50 MB // 209715200 = 200MB  -->
     </bean>
 
     <!-- Configuration for the Interactors-Core components -->
-    <bean id="interactorsDB" class="org.reactome.server.tools.interactors.database.InteractorsDatabase">
+    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase">
         <constructor-arg name="fileName" value="${interactors.static.db}"/>
     </bean>
 
-    <bean id="interactionParserService" class="org.reactome.server.tools.interactors.service.InteractionParserService">
+    <bean id="interactionParserService" class="org.reactome.server.interactors.service.InteractionParserService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
-    <bean id="interactionResourceService" class="org.reactome.server.tools.interactors.service.InteractionResourceService">
+    <bean id="interactionResourceService" class="org.reactome.server.interactors.service.InteractionResourceService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
-    <bean id="interactionService" class="org.reactome.server.tools.interactors.service.InteractionService">
+    <bean id="interactionService" class="org.reactome.server.interactors.service.InteractionService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
-    <bean id="interactorResourceService" class="org.reactome.server.tools.interactors.service.InteractorResourceService">
+    <bean id="interactorResourceService" class="org.reactome.server.interactors.service.InteractorResourceService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
-    <bean id="interactorService" class="org.reactome.server.tools.interactors.service.InteractorService">
+    <bean id="interactorService" class="org.reactome.server.interactors.service.InteractorService">
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
-    <bean id="templateCacher" class="org.reactome.server.tools.utils.HeaderFooterCacher">
+    <bean id="templateCacher" class="org.reactome.server.service.utils.HeaderFooterCacher">
         <constructor-arg name="server" value="${template.server}"/>
     </bean>
 
-    <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
+    <bean id="psicquicService" class="org.reactome.server.interactors.service.PsicquicService"/>
 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="targetClass" value="java.lang.System"/>
@@ -109,7 +109,7 @@
         </property>
     </bean>
 
-    <bean id="fileCheckerController" class="org.reactome.server.tools.utils.TuplesFileCheckerController">
+    <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController">
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
         <property name="maxSize" value="2684354560"/> <!-- 2684354560 = 2.5GB // 5368709120 = 5 GB // 10737418240 = 10GB -->
         <property name="threshold" value="524288000"/> <!-- 10485760 = 10MB // 524288000 = 500MB // 1073741824 = 1GB -->
@@ -117,7 +117,7 @@
         <property name="ttl" value="604800000"/> <!-- 1 week (SAB suggestion) -->
     </bean>
 
-    <bean id="tupleManager" class="org.reactome.server.tools.utils.TupleManager">
+    <bean id="tupleManager" class="org.reactome.server.service.utils.TupleManager">
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
     </bean>
 

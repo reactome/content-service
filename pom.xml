@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.reactome.server.tools</groupId>
+    <groupId>org.reactome.server.service</groupId>
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
@@ -36,7 +36,7 @@
 
         <graph.version>0.0.4-SNAPSHOT</graph.version>
         <search.version>0.0.4-SNAPSHOT</search.version>
-        <interactors.version>0.0.9-SNAPSHOT</interactors.version>
+        <interactors.version>1.0.0-SNAPSHOT</interactors.version>
         <spring.version>4.2.4.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -73,7 +73,7 @@
         </dependency>
         <!-- Interactors Core -->
         <dependency>
-            <groupId>org.reactome.server.tools</groupId>
+            <groupId>org.reactome.server.interactors</groupId>
             <artifactId>interactor-core</artifactId>
             <version>${interactors.version}</version>
             <exclusions>
