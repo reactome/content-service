@@ -23,7 +23,7 @@
 	<!-- Adds the headers to support cross-origin resource sharing in the web clients -->
 	<filter>
 		<filter-name>cors</filter-name>
-		<filter-class>org.reactome.server.tools.utils.CORSFilter</filter-class>
+		<filter-class>org.reactome.server.utils.CORSFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>cors</filter-name>
@@ -49,6 +49,27 @@
 	<servlet-mapping>
 		<servlet-name>Wordpress</servlet-name>
 		<url-pattern>/wordpress/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Content</servlet-name>
+		<servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>proxyHost</param-name>
+			<param-value>reactomedev.oicr.on.ca</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPort</param-name>
+			<param-value>80</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPath</param-name>
+			<param-value>/content</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Content</servlet-name>
+		<url-pattern>/content/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>

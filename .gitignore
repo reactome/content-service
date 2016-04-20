@@ -32,3 +32,10 @@ local.properties
 
 # Custom
 ReactomeInteractorsCore.log
+
+#Header Footer
+footer.jsp
+header.jsp
+
+#Execution time file
+test.txt
