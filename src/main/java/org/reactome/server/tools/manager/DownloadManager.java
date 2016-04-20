@@ -12,6 +12,7 @@ import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.util.InteractorConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import psidev.psi.mi.tab.PsimiTabException;
 
