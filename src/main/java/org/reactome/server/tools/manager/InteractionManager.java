@@ -1,12 +1,13 @@
 package org.reactome.server.tools.manager;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
-import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
+import org.reactome.server.tools.interactors.exception.PsicquicQueryException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
-import org.reactome.server.tools.interactors.model.PsicquicResource;
 import org.reactome.server.tools.interactors.service.InteractionService;
 import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.util.Toolbox;
@@ -14,7 +15,8 @@ import org.reactome.server.tools.model.interactors.Interactor;
 import org.reactome.server.tools.model.interactors.InteractorEntity;
 import org.reactome.server.tools.model.interactors.Interactors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import psidev.psi.mi.tab.PsimiTabException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ import java.util.Map;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@Component
+@Controller
 public class InteractionManager {
     /**
      * Holds the services that query the DB
@@ -71,8 +73,12 @@ public class InteractionManager {
             Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
 
             return getDetailInteractionResult(interactionMap, resource);
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+        } catch (PsicquicQueryException e) {
+            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
+        } catch (PsimiTabException e) {
+            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
+        } catch (PsicquicRegistryClientException e) {
+            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
         }
     }
 
@@ -107,23 +113,15 @@ public class InteractionManager {
 
         try {
             interactionMap = psicquicService.countInteraction(resource, accs);
-
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+        } catch (PsicquicQueryException e) {
+            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
+        } catch (PsimiTabException e) {
+            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
+        } catch (PsicquicRegistryClientException e) {
+            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
         }
 
         return getSummaryInteractionResult(interactionMap, resource);
-    }
-
-    /**
-     * Call psicquic REST service and retrieve all Resources.
-     */
-    public List<PsicquicResource> getPsicquicResources() {
-        try {
-            return psicquicService.getResources();
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
-        }
     }
 
     /**
@@ -135,6 +133,14 @@ public class InteractionManager {
      * @return InteractionMapper
      */
     public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource) {
+        return getInteractionResult(interactionMaps, resource, null);
+    }
+
+    public Interactors getCustomInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
+        return getInteractionResult(interactionMaps, resource, token);
+    }
+
+    private Interactors getInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
         Interactors interactionMapper = new Interactors();
 
         /** Entities are a JSON Object **/
@@ -169,12 +175,14 @@ public class InteractionManager {
                 List<String> evidencesWithDbNames = new ArrayList<>();
 
                 /** Set Evidences as the others Interactions identifiers **/
-                for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
-                    String evidence = interactionDetail.getInteractionAc();
-                    evidencesWithDbNames.add(evidence);
+                if (interaction.getInteractionDetailsList() != null) {
+                    for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
+                        String evidence = interactionDetail.getInteractionAc();
+                        evidencesWithDbNames.add(evidence);
+                    }
                 }
 
-                if(interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
+                if (interaction.getInteractionDetailsList() != null && interaction.getInteractionDetailsList().size() > 0) {
                     interactor.setEvidences(interaction.getInteractionDetailsList().size());
                 }
 
@@ -193,6 +201,12 @@ public class InteractionManager {
         }
 
         interactionMapper.setResource(resource);
+
+        // THis is needed for the custom interaction
+        if (StringUtils.isNotEmpty(token)) {
+            interactionMapper.setResource(token);
+        }
+
         interactionMapper.setEntities(entities);
 
         return interactionMapper;

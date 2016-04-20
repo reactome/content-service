@@ -1,9 +1,10 @@
 package org.reactome.server.tools.manager;
 
+import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.tools.exception.InteractorResourceNotFound;
 import org.reactome.server.tools.exception.PsicquicContentException;
 import org.reactome.server.tools.interactors.exception.InvalidInteractionResourceException;
-import org.reactome.server.tools.interactors.exception.PsicquicInteractionClusterException;
+import org.reactome.server.tools.interactors.exception.PsicquicQueryException;
 import org.reactome.server.tools.interactors.model.Interaction;
 import org.reactome.server.tools.interactors.model.InteractionDetails;
 import org.reactome.server.tools.interactors.service.InteractionService;
@@ -11,7 +12,8 @@ import org.reactome.server.tools.interactors.service.PsicquicService;
 import org.reactome.server.tools.interactors.util.InteractorConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import psidev.psi.mi.tab.PsimiTabException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,7 +27,7 @@ import java.util.Map;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@Component
+@Controller
 public class DownloadManager {
 
     /**
@@ -97,8 +99,12 @@ public class DownloadManager {
             File downloadFile = prepareDownloadFile(interactionsMap, filename);
             return new FileSystemResource(downloadFile);
 
-        } catch (PsicquicInteractionClusterException e) {
-            throw new PsicquicContentException(e);
+        } catch (PsicquicQueryException e) {
+            throw new PsicquicContentException("Resource is not responding.");
+        } catch (PsimiTabException e) {
+            throw new PsicquicContentException("Couldn't parse psimitab file.");
+        } catch (PsicquicRegistryClientException e) {
+            throw new PsicquicContentException("Couldn't load Resource");
         }
     }
 

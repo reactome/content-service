@@ -2,10 +2,12 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
     <context:component-scan base-package="org.reactome.server"/>
 
@@ -26,12 +28,20 @@
 
     <context:property-placeholder location="classpath:/service.properties" />
 
+    <mvc:resources mapping="/**" location="/resources/" />
+
+    <task:annotation-driven />
+
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
     <bean class= "org.reactome.server.tools.handler.HandlerExceptionResolverImpl" />
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="52428800"/> <!-- 10 MB  // 52428800 = 50 MB // 209715200 = 200MB  -->
+    </bean>
 
     <!-- Configuration for the Interactors-Core components -->
     <bean id="interactorsDB" class="org.reactome.server.tools.interactors.database.InteractorsDatabase">
@@ -54,14 +64,29 @@
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
+    <bean id="templateCacher" class="org.reactome.server.tools.utils.HeaderFooterCacher">
+        <constructor-arg name="server" value="${template.server}"/>
+    </bean>
+
     <bean id="psicquicService" class="org.reactome.server.tools.interactors.service.PsicquicService"/>
 
-    <!-- Enables swgger ui-->
+    <!-- Enables swagger ui-->
     <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
     <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
     <!-- Include a swagger configuration-->
     <bean name="/applicationSwaggerConfig" class="org.reactome.server.tools.config.SwaggerConfig"/>
 
+    <bean id="fileCheckerController" class="org.reactome.server.tools.utils.TuplesFileCheckerController">
+        <property name="pathDirectory" value="${tuples.custom.folder}"/>
+        <property name="maxSize" value="2684354560"/> <!-- 2684354560 = 2.5GB // 5368709120 = 5 GB // 10737418240 = 10GB -->
+        <property name="threshold" value="524288000"/> <!-- 10485760 = 10MB // 524288000 = 500MB // 1073741824 = 1GB -->
+        <property name="time" value="10000"/> <!-- 10 sec -->
+        <property name="ttl" value="604800000"/> <!-- 1 week (SAB suggestion) -->
+    </bean>
+
+    <bean id="tupleManager" class="org.reactome.server.tools.utils.TupleManager">
+        <property name="pathDirectory" value="${tuples.custom.folder}"/>
+    </bean>
 
 </beans>
