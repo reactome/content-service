@@ -4,13 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
-import org.reactome.server.tools.domain.model.DatabaseObject;
-import org.reactome.server.tools.search.domain.EnrichedEntry;
-import org.reactome.server.tools.search.domain.FacetMapping;
-import org.reactome.server.tools.search.domain.GroupedResult;
-import org.reactome.server.tools.search.domain.Query;
-import org.reactome.server.tools.search.exception.SolrSearcherException;
-import org.reactome.server.tools.search.service.SearchService;
+import org.reactome.server.search.domain.FacetMapping;
+import org.reactome.server.search.domain.GroupedResult;
+import org.reactome.server.search.domain.Query;
+import org.reactome.server.search.exception.SolrSearcherException;
+import org.reactome.server.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

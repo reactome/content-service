@@ -3,11 +3,11 @@ package org.reactome.server.controller.graph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.reactome.server.tools.domain.model.*;
-import org.reactome.server.tools.domain.result.Participant;
-import org.reactome.server.tools.service.DatabaseObjectService;
-import org.reactome.server.tools.service.GeneralService;
-import org.reactome.server.tools.service.ParticipantService;
+import org.reactome.server.graph.domain.model.*;
+import org.reactome.server.graph.domain.result.Participant;
+import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.GeneralService;
+import org.reactome.server.graph.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -39,10 +39,10 @@ public class GraphController {
 //    @Autowired
 //    private PhysicalEntityService physicalEntityService;
 
-    private FileWriter writer;
+//    private FileWriter writer;
 
     public GraphController() throws IOException {
-        writer = new FileWriter(new File("test.txt"));
+//        writer = new FileWriter(new File("test.txt"));
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
@@ -70,16 +70,16 @@ public class GraphController {
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject queryById(@ApiParam(defaultValue = "R-HSA-1640170",required = true) @PathVariable String id) throws IOException {
-        Long start, time;
-        start = System.currentTimeMillis();
+//        Long start, time;
+//        start = System.currentTimeMillis();
 
         DatabaseObject databaseObject = databaseObjectService.findById(id);
 //        DatabaseObject databaseObject  = new Pathway();
 //        databaseObject.setDbId(123l);
-        time = System.currentTimeMillis() - start;
+//        time = System.currentTimeMillis() - start;
 
-        writer.write(time.toString() + "\n");
-        writer.flush();
+//        writer.write(time.toString() + "\n");
+//        writer.flush();
         return databaseObject;
     }
 

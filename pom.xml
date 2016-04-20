@@ -34,8 +34,8 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.version>0.0.3-SNAPSHOT</graph.version>
-        <search.version>0.0.3-SNAPSHOT</search.version>
+        <graph.version>0.0.4-SNAPSHOT</graph.version>
+        <search.version>0.0.4-SNAPSHOT</search.version>
         <interactors.version>0.0.9-SNAPSHOT</interactors.version>
         <spring.version>4.2.4.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
@@ -55,19 +55,19 @@
         <jackrabbit.version>2.10</jackrabbit.version>
         <maven.javadoc.version>2.10.3</maven.javadoc.version>
         <maven.info.report.version>2.8.1</maven.info.report.version>
-        <pmd.version>3.added neo4j host parameter6</pmd.version>
+        <pmd.version>3.6</pmd.version>
     </properties>
 
     <dependencies>
         <!--Graph Core-->
         <dependency>
-            <groupId>org.reactome.server.tools</groupId>
+            <groupId>org.reactome.server.graph</groupId>
             <artifactId>graph-core</artifactId>
             <version>${graph.version}</version>
         </dependency>
         <!--Search Core-->
         <dependency>
-            <groupId>org.reactome.server.tools</groupId>
+            <groupId>org.reactome.server.search</groupId>
             <artifactId>search-core</artifactId>
             <version>${search.version}</version>
         </dependency>
@@ -170,16 +170,16 @@
     </dependencies>
 
     <repositories>
-        <repository>
-            <id>flo-local-repo</id>
-            <url>http://172.22.69.124:8081/nexus/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+        <!--<repository>-->
+            <!--<id>flo-local-repo</id>-->
+            <!--<url>http://172.22.69.124:8081/nexus/content/repositories/snapshots/</url>-->
+            <!--<releases>-->
+                <!--<enabled>true</enabled>-->
+            <!--</releases>-->
+            <!--<snapshots>-->
+                <!--<enabled>false</enabled>-->
+            <!--</snapshots>-->
+        <!--</repository>-->
         <repository>
             <id>nexus-ebi-repo</id>
             <name>The EBI internal repository</name>
