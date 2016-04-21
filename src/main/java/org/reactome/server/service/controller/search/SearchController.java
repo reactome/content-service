@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.reactome.server.search.domain.FacetMapping;
+import org.reactome.server.search.domain.FireworksResult;
 import org.reactome.server.search.domain.GroupedResult;
 import org.reactome.server.search.domain.Query;
 import org.reactome.server.search.exception.SolrSearcherException;
@@ -31,52 +32,64 @@ class SearchController {
     @Autowired
     private SearchService searchService;
 
-    @ApiOperation(value = "Retrieves spellcheck suggestions for a given query",response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Retrieves spellcheck suggestions for a given query", response = String.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> spellcheckSuggestions(@ApiParam(defaultValue = "appoptosis",required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> spellcheckSuggestions(@ApiParam(defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
         return searchService.getSpellcheckSuggestions(query);
     }
 
-    @ApiOperation(value = "Retrieves auto-suggestions for a given query",response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Retrieves auto-suggestions for a given query", response = String.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> suggesterSuggestions(@ApiParam(defaultValue = "apoptos",required = true)@RequestParam String query) throws SolrSearcherException {
+    public List<String> suggesterSuggestions(@ApiParam(defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
         return searchService.getAutocompleteSuggestions(query);
     }
 
-    @ApiOperation(value = "Retrieves faceting information on the whole Reactome search data",response = FacetMapping.class, produces = "application/json")
+    @ApiOperation(value = "Retrieves faceting information on the whole Reactome search data", response = FacetMapping.class, produces = "application/json")
     @RequestMapping(value = "/facet", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet() throws SolrSearcherException {
         return searchService.getTotalFacetingInformation();
     }
 
-    @ApiOperation(value = "Retrieves faceting information for a given query",response = FacetMapping.class, produces = "application/json")
+    @ApiOperation(value = "Retrieves faceting information for a given query", response = FacetMapping.class, produces = "application/json")
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
-    public FacetMapping facet_type(@ApiParam(defaultValue = "apoptosis",required = true) @RequestParam String query,
-                                   @ApiParam(defaultValue = "Homo sapiens") @RequestParam( required = false ) List<String> species,
-                                   @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam( required = false ) List<String> types,
-                                   @RequestParam( required = false ) List<String> compartments,
-                                   @RequestParam( required = false ) List<String> keywords ) throws SolrSearcherException {
+    public FacetMapping facet_type(@ApiParam(defaultValue = "apoptosis", required = true) @RequestParam String query,
+                                   @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
+                                   @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(required = false) List<String> compartments,
+                                   @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, compartments, keywords);
         return searchService.getFacetingInformation(queryObject);
     }
 
-    @ApiOperation(value = "Performs a Solr query for given QueryObject",response = GroupedResult.class, produces = "application/json")
+    @ApiOperation(value = "Performs a Solr query for given QueryObject", response = GroupedResult.class, produces = "application/json")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
-    public GroupedResult getResult (@ApiParam(defaultValue = "apoptosis",required = true) @RequestParam String query,
-                                    @ApiParam(defaultValue = "Homo sapiens") @RequestParam( required = false ) List<String> species,
-                                    @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam( required = false ) List<String> types,
-                                    @RequestParam( required = false ) List<String> compartments,
-                                    @RequestParam( required = false ) List<String> keywords,
-                                    @ApiParam(defaultValue = "true") @RequestParam( required = false ) Boolean cluster,
-                                    @RequestParam( required = false ) Integer page,
-                                    @RequestParam( required = false ) Integer rows ) throws SolrSearcherException {
-        Query queryObject = new Query(query, species,types,compartments,keywords,page, rows);
+    public GroupedResult getResult(@ApiParam(defaultValue = "apoptosis", required = true) @RequestParam String query,
+                                   @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
+                                   @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(required = false) List<String> compartments,
+                                   @RequestParam(required = false) List<String> keywords,
+                                   @ApiParam(defaultValue = "true") @RequestParam(required = false) Boolean cluster,
+                                   @RequestParam(required = false) Integer page,
+                                   @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        Query queryObject = new Query(query, species, types, compartments, keywords, page, rows);
         return searchService.getEntries(queryObject, cluster);
+    }
+
+    @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
+    @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
+    @ResponseBody
+    public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
+                                              @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
+                                              @ApiParam(defaultValue = "Protein") @RequestParam(required = false) List<String> types,
+                                              @RequestParam(required = false) Integer page,
+                                              @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        Query queryObject = new Query(query, species, types, null, null, page, rows);
+        return searchService.getFireworks(queryObject);
     }
 
 //    /**
