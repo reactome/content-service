@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.reactome.server.graph.domain.model.*;
 import org.reactome.server.graph.domain.result.Participant;
+import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.graph.service.ParticipantService;
@@ -109,6 +110,15 @@ public class GraphController {
                                                                @ApiParam(defaultValue = "1", required = true) @RequestParam(required = true) Integer page,
                                                                @ApiParam(defaultValue = "25", required = true) @RequestParam(required = true) Integer offset) throws ClassNotFoundException {
         return generalService.findObjectsByClassName(className,page,offset);
+    }
+
+    @ApiOperation(value = "Retrieves the list of the lower level pathways where the passed PhysicalEntity or Event are present", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @RequestMapping(value = "/pathwaysFor/{stableIdentifier}", method = RequestMethod.GET)
+    @ResponseBody
+    public Collection<SimpleDatabaseObject> getPathwaysFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String stableIdentifier,
+                                                           @ApiParam(defaultValue = "48887", required = false) @RequestParam(required = false, defaultValue = "48887") Long speciesId){
+        Collection<SimpleDatabaseObject> rtn = generalService.getPathwaysFor(stableIdentifier, speciesId);
+        return rtn;
     }
 
     @ApiIgnore
