@@ -23,6 +23,15 @@
         </encoder>
     </appender>
 
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>./target/testFile.log</file>
+        <append>true</append>
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
 
     <!--<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">-->
     <!--<smtpHost>${smtpHost}</smtpHost>-->
@@ -163,7 +172,8 @@
         <appender-ref ref="EMAIL"/>
     </logger>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="STDOUT" />-->
     </root>
 </configuration>
