@@ -122,11 +122,11 @@ public class GraphController {
     }
 
     @ApiOperation(value = "Retrieves the list of the lower level pathways where the passed PhysicalEntity or Event are present", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/pathwaysFor/{stableIdentifier}", method = RequestMethod.GET)
+    @RequestMapping(value = "/pathwaysFor/{stId}", method = RequestMethod.GET)
     @ResponseBody
-    public Collection<SimpleDatabaseObject> getPathwaysFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String stableIdentifier,
+    public Collection<SimpleDatabaseObject> getPathwaysFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String stId,
                                                            @ApiParam(defaultValue = "48887", required = false) @RequestParam(required = false, defaultValue = "48887") Long speciesId){
-        Collection<SimpleDatabaseObject> rtn = generalService.getPathwaysFor(stableIdentifier, speciesId);
+        Collection<SimpleDatabaseObject> rtn = generalService.getPathwaysFor(stId, speciesId);
         return rtn;
     }
 

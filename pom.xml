@@ -36,7 +36,7 @@
 
         <graph.version>0.0.4-SNAPSHOT</graph.version>
         <search.version>0.0.4-SNAPSHOT</search.version>
-        <interactors.version>1.0.0-SNAPSHOT</interactors.version>
+        <interactors.version>1.0.2-SNAPSHOT</interactors.version>
         <spring.version>4.2.4.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -50,7 +50,7 @@
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>
-        <jdk.version>1.7</jdk.version>
+        <jdk.version>1.8</jdk.version>
         <maven.site.version>3.4</maven.site.version>
         <jackrabbit.version>2.10</jackrabbit.version>
         <maven.javadoc.version>2.10.3</maven.javadoc.version>

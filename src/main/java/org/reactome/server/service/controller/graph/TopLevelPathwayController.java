@@ -18,7 +18,7 @@ import java.util.Collection;
  * @since 18.05.16.
  */
 @RestController
-@Api(tags = "tlp", description = "Reactome Data " )
+@Api(tags = "topLevelPathways", description = "Reactome Data " )
 @RequestMapping("/data")
 public class TopLevelPathwayController {
 

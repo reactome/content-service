@@ -20,7 +20,7 @@ import java.util.Collection;
  * @since 18.05.16.
  */
 @RestController
-@Api(tags = "participant", description = "Reactome Data " )
+@Api(tags = "participants", description = "Reactome Data " )
 @RequestMapping("/data")
 public class ParticipantController {
 
