@@ -75,19 +75,6 @@ public class GraphController {
         return StringUtils.join(generalService.findSimpleReferencesByClassName(ReferenceGeneProduct.class.getSimpleName()), "\n");
     }
 
-    @ApiOperation(value = "Retrieves all Persons containing name",response = Person.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/queryPeopleByName/{name}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<Person> queryPersonByName(@ApiParam(defaultValue = "Steve",required = true) @PathVariable String name) {
-        return generalService.queryPersonByName(name);
-    }
-
-    @ApiOperation(value = "Retrieves all Persons with name",response = Person.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/findPersonByName/{name}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<Person> findPersonByName(@ApiParam(defaultValue = "Steve",required = true) @PathVariable String name) {
-        return generalService.findPersonByName(name);
-    }
 
     @ApiOperation(value = "Retrieves all Persons with name",response = Person.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/queryPersonByEmail/{email:.+}", method = RequestMethod.GET, produces = "application/json")
