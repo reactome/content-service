@@ -5,11 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.reactome.server.graph.domain.model.*;
-import org.reactome.server.graph.domain.result.Participant;
-import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
-import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
-import org.reactome.server.graph.service.ParticipantService;
 import org.reactome.server.graph.service.helper.RelationshipDirection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -106,15 +102,6 @@ public class GraphController {
     public DatabaseObject findByIdWithOutgoingRelations(@ApiParam(defaultValue = "R-HSA-1640170",required = true) @PathVariable String id) throws IOException {
         DatabaseObject databaseObject = generalService.find(id, RelationshipDirection.OUTGOING);
         return databaseObject;
-    }
-
-    @ApiOperation(value = "Retrieves the list of the lower level pathways where the passed PhysicalEntity or Event are present", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/pathwaysFor/{stId}", method = RequestMethod.GET)
-    @ResponseBody
-    public Collection<SimpleDatabaseObject> getPathwaysFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String stId,
-                                                           @ApiParam(defaultValue = "48887", required = false) @RequestParam(required = false, defaultValue = "48887") Long speciesId){
-        Collection<SimpleDatabaseObject> rtn = generalService.getPathwaysFor(stId, speciesId);
-        return rtn;
     }
 
 }
