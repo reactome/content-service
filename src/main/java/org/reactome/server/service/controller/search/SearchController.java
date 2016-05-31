@@ -74,9 +74,9 @@ class SearchController {
                                    @RequestParam(required = false) List<String> compartments,
                                    @RequestParam(required = false) List<String> keywords,
                                    @ApiParam(defaultValue = "true") @RequestParam(required = false) Boolean cluster,
-                                   @RequestParam(required = false) Integer page,
+                                   @RequestParam(required = false) Integer start,
                                    @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, species, types, compartments, keywords, page, rows);
+        Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         return searchService.getEntries(queryObject, cluster);
     }
 
@@ -86,9 +86,9 @@ class SearchController {
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
                                               @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
                                               @ApiParam(defaultValue = "Protein") @RequestParam(required = false) List<String> types,
-                                              @RequestParam(required = false) Integer page,
+                                              @RequestParam(required = false) Integer start,
                                               @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, species, types, null, null, page, rows);
+        Query queryObject = new Query(query, species, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
     }
 
