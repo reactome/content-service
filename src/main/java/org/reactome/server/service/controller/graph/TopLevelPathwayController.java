@@ -36,14 +36,14 @@ public class TopLevelPathwayController {
     @RequestMapping(value = "/topLevelPathway/{speciesName}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<TopLevelPathway> getTopLevelPathwaysByName(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
-        return topLevelPathwayService.getTopLevelPathways(speciesName);
+        return topLevelPathwayService.getTopLevelPathwaysByName(speciesName);
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways for given species dbId",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/topLevelPathwaysById/{speciesId}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<TopLevelPathway> getTopLevelPathwaysById(@ApiParam(defaultValue = "48887",required = true) @PathVariable Long speciesId)  {
-        return topLevelPathwayService.getTopLevelPathways(speciesId);
+        return topLevelPathwayService.getTopLevelPathwaysById(speciesId);
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways for given species taxonomy id",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
@@ -64,14 +64,14 @@ public class TopLevelPathwayController {
     @RequestMapping(value = "/curatedTopLevelPathway/{speciesName}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<TopLevelPathway> getCuratedTopLevelPathwaysByName(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
-        return topLevelPathwayService.getCuratedTopLevelPathways(speciesName);
+        return topLevelPathwayService.getCuratedTopLevelPathwaysByName(speciesName);
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways for given species dbId",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/curatedTopLevelPathwaysById/{speciesId}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<TopLevelPathway> getCuratedTopLevelPathwaysById(@ApiParam(defaultValue = "48887",required = true) @PathVariable Long speciesId)  {
-        return topLevelPathwayService.getCuratedTopLevelPathways(speciesId);
+        return topLevelPathwayService.getCuratedTopLevelPathwaysById(speciesId);
     }
 
     @ApiOperation(value = "Retrieves all Reactome top level pathways for given species taxonomy id",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
