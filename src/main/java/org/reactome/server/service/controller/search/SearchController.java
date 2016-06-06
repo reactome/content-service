@@ -15,12 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 /**
- * Converts a Solr QueryResponse into Objects provided by Project Models
+ * Created by:
  *
- * @author Florian Korninger (fkorn@ebi.ac.uk)
- * @version 1.0
+ * @author Florian Korninger (florian.korninger@ebi.ac.uk)
+ * @since 18.05.16.
  */
 @RestController
 @Api(tags = "search", description = "Reactome Search")
@@ -95,13 +94,7 @@ class SearchController {
 //    /**
 //     * Overwrites the Global Exception Handler
 //     */
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(SolrSearcherException.class)
-//    @ResponseBody
-//    ErrorInfo handleSolrException(HttpServletRequest req, SolrSearcherException e) {
-//        logger.error(e);
-//        return new ErrorInfo("SolrService Exception occurred", req.getRequestURL(), e);
-//    }
+
 //    /**
 //     * Overwrites the Global Exception Handler
 //     */
@@ -112,14 +105,5 @@ class SearchController {
 //        logger.error(e);
 //        return new ErrorInfo("SearchService Exception occurred", req.getRequestURL(), e);
 //    }
-//    /**
-//     * Overwrites the Global Exception Handler
-//     */
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(EnricherException.class)
-//    @ResponseBody
-//    ErrorInfo handleEnricherException(HttpServletRequest req, EnricherException e) {
-//        logger.error(e);
-//        return new ErrorInfo("Enricher Exception occurred", req.getRequestURL(), e);
-//    }
+
 }

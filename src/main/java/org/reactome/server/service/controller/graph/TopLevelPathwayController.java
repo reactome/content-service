@@ -3,12 +3,14 @@ package org.reactome.server.service.controller.graph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.TopLevelPathway;
 import org.reactome.server.graph.service.TopLevelPathwayService;
+import org.reactome.server.service.controller.graph.util.ControllerUtils;
+import org.reactome.server.service.exception.newExceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 /**
@@ -18,66 +20,75 @@ import java.util.Collection;
  * @since 18.05.16.
  */
 @RestController
-@Api(tags = "topLevelPathways", description = "Reactome Data " )
+@Api(tags = "topLevelPathways", description = "Reactome Data: TopLevelPathway queries" )
 @RequestMapping("/data")
 public class TopLevelPathwayController {
 
     @Autowired
     private TopLevelPathwayService topLevelPathwayService;
 
-    @ApiOperation(value = "Retrieves all Reactome top level pathways",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Retrieves all Reactome top level pathways",
+            notes = "If species is specified result will be filtered.",
+            produces = "application/json")
     @RequestMapping(value = "/topLevelPathway", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<TopLevelPathway> getTopLevelPathways()  {
-        return topLevelPathwayService.getTopLevelPathways();
+    public Collection<TopLevelPathway> getTopLevelPathways(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species)  {
+        if (species == null) {
+            return topLevelPathwayService.getTopLevelPathways();
+        } else {
+            Collection<TopLevelPathway> topLevelPathways = topLevelPathwayService.getTopLevelPathways(species);
+            if (topLevelPathways == null || topLevelPathways.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+            return topLevelPathways;
+        }
     }
 
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species name",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/topLevelPathway/{speciesName}", method = RequestMethod.GET, produces = "application/json")
+    @ApiOperation(value = "Retrieves all Reactome top level pathways",
+            notes = "Retrieves a single property from the list of DatabaseObjects. If species is specified result will be filtered.",
+            produces = "application/json")
+    @RequestMapping(value = "/topLevelPathway/{attributeName}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<TopLevelPathway> getTopLevelPathwaysByName(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
-        return topLevelPathwayService.getTopLevelPathways(speciesName);
+    public Collection<Object> getTopLevelPathways(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species,
+                                                  @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
+
+        Collection<TopLevelPathway> topLevelPathways;
+        if (species == null) {
+            topLevelPathways = topLevelPathwayService.getTopLevelPathways();
+        } else {
+            topLevelPathways = topLevelPathwayService.getTopLevelPathways(species);
+            if (topLevelPathways == null || topLevelPathways.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        }
+        return ControllerUtils.getProperties(topLevelPathways, attributeName);
     }
 
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species dbId",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/topLevelPathwaysById/{speciesId}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<TopLevelPathway> getTopLevelPathwaysById(@ApiParam(defaultValue = "48887",required = true) @PathVariable Long speciesId)  {
-        return topLevelPathwayService.getTopLevelPathways(speciesId);
-    }
-
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species taxonomy id",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/topLevelPathwaysByTaxId/{taxId}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<TopLevelPathway> getTopLevelPathwaysByTaxId(@ApiParam(defaultValue = "9606",required = true) @PathVariable String taxId)  {
-        return topLevelPathwayService.getTopLevelPathwaysByTaxId(taxId);
-    }
-
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species name",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Retrieves all Reactome top level pathways",
+            notes = "If species is specified result will be filtered.",
+            produces = "application/json")
     @RequestMapping(value = "/curatedTopLevelPathway", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<TopLevelPathway> getCuratedTopLevelPathways()  {
-        return topLevelPathwayService.getCuratedTopLevelPathways();
+    public Collection<TopLevelPathway> getCuratedTopLevelPathways(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species)  {
+        if (species == null) {
+            return topLevelPathwayService.getCuratedTopLevelPathways();
+        } else {
+            Collection<TopLevelPathway> topLevelPathways = topLevelPathwayService.getCuratedTopLevelPathways(species);
+            if (topLevelPathways == null || topLevelPathways.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+            return topLevelPathways;
+        }
     }
 
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species name",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/curatedTopLevelPathway/{speciesName}", method = RequestMethod.GET, produces = "application/json")
+    @ApiOperation(value = "Retrieves all Reactome top level pathways",
+            notes = "Retrieves a single property from the list of DatabaseObjects. If species is specified result will be filtered.",
+            produces = "application/json")
+    @RequestMapping(value = "/curatedTopLevelPathway/{attributeName}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<TopLevelPathway> getCuratedTopLevelPathwaysByName(@ApiParam(defaultValue = "Homo sapiens",required = true) @PathVariable String speciesName)  {
-        return topLevelPathwayService.getCuratedTopLevelPathways(speciesName);
-    }
-
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species dbId",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/curatedTopLevelPathwaysById/{speciesId}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<TopLevelPathway> getCuratedTopLevelPathwaysById(@ApiParam(defaultValue = "48887",required = true) @PathVariable Long speciesId)  {
-        return topLevelPathwayService.getCuratedTopLevelPathways(speciesId);
-    }
-
-    @ApiOperation(value = "Retrieves all Reactome top level pathways for given species taxonomy id",response = DatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/curatedTopLevelPathwaysByTaxId/{taxId}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<TopLevelPathway> getCuratedTopLevelPathwaysByTaxId(@ApiParam(defaultValue = "9606",required = true) @PathVariable String taxId)  {
-        return topLevelPathwayService.getCuratedTopLevelPathwaysByTaxId(taxId);
+    public Collection<Object> getCuratedTopLevelPathways(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species,
+                                                         @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
+        Collection<TopLevelPathway> topLevelPathways;
+        if (species == null) {
+            topLevelPathways = topLevelPathwayService.getCuratedTopLevelPathways();
+        } else {
+            topLevelPathways = topLevelPathwayService.getCuratedTopLevelPathways(species);
+            if (topLevelPathways == null || topLevelPathways.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        }
+        return ControllerUtils.getProperties(topLevelPathways, attributeName);
     }
 }

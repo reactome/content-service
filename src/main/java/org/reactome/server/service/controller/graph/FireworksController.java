@@ -14,7 +14,7 @@ import java.util.Collection;
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
 @RestController
-@Api(tags = "data", description = "Reactome Data ")
+@Api(tags = "fireworks", description = "Search \"on fire\" queries.")
 @RequestMapping("/data")
 public class FireworksController {
 
