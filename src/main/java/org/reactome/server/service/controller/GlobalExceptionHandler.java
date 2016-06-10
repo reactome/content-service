@@ -32,27 +32,31 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody ErrorInfo handleNotFoundException(HttpServletRequest request, NotFoundException e) {
-        return new ErrorInfo(HttpStatus.NOT_FOUND, e.getMessage(), request.getRequestURL(), e);
+        //no logging here!
+        return new ErrorInfo(HttpStatus.NOT_FOUND, request.getRequestURL(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({InvocationTargetException.class, IllegalAccessException.class})
     @ResponseBody ErrorInfo handleReflectionError (HttpServletRequest request, Exception e) {
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request.getRequestURL(), e);
+        logger.error("ReflectionException was caught",e);
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(SolrSearcherException.class)
     @ResponseBody
     ErrorInfo handleSolrException(HttpServletRequest request, SolrSearcherException e) {
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request.getRequestURL(), e);
+        logger.error("Solr exception was caught",e);
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ClassNotFoundException.class)
     @ResponseBody
     ErrorInfo handleSolrException(HttpServletRequest request, ClassNotFoundException e) {
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, "Class specified was not found", request.getRequestURL(), e);
+        logger.error("ClassNotFoundException was caught",e);
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "Class specified was not found");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -60,6 +64,6 @@ class GlobalExceptionHandler {
     @ResponseBody
     ErrorInfo handleUnclassified(HttpServletRequest request, Exception e) {
         logger.error("An unspecified exception was caught",e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, "An unspecified exception was caught", request.getRequestURL(), e);
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "An unspecified exception was caught");
     }
 }

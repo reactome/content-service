@@ -26,7 +26,7 @@ public class ControllerUtils {
     public static Object getProperty(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {
         Object property = getPropertyObject(object, attributeName);
         if (property != null) return property;
-        throw new NotFoundException("Attribute: " + attributeName + " has not been found in the System");
+        throw new NotFoundException("Attribute: " + attributeName + " has not been found for object: " + object.getClass());
     }
 
     private static Object getPropertyObject(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {

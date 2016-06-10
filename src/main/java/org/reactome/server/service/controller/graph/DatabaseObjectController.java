@@ -42,7 +42,7 @@ public class DatabaseObjectController {
     @ApiOperation(value = "Retrieves a DatabaseObject",
             notes = "Retrieves a single property from the DatabaseObject.",
             produces = "application/json")
-    @RequestMapping(value = "/detail/{id}/{attributeName}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/detail/{id}/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public Object findById(@ApiParam(value = "DbId or StId of a DatabaseObject", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true)   @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {

@@ -16,16 +16,15 @@ import org.springframework.web.bind.annotation.*;
  * @since 19.05.16.
  */
 @RestController
-@Api(tags = "detail", description = "Reactome Data: Detailed queries.")
+@Api(tags = "detail", description = "Reactome Data: Detailed queries")
 @RequestMapping("/data")
 public class DetailsController {
 
     @Autowired
     private DetailsService detailsService;
 
-    @ApiOperation(value = "Retrieves a wrapper containing extended information about a DatabaseObject: ",
+    @ApiOperation(value = "Retrieves a wrapper containing extended information about a DatabaseObject",
             notes = "ContentDetails contains: DatabaseObject, componentsOf, other forms of the entry, locationsTree.",
-            response = ContentDetails.class,
             produces = "application/json")
     @RequestMapping(value = "/detail/{id}/extended", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
