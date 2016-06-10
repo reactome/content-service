@@ -11,14 +11,13 @@ import org.springframework.http.HttpStatus;
 public class ErrorInfo {
 
     public final HttpStatus status;
-    public final String message;
     public final String url;
-    public final Exception ex;
+    public final String[] message;
 
-    public ErrorInfo(HttpStatus status, String message, StringBuffer url, Exception ex) {
+
+    public ErrorInfo(HttpStatus status, StringBuffer url, String... message) {
         this.status = status;
-        this.message = message;
         this.url = url.toString();
-        this.ex = ex;
+        this.message = message;
     }
 }
