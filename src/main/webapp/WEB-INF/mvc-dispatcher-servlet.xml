@@ -9,11 +9,12 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-    <context:component-scan base-package="org.reactome.server">
-        <context:exclude-filter type="regex" expression="org.reactome.server.service.controller.graph.*"/>
-        <context:exclude-filter type="regex" expression="org.reactome.server.service.controller.search.*"/>
-    </context:component-scan>
+    <!--<context:component-scan base-package="org.reactome.server">-->
+        <!--<context:exclude-filter type="regex" expression="org.reactome.server.service.controller.graph.*"/>-->
+        <!--<context:exclude-filter type="regex" expression="org.reactome.server.service.controller.search.*"/>-->
+    <!--</context:component-scan>-->
 
+    <context:component-scan base-package="org.reactome.server" />
     <context:property-placeholder location="classpath:/service.properties" />
 
     <!-- Standard xml based mvc config-->
