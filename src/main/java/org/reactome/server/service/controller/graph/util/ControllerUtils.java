@@ -8,24 +8,29 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Created by flo on 06/06/16.
- */
 public class ControllerUtils {
 
-    public static Collection<Object> getProperties(Collection<? extends Object> objects, String attributeName) throws InvocationTargetException, IllegalAccessException {
-        Collection<Object> properties = new ArrayList<>();
+//    public static Collection<Object> getProperties(Collection<? extends Object> objects, String attributeName) throws InvocationTargetException, IllegalAccessException {
+//        Collection<Object> properties = new ArrayList<>();
+//        for (Object object : objects) {
+//            Object property = ControllerUtils.getPropertyObject(object, attributeName);
+//            if (property != null) properties.add(property);
+//        }
+//        if (!properties.isEmpty()) return properties;
+//        throw new NotFoundException("Attribute: " + attributeName + " has not been found in the System");
+//    }
+
+    public static Collection<String> getProperties(Collection objects, String attributeName) throws InvocationTargetException, IllegalAccessException {
+        Collection<String> rtn = new ArrayList<>();
         for (Object object : objects) {
-            Object property = ControllerUtils.getPropertyObject(object, attributeName);
-            if (property != null) properties.add(property);
+            rtn.add(getProperty(object, attributeName));
         }
-        if (!properties.isEmpty()) return properties;
-        throw new NotFoundException("Attribute: " + attributeName + " has not been found in the System");
+        return rtn;
     }
 
-    public static Object getProperty(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {
+    public static String getProperty(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {
         Object property = getPropertyObject(object, attributeName);
-        if (property != null) return property;
+        if (property != null) return toTSV(property);
         throw new NotFoundException("Attribute: " + attributeName + " has not been found for object: " + object.getClass());
     }
 
@@ -37,5 +42,22 @@ public class ControllerUtils {
             }
         }
         return null;
+    }
+
+    private static String toTSV(Object object) {
+        if (object instanceof DatabaseObject){
+            DatabaseObject dbo = (DatabaseObject) object;
+            String id = dbo.getStId();
+            return ((id!=null && !id.isEmpty()) ? id : dbo.getDbId()) + "\t" + dbo.getDisplayName() + "\t" + dbo.getSchemaClass();
+        }
+        if (object instanceof Collection){
+            Collection<?> list = (Collection) object;
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Object o : list) {
+                stringBuilder.append(toTSV(o)).append("\n");
+            }
+            return stringBuilder.toString();
+        }
+        return object.toString();
     }
 }

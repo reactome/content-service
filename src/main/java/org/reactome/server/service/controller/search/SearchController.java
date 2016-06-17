@@ -3,7 +3,6 @@ package org.reactome.server.service.controller.search;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.log4j.Logger;
 import org.reactome.server.search.domain.FacetMapping;
 import org.reactome.server.search.domain.FireworksResult;
 import org.reactome.server.search.domain.GroupedResult;
@@ -12,6 +11,7 @@ import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -25,8 +25,6 @@ import java.util.List;
 @Api(tags = "search", description = "Reactome Search")
 @RequestMapping("/search")
 class SearchController {
-
-    private static final Logger logger = Logger.getLogger(SearchController.class);
 
     @Autowired
     private SearchService searchService;
@@ -79,6 +77,7 @@ class SearchController {
         return searchService.getEntries(queryObject, cluster);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody

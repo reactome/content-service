@@ -17,21 +17,21 @@ import java.util.List;
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
 @RestController
-@Api(tags = "species", description = "Species related queries.")
+@Api(tags = "species", description = "Reactome Data: Species related queries")
 @RequestMapping("/data")
 public class SpeciesController {
 
     @Autowired
     SpeciesService speciesService;
 
-    @ApiOperation(value = "Retrieves the list of main species sorted by name (but having 'Homo sapiens' the first one)", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
-    @RequestMapping(value = "/species", method = RequestMethod.GET)
+    @ApiOperation(value = "The list of main species sorted by name (but having 'Homo sapiens' the first one)", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @RequestMapping(value = "/species/main", method = RequestMethod.GET)
     @ResponseBody
     public List<Species> getSpecies() {
         return speciesService.getSpecies();
     }
 
-    @ApiOperation(value = "Retrieves the list of all species sorted by name", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "The list of all species sorted by name", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/species/all", method = RequestMethod.GET)
     @ResponseBody
     public List<Species> getAllSpecies() {

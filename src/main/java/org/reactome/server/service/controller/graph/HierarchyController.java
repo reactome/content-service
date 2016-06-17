@@ -9,6 +9,7 @@ import org.reactome.server.graph.service.util.PathwayBrowserLocationsUtils;
 import org.reactome.server.service.exception.newExceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 import java.util.Set;
@@ -19,9 +20,11 @@ import java.util.Set;
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
  * @since 18.05.16.
  */
-@RestController
+//@RestController
+@ApiIgnore
 @Api(tags = "hierarchy", description = "Reactome Data: Hierarchical queries." )
 @RequestMapping("/data")
+@Deprecated
 public class HierarchyController {
 
     @Autowired
@@ -85,11 +88,5 @@ public class HierarchyController {
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty()) throw new NotFoundException("No Locations in the PathwayBrowser could have been found for id: " + id);
         return pathwayBrowserNodes;
     }
-
-
-
-
-
-
 
 }
