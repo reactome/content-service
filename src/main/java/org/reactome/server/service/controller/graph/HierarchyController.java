@@ -30,19 +30,6 @@ public class HierarchyController {
     @Autowired
     private HierarchyService eventHierarchyService;
 
-    @ApiOperation(value = "Retrieves a full Event hierarchy",
-            notes = "Event hierarchy will be created following hasEvent relationships. Each TopLevelPathway will form a tree. PathwayBrowserNode contains: stId, name, species, url, type, diagram.",
-            response = PathwayBrowserNode.class,
-            responseContainer = "List",
-            produces = "application/json")
-    @RequestMapping(value = "/eventHierarchy/{species}", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<PathwayBrowserNode> getEventHierarchy(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606",required = true) @PathVariable String species)  {
-        Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species);
-        if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty()) throw new NotFoundException("No event hierarchy found for given species: " + species);
-        return pathwayBrowserNodes;
-    }
-
     @ApiOperation(value = "Retrieves a sub graph for given id",
             notes = "Sub graph will be created following all outgoing relationships of type: hasEvent, input, output, hasCandidate, hasMember, hasComponent, repeatedUnit. PathwayBrowserNode contains: stId, name, species, url, type, diagram.",
             response = PathwayBrowserNode.class,
