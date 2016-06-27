@@ -30,7 +30,7 @@
     <appender name="EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
 
         <smtpHost>${mail.host}</smtpHost>
-        <smtpPort>${mail.port}</smtpPort> have different Class objects for the type org/apache/http/HttpRequestInterceptor used in the signature
+        <smtpPort>${mail.port}</smtpPort>
         <to>${mail.to}</to>
         <from>${mail.from}</from>
         <subject>${mail.subject}</subject>
