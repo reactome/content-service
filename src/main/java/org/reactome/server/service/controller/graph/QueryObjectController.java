@@ -10,6 +10,8 @@ import org.reactome.server.graph.service.DetailsService;
 import org.reactome.server.graph.service.helper.ContentDetails;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/data")
 public class QueryObjectController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private DatabaseObjectService databaseObjectService;
 
@@ -45,6 +49,7 @@ public class QueryObjectController {
     public DatabaseObject findById(@ApiParam(value = "DbId or StId of a DatabaseObject", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id) {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("DatabaseObject for id: {} was {}", id, "found");
         return databaseObject;
     }
 
@@ -55,6 +60,7 @@ public class QueryObjectController {
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("DatabaseObject for id: {} was {}", id, "found");
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 

@@ -3,177 +3,67 @@
 <!--Logback official documentation:
         The syntax of logback configuration files is extremely flexible.
         As such, it is not possible to specify the allowed syntax with a DTD file or an XML schema.-->
-<!--todo ${log4j.level}-->
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="importFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>./target/data-import-logging/data-import-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-            <maxHistory>-1</maxHistory>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logging.dir}/content-service/content-service.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logging.dir}/content-service/content-service-%i-log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
         </rollingPolicy>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>./target/testFile.log</file>
-        <append>true</append>
-        <!-- encoders are assigned the type
-             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-        <encoder>
-            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-        </encoder>
+    <appender name="EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
+
+        <smtpHost>${mail.host}</smtpHost>
+        <smtpPort>${mail.port}</smtpPort> have different Class objects for the type org/apache/http/HttpRequestInterceptor used in the signature
+        <to>${mail.to}</to>
+        <from>${mail.from}</from>
+        <subject>${mail.subject}</subject>
+
+        <maxMessages>5</maxMessages>
+        <timeInterval>1</timeInterval>
+
+        <layout class="ch.qos.logback.classic.html.HTMLLayout"/>
+        <asynchronousSending>false</asynchronousSending>
     </appender>
 
-    <!--<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">-->
-    <!--<smtpHost>${smtpHost}</smtpHost>-->
-    <!--<to>${to}</to>-->
-    <!--<from>${from}</from>-->
-    <!--<subject>%logger{20} - %m</subject>-->
-    <!--<layout class="ch.qos.logback.classic.html.HTMLLayout"/>-->
-
-    <!--<cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">-->
-    <!--&lt;!&ndash; send just one log entry per email &ndash;&gt;-->
-    <!--<bufferSize>1</bufferSize>-->
-    <!--</cyclicBufferTracker>-->
-    <!--</appender>-->
-
-    <!--<appender name="EMAIL" class="org.reactome.server.tools.search.util.ScheduledSMTPAppender">>-->
-        <!--<smtpHost>localhost</smtpHost>-->
-        <!--<smtpPort>9999</smtpPort>-->
-        <!--<to>fkorninger@yahoo.de</to>-->
-        <!--<from>reactome-indexer@reactome.org</from>-->
-        <!--<subject>Search-Core Warnings and Errors</subject>-->
-
-        <!--<maxMessages>100</maxMessages>-->
-        <!--<timeInterval>2</timeInterval>-->
-
-        <!--<layout class="ch.qos.logback.classic.html.HTMLLayout"/>-->
-        <!--<asynchronousSending>false</asynchronousSending>-->
-    <!--</appender>-->
-
-
-    <!--<appender name="EMAIL" class="org.apache.log4j.net.SMTPAppender">-->
-        <!--<param name="BufferSize" value="10" />-->
-        <!--<smtpHost>localhost</smtpHost>-->
-        <!--<smtpPort>9999</smtpPort>-->
-        <!--<to>fkorninger@yahoo.de</to>-->
-        <!--<from>reactome-indexer@reactome.org</from>-->
-
-        <!--<param name="Subject" value="Diagram Generation Report" />-->
-        <!--<param name="SMTPDebug" value="false" />-->
-        <!--<triggeringPolicy  class="org.apache.log4j.rolling.FilterBasedTriggeringPolicy">-->
-            <!--<filter class="org.apache.log4j.varia.DenyAllFilter" />-->
-        <!--</triggeringPolicy>-->
-        <!--<layout class="org.apache.log4j.PatternLayout">-->
-            <!--<param name="ConversionPattern"-->
-                   <!--value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />-->
-        <!--</layout>-->
-        <!--<filter class="org.apache.log4j.varia.LevelRangeFilter">-->
-            <!--<param name="levelMin" value="WARN" />-->
-            <!--<param name="levelMax" value="ERROR" />-->
-        <!--</filter>-->
-        <!--<filter class="org.apache.log4j.varia.StringMatchFilter">-->
-            <!--<param name="StringToMatch" value="[DEV]" />-->
-            <!--<param name="AcceptOnMatch" value="true" />-->
-        <!--</filter>-->
-        <!--<filter class="org.apache.log4j.varia.DenyAllFilter"/>-->
-    <!--</appender>-->
-
-
-
-    <!--<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">-->
-        <!--<smtpHost>localhost</smtpHost>-->
-        <!--<smtpPort>9999</smtpPort>-->
-        <!--&lt;!&ndash;<username>xxxxx</username>&ndash;&gt;-->
-        <!--&lt;!&ndash;<password>xxxxxx</password>&ndash;&gt;-->
-        <!--<to>fkorninger@yahoo.de</to>-->
-        <!--<from>reactome-indexer@reactome.org</from>-->
-        <!--&lt;!&ndash;<from>${from}</from>&ndash;&gt;-->
-        <!--&lt;!&ndash;<maxMessages>10</maxMessages>&ndash;&gt;-->
-        <!--<subject>Testing %logger{20} - %m</subject>-->
-        <!--<layout class="ch.qos.logback.classic.html.HTMLLayout"/>-->
-
-        <!--&lt;!&ndash;<layout class="ch.qos.logback.classic.PatternLayout">&ndash;&gt;-->
-            <!--&lt;!&ndash;<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>&ndash;&gt;-->
-        <!--&lt;!&ndash;</layout>&ndash;&gt;-->
-        <!--&lt;!&ndash;<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">&ndash;&gt;-->
-            <!--&lt;!&ndash;<maxFileSize>1MB</maxFileSize>&ndash;&gt;-->
-        <!--&lt;!&ndash;</triggeringPolicy>&ndash;&gt;-->
-
-        <!--&lt;!&ndash;<cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">&ndash;&gt;-->
-            <!--&lt;!&ndash; send just one log entry per email &ndash;&gt;-->
-            <!--&lt;!&ndash;<bufferSize>10</bufferSize>&ndash;&gt;-->
-        <!--&lt;!&ndash;</cyclicBufferTracker>&ndash;&gt;-->
-        <!--&lt;!&ndash;<cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">&ndash;&gt;-->
-            <!--&lt;!&ndash;&lt;!&ndash; send just one log entry per email &ndash;&gt;&ndash;&gt;-->
-            <!--&lt;!&ndash;<bufferSize>50</bufferSize>&ndash;&gt;-->
-        <!--&lt;!&ndash;</cyclicBufferTracker>&ndash;&gt;-->
-
-        <!--<asynchronousSending>false</asynchronousSending>-->
-    <!--</appender>-->
-
-
-    <!--<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">-->
-    <!--<smtpHost>ADDRESS-OF-YOUR-SMTP-HOST</smtpHost>-->
-    <!--<to>EMAIL-DESTINATION</to>-->
-    <!--<to>ANOTHER_EMAIL_DESTINATION</to> &lt;!&ndash; additional destinations are possible &ndash;&gt;-->
-    <!--<from>SENDER-EMAIL</from>-->
-    <!--<subject>TESTING: %logger{20} - %m</subject>-->
-    <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
-    <!--<pattern>%date %-5level %logger{35} - %message%n</pattern>-->
-    <!--</layout>-->
-    <!--</appender>-->
-
-
-    <!--<appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-    <!--<file>mylog.txt</file>-->
-    <!--<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
-    <!--&lt;!&ndash; rollover daily &ndash;&gt;-->
-    <!--<fileNamePattern>mylog-%d{yyyy-MM-dd}.%i.txt</fileNamePattern>-->
-    <!--&lt;!&ndash; each file should be at most 100MB, keep 60 days worth of history, but at most 20GB &ndash;&gt;-->
-    <!--<maxFileSize>100MB</maxFileSize>-->
-    <!--<maxHistory>60</maxHistory>-->
-    <!--<totalSizeCap>20GB</totalSizeCap>-->
-    <!--</rollingPolicy>-->
-
-
-
-
-    <appender name="testFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>./target/test-logging/service-test-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-            <maxHistory>-1</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
+    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>org.sqlite.JDBC</driverClass>
+            <url>jdbc:sqlite:${logging.database}</url>
+        </connectionSource>
     </appender>
 
-    <logger name="importLogger" level="WARN" additivity="false">
-        <appender-ref ref="importFileAppender"/>
+    <!--Async appender, will add 10 ms per request if not used-->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DB" />
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <logger name="infoLogger" level="INFO"  >
+        <appender-ref ref="ASYNC"/>
     </logger>
 
-    <logger name="testLogger" level="INFO" additivity="false">
-        <appender-ref ref="testFile"/>
+    <logger name="errorLogger" level="ERROR">
+        <appender-ref ref="EMAIL" />
     </logger>
 
-
-    <logger name="ee" level="INFO"  >
-        <appender-ref ref="EMAIL"/>
-    </logger>
-
-    <root level="WARN">
-        <appender-ref ref="STDOUT" />
-        <!--<appender-ref ref="STDOUT" />-->
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

@@ -239,6 +239,14 @@
             </resource>
         </resources>
         <plugins>
+            <!--Plugin needed to force maven resources to latest version. Default version contains a bug-->
+            <!--preventing maven to filter resources containg a @ symbol-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.1</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>

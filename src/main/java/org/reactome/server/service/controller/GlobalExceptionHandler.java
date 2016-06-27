@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 @SuppressWarnings("unused")
 class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger("errorLogger");
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)

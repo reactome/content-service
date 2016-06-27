@@ -10,16 +10,6 @@ import java.util.Collection;
 
 public class ControllerUtils {
 
-//    public static Collection<Object> getProperties(Collection<? extends Object> objects, String attributeName) throws InvocationTargetException, IllegalAccessException {
-//        Collection<Object> properties = new ArrayList<>();
-//        for (Object object : objects) {
-//            Object property = ControllerUtils.getPropertyObject(object, attributeName);
-//            if (property != null) properties.add(property);
-//        }
-//        if (!properties.isEmpty()) return properties;
-//        throw new NotFoundException("Attribute: " + attributeName + " has not been found in the System");
-//    }
-
     public static Collection<String> getProperties(Collection objects, String attributeName) throws InvocationTargetException, IllegalAccessException {
         Collection<String> rtn = new ArrayList<>();
         for (Object object : objects) {
