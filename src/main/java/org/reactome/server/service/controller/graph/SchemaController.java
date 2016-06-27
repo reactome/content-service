@@ -10,29 +10,22 @@ import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.service.exception.newExceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 
 /**
- * Created by:
- *
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
- * @since 18.05.16.
+ * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
-//@RestController
-@ApiIgnore
-@Api(tags = "schema", description = "Reactome Data: Schema class based queries.")
+@RestController
+@Api(tags = "schema", description = "Reactome Data: Schema class queries")
 @RequestMapping("/data")
-@Deprecated
 public class SchemaController {
 
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(value = "Retrieves a list of DatabaseObjects for given class name.",
-            notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 25 entries can be returned per request",
-            produces = "application/json")
+    @ApiOperation(value = "Retrieves a list of DatabaseObjects for given class name", notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 25 entries can be returned per request")
     @RequestMapping(value = "/schema/{className}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<DatabaseObject> getDatabaseObjectsForClassName(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
@@ -50,12 +43,8 @@ public class SchemaController {
         return databaseObjects;
     }
 
-    @ApiOperation(value = "Retrieves a list of SimpleDatabaseObjects for given class name.",
-            notes = "SimpleDatabaseObject contains dbId, stId, displayName and the type. If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 20000 entries can be returned per request",
-            response = SimpleDatabaseObject.class,
-            responseContainer = "List",
-            produces = "application/json")
-    @RequestMapping(value = "/schema/{className}/less", method = RequestMethod.GET, produces = "application/json")
+    @ApiOperation(value = "Retrieves a list of SimpleDatabaseObjects for given class name", notes = "SimpleDatabaseObject is a minimised version of the DatabaseObject that contains dbId, stId, displayName and the type. If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 20000 entries can be returned per request")
+    @RequestMapping(value = "/schema/{className}/min", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<SimpleDatabaseObject> getSimpleDatabaseObjectByClassName(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
                                                                                @ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species,
@@ -72,11 +61,7 @@ public class SchemaController {
         return simpleDatabaseObjects;
     }
 
-    @ApiOperation(value = "Retrieves of SimpleReferenceObjects for given class name.",
-            notes = "SimpleReferenceObjects contains dbId, external identifier and external database name. Schema class needs to an instance of ReferenceEntity or ExternalOntology. Paging is required. A maximum of 20000 entries can be returned per request",
-            response = SimpleReferenceObject.class,
-            responseContainer = "List",
-            produces = "text/plain")
+    @ApiOperation(value = "Retrieves of SimpleReferenceObjects for given class name", notes = "SimpleReferenceObjects contains dbId, external identifier and external database name. Schema class needs to an instance of ReferenceEntity or ExternalOntology. Paging is required. A maximum of 20000 entries can be returned per request")
     @RequestMapping(value = "/schema/{className}/reference", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<SimpleReferenceObject> getSimpleReferencesObjectsByClassName(@ApiParam(value = "Schema class name. Class needs to an instance of ReferenceEntity or ExternalOntology", defaultValue = "ReferenceMolecule",required = true) @PathVariable String className,
@@ -88,10 +73,7 @@ public class SchemaController {
         return simpleReferenceObjects;
     }
 
-    @ApiOperation(value = "Counts entries of Schema class specified.",
-            notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity.",
-            response = Long.class,
-            produces = "application/json")
+    @ApiOperation(value = "Counts entries of Schema class specified", notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity")
     @RequestMapping(value = "/schema/{className}/count", method = RequestMethod.GET)
     @ResponseBody
     public Long countEntries(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
