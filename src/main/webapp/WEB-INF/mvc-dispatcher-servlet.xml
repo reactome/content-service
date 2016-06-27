@@ -93,4 +93,9 @@
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
     </bean>
 
+    <!-- Disabling the LazyLoading feature -->
+    <bean class="org.reactome.server.graph.aop.LazyFetchAspect" factory-method="aspectOf">
+        <property name="enableAOP" value="false"/>
+    </bean>
+
 </beans>
