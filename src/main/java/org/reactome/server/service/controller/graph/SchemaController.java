@@ -7,7 +7,9 @@ import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
 import org.reactome.server.graph.domain.result.SimpleReferenceObject;
 import org.reactome.server.graph.service.SchemaService;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -26,6 +28,8 @@ import java.util.Collection;
 @RequestMapping("/data")
 @Deprecated
 public class SchemaController {
+
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     @Autowired
     private SchemaService schemaService;
@@ -47,6 +51,7 @@ public class SchemaController {
             databaseObjects = schemaService.getByClassName(className, species, page, offset);
         }
         if (databaseObjects == null || databaseObjects.isEmpty()) throw new NotFoundException("No entries found for class: " + className);
+        infoLogger.info("Request for objects of class: {}", className , species);
         return databaseObjects;
     }
 
@@ -69,6 +74,7 @@ public class SchemaController {
             simpleDatabaseObjects = schemaService.getSimpleDatabaseObjectByClassName(className, species, page, offset);
         }
         if (simpleDatabaseObjects == null || simpleDatabaseObjects.isEmpty()) throw new NotFoundException("No entries found for class: " + className);
+        infoLogger.info("Request for simple objects of class: {}", className , species);
         return simpleDatabaseObjects;
     }
 
@@ -85,6 +91,7 @@ public class SchemaController {
         if (offset > 20000) offset = 20000;
         Collection<SimpleReferenceObject> simpleReferenceObjects = schemaService.getSimpleReferencesObjectsByClassName(className, page, offset);
         if (simpleReferenceObjects == null || simpleReferenceObjects.isEmpty()) throw new NotFoundException("No entries found for class: " + className);
+        infoLogger.info("Request for reference objects of class: {}", className);
         return simpleReferenceObjects;
     }
 
@@ -96,6 +103,7 @@ public class SchemaController {
     @ResponseBody
     public Long countEntries(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
                              @ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species) throws ClassNotFoundException {
+        infoLogger.info("Request for counf of objects of class: {}", className , species);
         if (species == null) {
             return schemaService.countEntries(className);
         } else {

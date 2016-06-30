@@ -3,8 +3,8 @@ package org.reactome.server.service.controller.interactors;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.FilenameUtils;
-import org.reactome.server.service.manager.DownloadManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -21,8 +21,7 @@ import java.io.IOException;
 @RequestMapping("/download")
 public class DownloadController {
 
-    @Autowired
-    public DownloadManager downloadManager;
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     @ApiIgnore // Shall we change the url just for security ?
     @ApiOperation(value = "Wrap interactor content into a CSV file")

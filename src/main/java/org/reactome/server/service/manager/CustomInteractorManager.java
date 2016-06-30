@@ -2,7 +2,6 @@ package org.reactome.server.service.manager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -16,12 +15,16 @@ import org.reactome.server.interactors.model.Interactor;
 import org.reactome.server.interactors.service.PsicquicService;
 import org.reactome.server.interactors.tuple.custom.CustomResource;
 import org.reactome.server.interactors.tuple.exception.ParserException;
-import org.reactome.server.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.interactors.tuple.model.CustomInteraction;
 import org.reactome.server.interactors.tuple.model.TupleResult;
 import org.reactome.server.interactors.tuple.util.ParserUtils;
-import org.reactome.server.service.exception.*;
+import org.reactome.server.service.exception.RequestEntityTooLargeException;
+import org.reactome.server.service.exception.TokenNotFoundException;
+import org.reactome.server.service.exception.UnprocessableEntityException;
+import org.reactome.server.service.exception.UnsupportedMediaTypeException;
 import org.reactome.server.service.utils.TupleManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -43,7 +46,7 @@ import java.util.*;
 @Component
 public class CustomInteractorManager {
 
-    private static Logger logger = Logger.getLogger(CustomInteractorManager.class);
+    private static final Logger logger = LoggerFactory.getLogger("errorLogger");
 
     @Autowired
     PsicquicService psicquicService;
@@ -54,7 +57,7 @@ public class CustomInteractorManager {
     @Autowired
     TupleManager tupleManager;
 
-    private TupleResult getUserDataContainer(String name, String filename, String file) {
+    private TupleResult getUserDataContainer(String name, String filename, String file) throws ParserException {
         try {
             String raw = name + file;
             String token = DigestUtils.md5DigestAsHex(raw.getBytes());
@@ -68,36 +71,34 @@ public class CustomInteractorManager {
             }
             return result;
         } catch (IOException | ClassCastException e) {
-            e.printStackTrace();
+            // will be logged in GlobalExceptionHandler
             throw new UnprocessableEntityException(); //TODO: Place the right exception here
-        } catch (TupleParserException e) {
-            throw new DataFormatException(e.getErrorMessages());
-        } catch (ParserException e) {
-            throw new DataFormatException(e.getMessage());
         }
     }
 
-    public TupleResult getUserDataContainerFromContent(String name, String input) {
+    public TupleResult getUserDataContainerFromContent(String name, String input) throws ParserException {
         return getUserDataContainer(name, null, input);
     }
 
-    public TupleResult getUserDataContainerFromFile(String name, MultipartFile file) {
+    public TupleResult getUserDataContainerFromFile(String name, MultipartFile file) throws ParserException {
         if (!file.isEmpty()) {
             try {
                 String mimeType = detectMimeType(TikaInputStream.get(file.getInputStream()));
 
                 if (!isAcceptedContentType(mimeType)) {
+                    // will be logged in GlobalExceptionHandler
                     throw new UnsupportedMediaTypeException();
                 }
 
                 try {
                     return getUserDataContainer(name, file.getOriginalFilename(), IOUtils.toString(file.getInputStream()));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // will be logged in GlobalExceptionHandler
                     throw new UnprocessableEntityException();
                 }
 
             } catch (IOException | NoSuchMethodError e) {
+                // will be logged in GlobalExceptionHandler
                 throw new UnsupportedMediaTypeException();
             }
         }
@@ -106,7 +107,7 @@ public class CustomInteractorManager {
 
     }
 
-    public TupleResult getUserDataContainerFromURL(String name, String filename, String url) {
+    public TupleResult getUserDataContainerFromURL(String name, String filename, String url) throws ParserException {
         if (url != null && !url.isEmpty()) {
             InputStream is;
             try {
@@ -135,31 +136,33 @@ public class CustomInteractorManager {
                 }
 
                 if (conn.getContentLength() > multipartResolver.getFileUpload().getSizeMax()) {
+                    // will be logged in GlobalExceptionHandler
                     throw new RequestEntityTooLargeException();
                 }
 
                 String mimeType = detectMimeType(TikaInputStream.get(aux));
                 if (!isAcceptedContentType(mimeType)) {
+                    // will be logged in GlobalExceptionHandler
                     throw new UnsupportedMediaTypeException();
                 }
 
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-                e.printStackTrace();
+                // will be logged in GlobalExceptionHandler
                 throw new UnprocessableEntityException();
             }
 
             try {
                 return getUserDataContainer(name, filename, IOUtils.toString(is));
             } catch (IOException e) {
-                e.printStackTrace();
+                // will be logged in GlobalExceptionHandler
                 throw new UnprocessableEntityException();
             }
         }
-
+// will be logged in GlobalExceptionHandler
         throw new UnsupportedMediaTypeException();
     }
 
-    public CustomPsicquicResource registryCustomPsicquic(String name, String psicquicURL) {
+    public CustomPsicquicResource registryCustomPsicquic(String name, String psicquicURL) throws ParserException {
         //InputStream is;
         try {
             URL aux = new URL(psicquicURL);
@@ -175,18 +178,14 @@ public class CustomInteractorManager {
             }*/
 
         } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
+            // will be logged in GlobalExceptionHandler
             throw new UnprocessableEntityException();
         }
 
-        try {
             CustomPsicquicResource cpr = ParserUtils.processCustomPsicquic(name, psicquicURL);
             tupleManager.saveToken(cpr.getSummary().getToken(), cpr);
             return cpr;
-        } catch (TupleParserException e) {
-            throw new DataFormatException(e.getErrorMessages());
-        } catch (ParserException e) {
-            throw new DataFormatException(e.getMessage());
-        }
+
     }
 
     /**
@@ -281,7 +280,7 @@ public class CustomInteractorManager {
      *
      * @return for a given pr
      */
-    public Map<String, List<Interaction>> getInteractionsByTokenAndProteins(String tokenStr, Set<String> proteins) {
+    public Map<String, List<Interaction>> getInteractionsByTokenAndProteins(String tokenStr, Set<String> proteins) throws CustomPsicquicInteractionClusterException {
         /**
          * Check if token exists in the Repository.
          */
@@ -323,15 +322,9 @@ public class CustomInteractorManager {
         return interactionMap;
     }
 
-    private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String url, Set<String> proteins) {
+    private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String url, Set<String> proteins) throws CustomPsicquicInteractionClusterException {
         Map<String, List<Interaction>> interactionMap;
-
-        try {
-            interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);
-        } catch (CustomPsicquicInteractionClusterException e) {
-            throw new PsicquicContentException("Error querying your PSICQUIC Resource.");
-        }
-
+         interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);
         return interactionMap;
     }
 
@@ -358,7 +351,7 @@ public class CustomInteractorManager {
      *
      * @throws IOException
      */
-    public String detectMimeType(TikaInputStream tikaInputStream) throws IOException {
+    private String detectMimeType(TikaInputStream tikaInputStream) throws IOException {
         final Detector DETECTOR = new DefaultDetector(MimeTypes.getDefaultMimeTypes());
 
         try {

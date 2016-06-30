@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
-public class InteractorResourceNotFound extends ContentServiceException {
+public class InteractorResourceNotFound extends RuntimeException {
 
     public InteractorResourceNotFound(String resource) {
-        super(HttpStatus.NOT_FOUND, resource + " not found");
+        super(resource + " not found");
     }
 }

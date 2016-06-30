@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.reactome.server.graph.domain.model.Disease;
 import org.reactome.server.graph.service.SchemaService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/data")
 public class DiseasesController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private SchemaService schemaService;
 
@@ -29,6 +33,7 @@ public class DiseasesController {
     @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Disease> getDiseases() {
+        infoLogger.info("Request for all diseases");
         return schemaService.getByClass(Disease.class);
     }
 
@@ -37,6 +42,7 @@ public class DiseasesController {
     @ResponseBody
     public String getDiseasesSummary() {
         List<String> diseases = schemaService.getByClass(Disease.class).stream().map(d -> d.getId() + "\t" + d.getDatabaseName() + ":" + d.getIdentifier()).collect(Collectors.toList());
+        infoLogger.info("Request for all diseases");
         return String.join("\n", diseases);
     }
 }

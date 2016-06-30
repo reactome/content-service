@@ -9,6 +9,9 @@ import org.reactome.server.search.domain.GroupedResult;
 import org.reactome.server.search.domain.Query;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -16,8 +19,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 
 /**
- * Created by:
- *
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
  * @since 18.05.16.
  */
@@ -26,6 +27,8 @@ import java.util.List;
 @RequestMapping("/search")
 class SearchController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private SearchService searchService;
 
@@ -33,6 +36,7 @@ class SearchController {
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
     public List<String> spellcheckSuggestions(@ApiParam(defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
+        infoLogger.info("Request for spellcheck suggestions for query {}", query);
         return searchService.getSpellcheckSuggestions(query);
     }
 
@@ -40,6 +44,7 @@ class SearchController {
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
     public List<String> suggesterSuggestions(@ApiParam(defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
+        infoLogger.info("Request for autocomplete suggestions for query {}", query);
         return searchService.getAutocompleteSuggestions(query);
     }
 
@@ -47,6 +52,7 @@ class SearchController {
     @RequestMapping(value = "/facet", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet() throws SolrSearcherException {
+        infoLogger.info("Request for faceting information of all Reactome data");
         return searchService.getTotalFacetingInformation();
     }
 
@@ -59,6 +65,7 @@ class SearchController {
                                    @RequestParam(required = false) List<String> compartments,
                                    @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, compartments, keywords);
+        infoLogger.info("Request for faceting information for query: {}", query);
         return searchService.getFacetingInformation(queryObject);
     }
 
@@ -74,7 +81,10 @@ class SearchController {
                                    @RequestParam(required = false) Integer start,
                                    @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
-        return searchService.getEntries(queryObject, cluster);
+        infoLogger.info("Search request for query: {}", query);
+        GroupedResult result = searchService.getEntries(queryObject, cluster);
+        if (result == null || result.getResults() == null || result.getResults().isEmpty()) throw new NotFoundException("No entries found for query: " + query);
+        return result;
     }
 
     @ApiIgnore
@@ -87,22 +97,7 @@ class SearchController {
                                               @RequestParam(required = false) Integer start,
                                               @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, null, null, start, rows);
+        infoLogger.info("Fireworks request for query: {}", query);
         return searchService.getFireworks(queryObject);
     }
-
-//    /**
-//     * Overwrites the Global Exception Handler
-//     */
-
-//    /**
-//     * Overwrites the Global Exception Handler
-//     */
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(SearchServiceException.class)
-//    @ResponseBody
-//    ErrorInfo handleServiceException(HttpServletRequest req, SearchServiceException e) {
-//        logger.error(e);
-//        return new ErrorInfo("SearchService Exception occurred", req.getRequestURL(), e);
-//    }
-
 }

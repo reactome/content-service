@@ -10,7 +10,9 @@ import org.reactome.server.graph.domain.result.ComponentOf;
 import org.reactome.server.graph.service.ComponentService;
 import org.reactome.server.graph.service.PhysicalEntityService;
 import org.reactome.server.graph.service.SchemaService;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/data")
 public class PhysicalEntityController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private PhysicalEntityService physicalEntityService;
 
@@ -48,6 +52,7 @@ public class PhysicalEntityController {
         Collection<PhysicalEntity> physicalEntities = physicalEntityService.getOtherFormsOf(id);
         if (physicalEntities == null || physicalEntities.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request all other forms of PhysicalEntity with id: {}", id);
         return physicalEntities;
     }
 
@@ -58,6 +63,7 @@ public class PhysicalEntityController {
         Collection<ComponentOf> componentOfs = componentService.getComponentsOf(id);
         if (componentOfs == null || componentOfs.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for all components of Entry with id: {}", id);
         return componentOfs;
     }
 
@@ -68,6 +74,7 @@ public class PhysicalEntityController {
         Collection<PhysicalEntity> componentOfs = physicalEntityService.getComplexSubunits(id);
         if (componentOfs == null || componentOfs.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for subunits of Complex with id: {}", id);
         return componentOfs;
     }
 
@@ -76,6 +83,7 @@ public class PhysicalEntityController {
     @RequestMapping(value = "/referenceMolecules", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<ReferenceMolecule> getReferenceMolecules() {
+        infoLogger.info("Request total list of ReferenceMolecules");
         return schemaService.getByClass(ReferenceMolecule.class);
     }
 
@@ -85,6 +93,7 @@ public class PhysicalEntityController {
     @ResponseBody
     public String getReferenceMoleculesSummary() {
         List<String> rtn = schemaService.getByClass(ReferenceMolecule.class).stream().map(r -> r.getId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
+        infoLogger.info("Request total list of ReferenceMolecules");
         return String.join("\n", rtn);
     }
 
@@ -96,6 +105,7 @@ public class PhysicalEntityController {
                                                                @RequestParam Integer page,
                                                                @ApiParam(value = "Number of elements per page", defaultValue = "20")
                                                                @RequestParam Integer offset) {
+        infoLogger.info("Request total list of ReferenceSequences");
         return schemaService.getByClass(ReferenceSequence.class, page, offset);
     }
 
@@ -108,6 +118,7 @@ public class PhysicalEntityController {
                                                @ApiParam(value = "Number of elements per page", defaultValue = "20")
                                                @RequestParam Integer offset) {
         List<String> rtn = schemaService.getByClass(ReferenceSequence.class, page, offset).stream().map(r -> r.getId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
+        infoLogger.info("Request total list of ReferenceSequences");
         return String.join("\n", rtn);
     }
 }

@@ -3,9 +3,12 @@ package org.reactome.server.service.controller.interactors;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.model.TupleResult;
 import org.reactome.server.service.manager.CustomInteractorManager;
 import org.reactome.server.service.manager.InteractionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +25,8 @@ import java.io.IOException;
 @RestController
 public class CustomInteractorsController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     public CustomInteractorManager customInteractionManager;
 
@@ -35,7 +40,7 @@ public class CustomInteractorsController {
     public TupleResult postFile(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
                                 @RequestParam(required = true) String name,
                                 @ApiParam(name = "file", required = true, value = "Upload your custom interactor file")
-                                @RequestPart(required = true) MultipartFile file) throws IOException {
+                                @RequestPart(required = true) MultipartFile file) throws IOException, ParserException {
 
         return customInteractionManager.getUserDataContainerFromFile(name, file);
     }
@@ -46,7 +51,7 @@ public class CustomInteractorsController {
     public TupleResult postFileContent(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
                                        @RequestParam(required = true) String name,
                                        @ApiParam(name = "file content", value = "Paste custom interactors file content", required = true)
-                                       @RequestBody String fileContent) {
+                                       @RequestBody String fileContent) throws ParserException {
 
         return customInteractionManager.getUserDataContainerFromContent(name, fileContent);
     }
@@ -57,7 +62,7 @@ public class CustomInteractorsController {
     public TupleResult postUrl(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
                                @RequestParam(required = true) String name,
                                @ApiParam(name = "url", required = true, value = "A URL pointing to the Interactors file")
-                               @RequestBody String url) {
+                               @RequestBody String url) throws ParserException {
 
         String fileNamefromUrl = customInteractionManager.getFileNameFromURL(url);
 

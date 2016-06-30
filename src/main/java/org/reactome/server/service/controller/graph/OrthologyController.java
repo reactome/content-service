@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.service.OrthologyService;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/data")
 public class OrthologyController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private OrthologyService orthologyService;
 
@@ -33,8 +37,8 @@ public class OrthologyController {
                                        @ApiParam(value = "The species for which the orthology is requested", defaultValue = "49633", required = true)
                                        @PathVariable Long speciesId) {
         DatabaseObject orthology = orthologyService.getOrthology(id, speciesId);
-        if (orthology == null)
-            throw new NotFoundException("No orthology found for '" + id + "' in species '" + speciesId + "'");
+        if (orthology == null) throw new NotFoundException("No orthology found for '" + id + "' in species '" + speciesId + "'");
+        infoLogger.info("Request for orthology of Entry with id: {} and species: {}", id, speciesId);
         return orthology;
     }
 
@@ -50,8 +54,8 @@ public class OrthologyController {
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
         Map<Object, DatabaseObject> orthologies = orthologyService.getOrthologies(ids, speciesId);
-        if (orthologies.isEmpty())
-            throw new NotFoundException("No orthologies found");
+        if (orthologies.isEmpty()) throw new NotFoundException("No orthologies found");
+        infoLogger.info("Request for orthology of Entries with ids: {} and species: {}", ids, speciesId);
         return orthologies;
     }
 }

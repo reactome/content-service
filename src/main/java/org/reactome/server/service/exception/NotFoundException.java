@@ -1,4 +1,4 @@
-package org.reactome.server.service.exception.newExceptions;
+package org.reactome.server.service.exception;
 
 /**
  * Created by:

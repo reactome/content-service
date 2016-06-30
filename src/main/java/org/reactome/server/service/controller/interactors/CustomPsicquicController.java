@@ -4,8 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.reactome.server.interactors.model.CustomPsicquicResource;
+import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.model.TupleResult;
 import org.reactome.server.service.manager.CustomInteractorManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class CustomPsicquicController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     public CustomInteractorManager customInteractionManager;
 
@@ -29,7 +34,7 @@ public class CustomPsicquicController {
     public CustomPsicquicResource registryPsicquicURL(@ApiParam(name = "name", required = true, value = "Name which identifies the custom psicquic")
                                            @RequestParam(required = true) String name,
                                                       @ApiParam(name = "url", required = true, value = "A URL pointing to the Custom PSICQUIC Resource")
-                                           @RequestBody String url) {
+                                           @RequestBody String url) throws ParserException {
 
         return customInteractionManager.registryCustomPsicquic(name, url);
 

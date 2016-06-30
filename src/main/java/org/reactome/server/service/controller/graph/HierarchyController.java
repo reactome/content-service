@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiParam;
 import org.reactome.server.graph.service.HierarchyService;
 import org.reactome.server.graph.service.helper.PathwayBrowserNode;
 import org.reactome.server.graph.service.util.PathwayBrowserLocationsUtils;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -27,6 +29,8 @@ import java.util.Set;
 @Deprecated
 public class HierarchyController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private HierarchyService eventHierarchyService;
 
@@ -39,6 +43,7 @@ public class HierarchyController {
     public PathwayBrowserNode getSubGraph(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "R-HSA-109581", required = true) @PathVariable String id)  {
         PathwayBrowserNode pathwayBrowserNode = eventHierarchyService.getSubHierarchy(id);
         if (pathwayBrowserNode == null) throw new NotFoundException("No sub graph found for given id: " + id);
+        infoLogger.info("Request for subgraph of Entry id: {}", id);
         return pathwayBrowserNode;
     }
 
@@ -54,6 +59,7 @@ public class HierarchyController {
                                                  @ApiParam(value = "Items like Catalysts or Regulations can not be displayed in the PWB, omit to avoid them in tree.", defaultValue = "true") @RequestParam(required = false) Boolean omitNonDisplayableItems)  {
         PathwayBrowserNode pathwayBrowserNode = eventHierarchyService.getLocationsInPathwayBrowser(id, directParticipants, omitNonDisplayableItems);
         if (pathwayBrowserNode == null) throw new NotFoundException("Reverse sub graph found for id: " + id);
+        infoLogger.info("Request for reverse subgraph of Entry with id: {}", id);
         return pathwayBrowserNode;
     }
 
@@ -73,6 +79,7 @@ public class HierarchyController {
         pathwayBrowserNodes = PathwayBrowserLocationsUtils.removeOrphans(pathwayBrowserNodes);
         pathwayBrowserNodes = PathwayBrowserLocationsUtils.buildTreesFromLeaves(pathwayBrowserNodes);
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty()) throw new NotFoundException("No Locations in the PathwayBrowser could have been found for id: " + id);
+        infoLogger.info("Request for locationsgraph of Entry with id: {}", id);
         return pathwayBrowserNodes;
     }
 

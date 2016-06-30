@@ -7,7 +7,9 @@ import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.HierarchyService;
 import org.reactome.server.graph.service.helper.PathwayBrowserNode;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,8 @@ import java.util.Collection;
 @RequestMapping("/data")
 public class EventsController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private HierarchyService eventHierarchyService;
 
@@ -34,8 +38,8 @@ public class EventsController {
     public Collection<Collection<Pathway>> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
                                                              @PathVariable String id) {
         Collection<Collection<Pathway>> ancestors = eventsService.getEventAncestors(id);
-        if (ancestors == null || ancestors.isEmpty())
-            throw new NotFoundException("No ancestors found for given event: " + id);
+        if (ancestors == null || ancestors.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
+        infoLogger.info("Request for all Ancestors of Event with id: {}", id);
         return ancestors;
     }
 
@@ -45,6 +49,7 @@ public class EventsController {
     public Collection<PathwayBrowserNode> getEventHierarchy(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606",required = true) @PathVariable String species)  {
         Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species);
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty()) throw new NotFoundException("No event hierarchy found for given species: " + species);
+        infoLogger.info("Request for full event hierarchy");
         return pathwayBrowserNodes;
     }
 }

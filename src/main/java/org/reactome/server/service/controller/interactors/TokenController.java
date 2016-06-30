@@ -1,12 +1,15 @@
-package org.reactome.server.service.controller;
+package org.reactome.server.service.controller.interactors;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.interactors.model.Interaction;
 import org.reactome.server.service.manager.CustomInteractorManager;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,8 @@ import java.util.*;
 @RequestMapping(value = "/interactors/token")
 @RestController
 public class TokenController {
+
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     private static final String CUSTOM_RESOURCE_NAME = "custom";
 
@@ -34,11 +39,10 @@ public class TokenController {
     public Interactors getInteractors(@ApiParam(value = "A token associated with a data submission", required = true)
                                       @PathVariable String token,
                                       @ApiParam(value = "Interactors accessions", required = true)
-                                      @RequestBody String proteins) {
+                                      @RequestBody String proteins) throws CustomPsicquicInteractionClusterException {
 
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
-
         Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
 
         return interactionManager.getCustomInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME, token);

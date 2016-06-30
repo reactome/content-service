@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ import java.util.List;
 @RequestMapping("/data")
 public class SpeciesController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     SpeciesService speciesService;
 
@@ -30,6 +33,7 @@ public class SpeciesController {
     @RequestMapping(value = "/species/main", method = RequestMethod.GET)
     @ResponseBody
     public List<Species> getSpecies() {
+        infoLogger.info("Request for all main species performed");
         return speciesService.getSpecies();
     }
 
@@ -37,6 +41,15 @@ public class SpeciesController {
     @RequestMapping(value = "/species/all", method = RequestMethod.GET)
     @ResponseBody
     public List<Species> getAllSpecies() {
+        infoLogger.info("Request for all species performed");
         return speciesService.getAllSpecies();
     }
+
+    @ApiIgnore
+    @RequestMapping(value = "/error", method = RequestMethod.GET)
+    @ResponseBody
+    public void error() throws Exception {
+        throw new Exception("bla");
+    }
+
 }

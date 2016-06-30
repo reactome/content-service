@@ -76,12 +76,6 @@
             <groupId>org.reactome.server.interactors</groupId>
             <artifactId>interactor-core</artifactId>
             <version>${interactors.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--Spring-->
         <dependency>
@@ -164,27 +158,20 @@
             <artifactId>activation</artifactId>
             <version>${activation.version}</version>
         </dependency>
+
         <!--Logging: will trasitively add logback core and slf4j-api-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logging.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>uk.ac.ebi.pride.web</groupId>
-            <artifactId>pride-web-utils</artifactId>
-            <version>1.3.11</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.reactome.server.utils</groupId>
+            <artifactId>reactome-utils</artifactId>
+            <version>1.0.2</version>
         </dependency>
+
         <!-- Kryo serializer -->
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>

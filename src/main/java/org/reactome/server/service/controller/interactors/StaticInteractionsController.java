@@ -3,9 +3,10 @@ package org.reactome.server.service.controller.interactors;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.reactome.server.service.manager.DownloadManager;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +24,13 @@ import java.util.Set;
 @RequestMapping("/interactors/static")
 public class StaticInteractionsController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     private static final String STATIC_RESOURCE_NAME = "static";
 
     @Autowired
     private InteractionManager interactions;
 
-    @Autowired
-    public DownloadManager downloadManager;
 
     @ApiOperation(value = "Retrieve a summary of a given accession", response = Interactors.class, produces = "application/json")
     @RequestMapping(value = "/molecule/{acc}/summary", method = RequestMethod.GET, produces = "application/json")

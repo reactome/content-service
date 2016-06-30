@@ -32,7 +32,7 @@
 
 	<servlet>
 		<servlet-name>Wordpress</servlet-name>
-		<servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
 		<init-param>
 			<param-name>proxyHost</param-name>
 			<param-value>reactomedev.oicr.on.ca</param-value>
@@ -53,7 +53,7 @@
 
 	<servlet>
 		<servlet-name>Content</servlet-name>
-		<servlet-class>uk.ac.ebi.pride.web.util.servlet.proxy.ProxyServlet</servlet-class>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
 		<init-param>
 			<param-name>proxyHost</param-name>
 			<param-value>reactomedev.oicr.on.ca</param-value>

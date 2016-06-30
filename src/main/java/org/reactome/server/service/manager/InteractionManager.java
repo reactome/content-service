@@ -10,10 +10,11 @@ import org.reactome.server.interactors.service.InteractionService;
 import org.reactome.server.interactors.service.PsicquicService;
 import org.reactome.server.interactors.util.Toolbox;
 import org.reactome.server.service.exception.InteractorResourceNotFound;
-import org.reactome.server.service.exception.PsicquicContentException;
 import org.reactome.server.service.model.interactors.Interactor;
 import org.reactome.server.service.model.interactors.InteractorEntity;
 import org.reactome.server.service.model.interactors.Interactors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.tab.PsimiTabException;
@@ -29,6 +30,7 @@ import java.util.Map;
  */
 @Component
 public class InteractionManager {
+
     /**
      * Holds the services that query the DB
      **/
@@ -55,7 +57,7 @@ public class InteractionManager {
             return getDetailInteractionResult(interactionMaps, resource);
 
         } catch (SQLException | InvalidInteractionResourceException s) {
-            s.printStackTrace();
+            // will be logged in GlobalExceptionHandler
             throw new InteractorResourceNotFound(resource);
         }
 
@@ -67,19 +69,10 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource) {
-        try {
-            /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
-            Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
-
-            return getDetailInteractionResult(interactionMap, resource);
-        } catch (PsicquicQueryException e) {
-            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
-        } catch (PsimiTabException e) {
-            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
-        } catch (PsicquicRegistryClientException e) {
-            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
-        }
+    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException {
+        /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
+        Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
+        return getDetailInteractionResult(interactionMap, resource);
     }
 
     /**
@@ -95,6 +88,7 @@ public class InteractionManager {
             return getSummaryInteractionResult(interactionCountMap, resource);
 
         } catch (SQLException | InvalidInteractionResourceException s) {
+            // will be logged in GlobalExceptionHandler
             throw new InteractorResourceNotFound(resource);
         }
 
@@ -106,21 +100,11 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource) {
+    public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException {
 
         /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
         Map<String, Integer> interactionMap;
-
-        try {
-            interactionMap = psicquicService.countInteraction(resource, accs);
-        } catch (PsicquicQueryException e) {
-            throw new PsicquicContentException("PSICQUIC Resource is not responding.");
-        } catch (PsimiTabException e) {
-            throw new PsicquicContentException("Couldn't parse PSICQUIC result.");
-        } catch (PsicquicRegistryClientException e) {
-            throw new PsicquicContentException("Couldn't query PSICQUIC Resources.");
-        }
-
+        interactionMap = psicquicService.countInteraction(resource, accs);
         return getSummaryInteractionResult(interactionMap, resource);
     }
 
@@ -132,7 +116,7 @@ public class InteractionManager {
      * @param resource        resource that can be static or psicquic resource
      * @return InteractionMapper
      */
-    public Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource) {
+    private Interactors getDetailInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource) {
         return getInteractionResult(interactionMaps, resource, null);
     }
 
@@ -221,7 +205,7 @@ public class InteractionManager {
      * @param resource   resource that can be static or psicquic resource
      * @return InteractionMapper
      */
-    public Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource) {
+    private Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource) {
         Interactors interactionMapper = new Interactors();
 
         /** Entities are a JSON Object **/

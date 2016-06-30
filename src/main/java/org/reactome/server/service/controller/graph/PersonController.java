@@ -8,7 +8,9 @@ import org.reactome.server.graph.domain.model.Person;
 import org.reactome.server.graph.domain.model.Publication;
 import org.reactome.server.graph.service.PersonService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,8 @@ import java.util.Collection;
 @RequestMapping("/data")
 public class PersonController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private PersonService personService;
 
@@ -36,6 +40,7 @@ public class PersonController {
     public Collection<Person> findPersonByName(@ApiParam(defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
         Collection<Person> persons = personService.findPersonByName(name);
         if (persons == null || persons.isEmpty())  throw new NotFoundException("No persons found for name: " + name);
+        infoLogger.info("Request for person with name: {}", name);
         return persons;
     }
 
@@ -46,6 +51,7 @@ public class PersonController {
     public Collection<Person> queryPersonByName(@ApiParam(defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
         Collection<Person> persons = personService.queryPersonByName(name);
         if (persons == null || persons.isEmpty())  throw new NotFoundException("No persons found for name: " + name);
+        infoLogger.info("Request for person with name: {}", name);
         return persons;
     }
 
@@ -56,6 +62,7 @@ public class PersonController {
     public Person findPerson(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {
         Person person = personService.findPerson(id);
         if (person == null)  throw new NotFoundException("No person found for id: " + id);
+        infoLogger.info("Request for person with id: {}", id);
         return person;
     }
 
@@ -67,6 +74,7 @@ public class PersonController {
                              @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         Person person = personService.findPerson(id);
         if (person == null)  throw new NotFoundException("No person found for id: " + id);
+        infoLogger.info("Request for person with id: {}", id);
         return ControllerUtils.getProperty(person, attributeName);
     }
 
@@ -76,6 +84,7 @@ public class PersonController {
     public Collection<Publication> getPublicationsOfPerson(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {
         Collection<Publication> publications = personService.getPublicationsOfPerson(id);
         if (publications == null || publications.isEmpty())  throw new NotFoundException("No publications found for person with id: " + id);
+        infoLogger.info("Request for all publications of person with id: {}", id);
         return publications;
     }
 
@@ -85,6 +94,7 @@ public class PersonController {
     public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {
         Collection<Pathway> pathways = personService.getAuthoredPathways(id);
         if (pathways == null || pathways.isEmpty())  throw new NotFoundException("No pathways found for person with id: " + id);
+        infoLogger.info("Request for all authored pathways of person with id: {}", id);
         return pathways;
     }
 }

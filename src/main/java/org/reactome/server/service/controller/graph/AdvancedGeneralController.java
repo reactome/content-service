@@ -7,7 +7,9 @@ import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.helper.RelationshipDirection;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 @Deprecated
 public class AdvancedGeneralController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     @Autowired
     private AdvancedDatabaseObjectService advancedDatabaseObjectService;
@@ -43,6 +46,7 @@ public class AdvancedGeneralController {
                                    @ApiParam(value = "Direction of mapped relationships", defaultValue = "OUTGOING", required = true) @PathVariable RelationshipDirection direction) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, direction);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Advanced Request for DatabaseObject for id: {}", id);
         return databaseObject;
     }
 
@@ -54,6 +58,7 @@ public class AdvancedGeneralController {
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, direction);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Advanced Request for DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 
@@ -65,6 +70,7 @@ public class AdvancedGeneralController {
                                    @ApiParam(value = "Relationship names that should be mapped", defaultValue = "hasEvent, regulatedBy", required = true) @PathVariable String[] relationships) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, direction, relationships);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Advanced Request for DatabaseObject for id: {}", id);
         return databaseObject;
     }
 
@@ -77,6 +83,7 @@ public class AdvancedGeneralController {
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, direction, relationships);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Advanced Request for DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 

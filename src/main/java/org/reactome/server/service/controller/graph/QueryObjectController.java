@@ -9,7 +9,7 @@ import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DetailsService;
 import org.reactome.server.graph.service.helper.ContentDetails;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class QueryObjectController {
     public DatabaseObject findById(@ApiParam(value = "DbId or StId of a DatabaseObject", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id) {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
-        infoLogger.info("DatabaseObject for id: {} was {}", id, "found");
+        infoLogger.info("Request for DatabaseObject for id: {}", id);
         return databaseObject;
     }
 
@@ -60,7 +60,7 @@ public class QueryObjectController {
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
-        infoLogger.info("DatabaseObject for id: {} was {}", id, "found");
+        infoLogger.info("Request for DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 
@@ -77,6 +77,7 @@ public class QueryObjectController {
         Collection<DatabaseObject> databaseObjects = databaseObjectService.findByIdsNoRelations(ids);
         if (databaseObjects == null || databaseObjects.isEmpty())
             throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
+        infoLogger.info("Request for DatabaseObjects for ids: {}", ids);
         return databaseObjects;
     }
 
@@ -96,6 +97,7 @@ public class QueryObjectController {
             if (object != null) map.put(id, object);
         }
         if (map.isEmpty()) throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
+        infoLogger.info("Request for DatabaseObjects for ids: {}", ids);
         return map;
     }
 
@@ -105,6 +107,7 @@ public class QueryObjectController {
     public DatabaseObject findEnhancedObjectById(@ApiParam(value = "DbId or StId of a DatabaseObject", defaultValue = "R-HSA-60140", required = true) @PathVariable String id) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
     }
 
@@ -116,6 +119,7 @@ public class QueryObjectController {
         ContentDetails contentDetails = detailsService.getContentDetails(id, directParticipants);
         if (contentDetails == null || contentDetails.getDatabaseObject() == null)
             throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for extended DatabaseObject for id: {}", id);
         return contentDetails;
     }
 
@@ -129,6 +133,7 @@ public class QueryObjectController {
 
         DatabaseObject databaseObject = databaseObjectService.findByIdNoRelations(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
         return databaseObject;
     }
 
@@ -140,6 +145,7 @@ public class QueryObjectController {
                                       @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 }

@@ -48,8 +48,6 @@
     <!-- Include a swagger configuration-->
     <bean name="/applicationSwaggerConfig" class="org.reactome.server.service.config.SwaggerConfig"/>
 
-    <bean class= "org.reactome.server.service.handler.HandlerExceptionResolverImpl" />
-
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="52428800"/> <!-- 10 MB  // 52428800 = 50 MB // 209715200 = 200MB  -->
     </bean>

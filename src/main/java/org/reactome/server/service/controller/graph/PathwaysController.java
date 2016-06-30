@@ -10,7 +10,9 @@ import org.reactome.server.graph.service.ParticipantService;
 import org.reactome.server.graph.service.PathwaysService;
 import org.reactome.server.graph.service.TopLevelPathwayService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
-import org.reactome.server.service.exception.newExceptions.NotFoundException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -27,6 +29,8 @@ import java.util.Collection;
 @RequestMapping("/data")
 public class PathwaysController {
 
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+
     @Autowired
     private ParticipantService participantService;
 
@@ -42,8 +46,8 @@ public class PathwaysController {
     public Collection<Event> getContainedEvents(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
                                                 @PathVariable String id) {
         Collection<Event> containedEvents = pathwaysService.getContainedEvents(id);
-        if (containedEvents == null || containedEvents.isEmpty())
-            throw new NotFoundException("No ancestors found for given event: " + id);
+        if (containedEvents == null || containedEvents.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
+        infoLogger.info("Request for contained events of event with id: {}", id);
         return containedEvents;
     }
 
@@ -56,8 +60,8 @@ public class PathwaysController {
                                                  @ApiParam(value = "Attribute to be filtered", defaultValue = "stId", required = true)
                                                  @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         Collection<Event> containedEvents = pathwaysService.getContainedEvents(id);
-        if (containedEvents == null || containedEvents.isEmpty())
-            throw new NotFoundException("No ancestors found for given event: " + id);
+        if (containedEvents == null || containedEvents.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
+        infoLogger.info("Request for contained events of event with id: {}", id);
         return ControllerUtils.getProperties(containedEvents, attributeName);
     }
 
@@ -69,6 +73,7 @@ public class PathwaysController {
     public Collection<Participant> getParticipants(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "5205685",required = true) @PathVariable String id)  {
         Collection<Participant> participants = participantService.getParticipants(id);
         if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
+        infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
 
@@ -78,6 +83,7 @@ public class PathwaysController {
     public Collection<PhysicalEntity> getParticipatingPhysicalEntities(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "R-HSA-5205685",required = true) @PathVariable String id)  {
         Collection<PhysicalEntity> participants = participantService.getParticipatingPhysicalEntities(id);
         if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
+        infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
 
@@ -87,6 +93,7 @@ public class PathwaysController {
     public Collection<ReferenceEntity> getParticipationgReferenceEntities(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "5205685",required = true) @PathVariable String id)  {
         Collection<ReferenceEntity> participants = participantService.getParticipatingReferenceEntities(id);
         if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
+        infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
 
@@ -96,8 +103,8 @@ public class PathwaysController {
     public Collection<? extends Pathway> getTopLevelPathways(@ApiParam(value = "Specifies the species by SpeciesName (eg: Homo sapiens) or SpeciesTaxId (eg: 9606)", defaultValue = "9606")
                                                              @PathVariable String species) {
         Collection<TopLevelPathway> rtn = topLevelPathwayService.getTopLevelPathways(species);
-        if (rtn == null || rtn.isEmpty())
-            throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        infoLogger.info("Request for toplevelpathways with species: {}", species);
         return rtn;
     }
 
@@ -107,8 +114,8 @@ public class PathwaysController {
     public Collection<SimpleDatabaseObject> getPathwaysFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String id,
                                                            @ApiParam(defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
         Collection<SimpleDatabaseObject> rtn = pathwaysService.getPathwaysFor(id, speciesId);
-        if (rtn == null || rtn.isEmpty())
-            throw new NotFoundException("No result for " + id + " in " + speciesId);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + id + " in " + speciesId);
+        infoLogger.info("Request for all lower level pathways of entry with id: {}", id);
         return rtn;
     }
 
@@ -118,8 +125,8 @@ public class PathwaysController {
     public Collection<SimpleDatabaseObject> getPathwaysForAllFormsOf(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String id,
                                                                      @ApiParam(defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
         Collection<SimpleDatabaseObject> rtn = pathwaysService.getPathwaysForAllFormsOf(id, speciesId);
-        if (rtn == null || rtn.isEmpty())
-            throw new NotFoundException("No result for " + id + " in " + speciesId);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + id + " in " + speciesId);
+        infoLogger.info("Request for all lower level pathways of entry with id: {}", id);
         return rtn;
     }
 
@@ -129,8 +136,8 @@ public class PathwaysController {
     public Collection<SimpleDatabaseObject> getPathwaysWithDiagramFor(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String id,
                                                                       @ApiParam(defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
         Collection<SimpleDatabaseObject> rtn = pathwaysService.getPathwaysWithDiagramFor(id, speciesId);
-        if (rtn == null || rtn.isEmpty())
-            throw new NotFoundException("No result for " + id + " in " + speciesId);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + id + " in " + speciesId);
+        infoLogger.info("Request for all lower level pathways (containing diagrams) of entry with id: {}", id);
         return rtn;
     }
 
@@ -140,8 +147,8 @@ public class PathwaysController {
     public Collection<SimpleDatabaseObject> getPathwaysWithDiagramForAllFormsOf(@ApiParam(defaultValue = "R-HSA-199420") @PathVariable String id,
                                                                                 @ApiParam(defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
         Collection<SimpleDatabaseObject> rtn = pathwaysService.getPathwaysWithDiagramForAllFormsOf(id, speciesId);
-        if (rtn == null || rtn.isEmpty())
-            throw new NotFoundException("No result for " + id + " in " + speciesId);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + id + " in " + speciesId);
+        infoLogger.info("Request for all lower level pathways (containing diagrams) of entry with id: {}", id);
         return rtn;
     }
 
@@ -155,8 +162,8 @@ public class PathwaysController {
     public Collection<? extends Pathway> getCuratedTopLevelPathways(@ApiParam(value = "Specifies the species by SpeciesName (eg: Homo sapiens) or SpeciesTaxId (eg: 9606)", defaultValue = "9606")
                                                                     @PathVariable String species) {
         Collection<TopLevelPathway> topLevelPathways = topLevelPathwayService.getCuratedTopLevelPathways(species);
-        if (topLevelPathways == null || topLevelPathways.isEmpty())
-            throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        if (topLevelPathways == null || topLevelPathways.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
+        infoLogger.info("Request for curated toplevelpathways with species: {}", species);
         return topLevelPathways;
     }
 }
