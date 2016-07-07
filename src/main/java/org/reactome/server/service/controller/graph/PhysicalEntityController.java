@@ -44,7 +44,7 @@ public class PhysicalEntityController {
     private SchemaService schemaService;
 
     @ApiOperation(value = "All other forms of a PhysicalEntity",
-            notes = "Other forms are PhysicalEntities that share the same ReferenceEntity identifier",
+            notes = "Retrieves a list containing all other forms of the given PhysicalEntity. These other forms are PhysicalEntities that share the same ReferenceEntity identifier, e.g. PTEN H93R[R-HSA-2318524] and PTEN C124R[R-HSA-2317439] are two forms of PTEN.",
             produces = "application/json")
     @RequestMapping(value = "/entity/{id}/otherForms", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -56,7 +56,7 @@ public class PhysicalEntityController {
         return physicalEntities;
     }
 
-    @ApiOperation(value = "A list of larger structures containing the entity", notes = "A list of simplified entries(type, names, ids) which include given id as component")
+    @ApiOperation(value = "A list of larger structures containing the entity", notes = "Retrieves the list of structures (Complexes and Sets) that include the given entity as their component. It should be mentioned that the list includes only simplified entries (type, names, ids) and not full information about each item.")
     @RequestMapping(value = "/entity/{id}/componentOf", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<ComponentOf> getComponentsOf(@ApiParam(defaultValue = "R-HSA-199420", required = true) @PathVariable String id) {
@@ -67,7 +67,7 @@ public class PhysicalEntityController {
         return componentOfs;
     }
 
-    @ApiOperation(value = "A list with the entities contained in a given complex", notes = "Retrieves a list of complex subunits that are not Complex class")
+    @ApiOperation(value = "A list with the entities contained in a given complex", notes = "Retrieves the list of subunits that constitute any given complex. In case the complex comprises other complexes, this method recursively breaks all of them into their subunits.")
     @RequestMapping(value = "/complex/{id}/subunits", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<PhysicalEntity> getComplexSubunits(@ApiParam(defaultValue = "R-HSA-5674003", required = true) @PathVariable String id) {

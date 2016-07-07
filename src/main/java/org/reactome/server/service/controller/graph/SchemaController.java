@@ -29,7 +29,7 @@ public class SchemaController {
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(value = "Retrieves a list of DatabaseObjects for given class name", notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 25 entries can be returned per request")
+    @ApiOperation(value = "A list of entries corrensponding to a given schema class", notes = "This method retrieves the list of entries in Reactome that belong to the specified schema class. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity. Additionally, paging is required, while a maximum of 25 entries can be returned per request.")
     @RequestMapping(value = "/schema/{className}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<DatabaseObject> getDatabaseObjectsForClassName(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
@@ -48,7 +48,7 @@ public class SchemaController {
         return databaseObjects;
     }
 
-    @ApiOperation(value = "Retrieves a list of SimpleDatabaseObjects for given class name", notes = "SimpleDatabaseObject is a minimised version of the DatabaseObject that contains dbId, stId, displayName and the type. If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity. Paging is required. A maximum of 20000 entries can be returned per request")
+    @ApiOperation(value = "A list of simplified entries corrensponding to a given schema class", notes = "This method retrieves the list of simplified entries in Reactome that belong to the specified schema class. A simplified entry may be considered as a minimised version of the full database object that includes its database id, stable id, displayName and type. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity. Also, paging is required, while a maximum of 20000 entries can be returned per request.")
     @RequestMapping(value = "/schema/{className}/min", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<SimpleDatabaseObject> getSimpleDatabaseObjectByClassName(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
@@ -67,7 +67,7 @@ public class SchemaController {
         return simpleDatabaseObjects;
     }
 
-    @ApiOperation(value = "Retrieves of SimpleReferenceObjects for given class name", notes = "SimpleReferenceObjects contains dbId, external identifier and external database name. Schema class needs to an instance of ReferenceEntity or ExternalOntology. Paging is required. A maximum of 20000 entries can be returned per request")
+    @ApiOperation(value = "A list of simplified reference objects corrensponding to a given schema class", notes = "This method retrieves the list of simplified reference objects that belong to the specified schema class. A reference object includes its database id, external identifier, and external database name. Please take into account that schema class needs to be an instance of ReferenceEntity or ExternalOntology. Also, paging is required, while a maximum of 20000 entries can be returned per request.")
     @RequestMapping(value = "/schema/{className}/reference", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<SimpleReferenceObject> getSimpleReferencesObjectsByClassName(@ApiParam(value = "Schema class name. Class needs to an instance of ReferenceEntity or ExternalOntology", defaultValue = "ReferenceMolecule",required = true) @PathVariable String className,
@@ -80,7 +80,7 @@ public class SchemaController {
         return simpleReferenceObjects;
     }
 
-    @ApiOperation(value = "Counts entries of Schema class specified", notes = "If species is specified result will be filtered. If species is specified, Schema class needs to an instance of Event or PhysicalEntity")
+    @ApiOperation(value = "Number of entries belonging to the specified schema class", notes = "This method counts the total number of entries in Reactome that belong to the specified schema class. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity.")
     @RequestMapping(value = "/schema/{className}/count", method = RequestMethod.GET)
     @ResponseBody
     public Long countEntries(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,

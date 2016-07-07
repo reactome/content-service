@@ -32,7 +32,7 @@ public class EventsController {
     @Autowired
     private EventsService eventsService;
 
-    @ApiOperation(value = "The ancestors for a given event", notes = "An event (pathway or reaction) can be in more than one location. This method retrieves a list of possible paths from the requested event to the top level pathway(s)")
+    @ApiOperation(value = "The ancestors of a given event", notes = "The Reactome definition of events includes pathways and reactions. Although events are organised in a hierarchical structure, a single event can be in more than one location, i.e. a reaction can take part in different pathways while, in the same way, a sub-pathway can take part in many pathways. Therefore, this method retrieves a list of all possible paths from the requested event to the top level pathway(s).")
     @RequestMapping(value = "/event/{id}/ancestors", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Collection<Pathway>> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
@@ -43,7 +43,7 @@ public class EventsController {
         return ancestors;
     }
 
-    @ApiOperation(value = "A full event hierarchy for a given species", notes = "Event hierarchy will be created following hasEvent relationships. Each TopLevelPathway will form a tree. PathwayBrowserNode contains: stId, name, species, url, type, diagram")
+    @ApiOperation(value = "The full event hierarchy for a given species", notes = "Events (pathways and reactions) in Reactome are organised in a hierarchical structure for every species. By following all 'hasEvent' relationships, this method retrieves the full event hierarchy for any given species. The result is a list of tree structures, one for each TopLevelPathway. Every event in these trees is represented by a PathwayBrowserNode. The latter contains the stable identifier, the name, the species, the url, the type, and the diagram of the particular event.")
     @RequestMapping(value = "/eventsHierarchy/{species}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<PathwayBrowserNode> getEventHierarchy(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606",required = true) @PathVariable String species)  {

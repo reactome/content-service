@@ -32,23 +32,23 @@ class SearchController {
     @Autowired
     private SearchService searchService;
 
-    @ApiOperation(value = "Retrieves spellcheck suggestions for a given query", response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> spellcheckSuggestions(@ApiParam(defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> spellcheckSuggestions(@ApiParam(value = "Search term", defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for spellcheck suggestions for query {}", query);
         return searchService.getSpellcheckSuggestions(query);
     }
 
-    @ApiOperation(value = "Retrieves auto-suggestions for a given query", response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiOperation(value = "Auto-suggestions for a given query", notes = "This method retrieves a list of suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> suggesterSuggestions(@ApiParam(defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for autocomplete suggestions for query {}", query);
         return searchService.getAutocompleteSuggestions(query);
     }
 
-    @ApiOperation(value = "Retrieves faceting information on the whole Reactome search data", response = FacetMapping.class, produces = "application/json")
+    @ApiOperation(value = "A list of facets corresponding to the whole Reactome search data", notes = "This method retrieves faceting information on the whole Reactome search data.", response = FacetMapping.class, produces = "application/json")
     @RequestMapping(value = "/facet", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet() throws SolrSearcherException {
@@ -56,30 +56,30 @@ class SearchController {
         return searchService.getTotalFacetingInformation();
     }
 
-    @ApiOperation(value = "Retrieves faceting information for a given query", response = FacetMapping.class, produces = "application/json")
+    @ApiOperation(value = "A list of facets corresponding to a specific query", notes = "This method retrieves faceting information on a specific query", response = FacetMapping.class, produces = "application/json")
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
-    public FacetMapping facet_type(@ApiParam(defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
-                                   @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
-                                   @RequestParam(required = false) List<String> compartments,
-                                   @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
+    public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
+                                   @ApiParam(value = "Species names", defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
+                                   @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
+                                   @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, compartments, keywords);
         infoLogger.info("Request for faceting information for query: {}", query);
         return searchService.getFacetingInformation(queryObject);
     }
 
-    @ApiOperation(value = "Performs a Solr query for given QueryObject", response = GroupedResult.class, produces = "application/json")
+    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.", response = GroupedResult.class, produces = "application/json")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
-    public GroupedResult getResult(@ApiParam(defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
-                                   @ApiParam(defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
-                                   @RequestParam(required = false) List<String> compartments,
-                                   @RequestParam(required = false) List<String> keywords,
-                                   @ApiParam(defaultValue = "true") @RequestParam(required = false) Boolean cluster,
-                                   @RequestParam(required = false) Integer start,
-                                   @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+    public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
+                                   @ApiParam(value = "Species names", defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
+                                   @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
+                                   @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords,
+                                   @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false) Boolean cluster,
+                                   @RequestParam(value = "Start row", required = false) Integer start,
+                                   @RequestParam(value = "Number of rows to include", required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         infoLogger.info("Search request for query: {}", query);
         GroupedResult result = searchService.getEntries(queryObject, cluster);
