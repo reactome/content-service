@@ -29,7 +29,7 @@ public class OrthologyController {
     @Autowired
     private OrthologyService orthologyService;
 
-    @ApiOperation(value = "The orthology for a given event or entity", notes = "ToDo")
+    @ApiOperation(value = "The orthology for a given event or entity", notes = "Reactome uses the set of manually curated human reactions to computationally infer reactions in twenty evolutionarily divergent eukaryotic species for which high-quality whole-genome sequence data are available, and hence a comprehensive and high-quality set of protein predictions exists. Thus, this method retrieves the orthology for any given event or entity in the specified species. <a href=\"http://www.reactome.org/pages/documentation/electronically-inferred-events/\" target=\"_blank\">Here</a> you can find more information about the computationally inferred events.")
     @RequestMapping(value = "/orthology/{id}/species/{speciesId}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject getOrthology(@ApiParam(value = "The event for which the orthology is requested", defaultValue = "R-HSA-6799198", required = true)
@@ -42,8 +42,8 @@ public class OrthologyController {
         return orthology;
     }
 
-    @ApiOperation(value = "The orthologies of a given set of events or entities", notes = "ToDo")
-    @RequestMapping(value = "/ortholgies/ids/species/{speciesId}", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
+    @ApiOperation(value = "The orthologies of a given set of events or entities", notes = "Reactome uses the set of manually curated human reactions to computationally infer reactions in twenty evolutionarily divergent eukaryotic species for which high-quality whole-genome sequence data are available, and hence a comprehensive and high-quality set of protein predictions exists. Thus, this method retrieves the orthologies for any given set of events or entities in the specified species. <a href=\"http://www.reactome.org/pages/documentation/electronically-inferred-events/\" target=\"_blank\">Here</a> you can find more information about the computationally inferred events.")
+    @RequestMapping(value = "/orthologies/ids/species/{speciesId}", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Map<Object, DatabaseObject> getOrthologies(@ApiParam(value = "The species for which the orthology is requested", defaultValue = "49633", required = true)
                                          @PathVariable Long speciesId,

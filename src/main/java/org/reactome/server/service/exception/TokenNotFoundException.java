@@ -1,7 +1,5 @@
 package org.reactome.server.service.exception;
 
-import org.springframework.http.HttpStatus;
-
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */

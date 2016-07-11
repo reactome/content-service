@@ -34,10 +34,10 @@ public class PersonController {
     private PersonService personService;
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A list of persons where first or lastname equals the given string")
+    @ApiOperation(value = "A list of people with first or last name exactly matching a given string", notes = "Retrieves a list of people in Reactome with either their first or last name matching exactly the given string.")
     @RequestMapping(value = "/people/name/{name}/exact", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Person> findPersonByName(@ApiParam(defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
+    public Collection<Person> findPersonByName(@ApiParam(value = "Person's first or last name", defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
         Collection<Person> persons = personService.findPersonByName(name);
         if (persons == null || persons.isEmpty())  throw new NotFoundException("No persons found for name: " + name);
         infoLogger.info("Request for person with name: {}", name);
@@ -45,10 +45,10 @@ public class PersonController {
     }
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A list of persons where first or lastname contains the given string")
+    @ApiOperation(value = "A list of people with first or last name partly matching a given string", notes = "Retrieves a list of people in Reactome with either their first or last name partly matching the given string.")
     @RequestMapping(value = "/people/name/{name}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Person> queryPersonByName(@ApiParam(defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
+    public Collection<Person> queryPersonByName(@ApiParam(value = "Person's first or last name", defaultValue = "Steve Jupe",required = true) @PathVariable String name) {
         Collection<Person> persons = personService.queryPersonByName(name);
         if (persons == null || persons.isEmpty())  throw new NotFoundException("No persons found for name: " + name);
         infoLogger.info("Request for person with name: {}", name);
@@ -56,7 +56,7 @@ public class PersonController {
     }
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A person for given identifier", notes = "Person identifier: Can be OrcidId or DbId")
+    @ApiOperation(value = "A person by his/her identifier", notes = "Retrieves a person in Reactome by his/her OrcidId or DbId.")
     @RequestMapping(value = "/person/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Person findPerson(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {
@@ -67,7 +67,7 @@ public class PersonController {
     }
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A person for given identifier", notes = "Person identifier: Can be OrcidId or DbId. Retrieves a single property from the list of DatabaseObjects")
+    @ApiOperation(value = "A person's property by his/her identifier", notes = "Retrieves a specific person's property by his/her OrcidId or DbId.")
     @RequestMapping(value = "/person/{id}/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public String findPerson(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id,
@@ -78,7 +78,7 @@ public class PersonController {
         return ControllerUtils.getProperty(person, attributeName);
     }
 
-    @ApiOperation(value = "A list of publication of a person", notes = "Person identifier: Can be OrcidId or DbId")
+    @ApiOperation(value = "A list of publications authored by a given person", notes = "Retrieves a list of publications authored by a given person. OrcidId, DbId or Email can be used to specify the person.")
     @RequestMapping(value = "/person/{id}/publications", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Publication> getPublicationsOfPerson(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {
@@ -88,7 +88,7 @@ public class PersonController {
         return publications;
     }
 
-    @ApiOperation(value = "A list of pathways authored by a person", notes = "Person identifier: Can be OrcidId or DbId")
+    @ApiOperation(value = "A list of pathways authored by a given person", notes = "Retrieves a list of pathways authored by a given person. OrcidId, DbId or Email can be used to specify the person.")
     @RequestMapping(value = "/person/{id}/authoredPathways", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id) {

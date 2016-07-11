@@ -29,7 +29,7 @@ public class DiseasesController {
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(value = "The list of disease objects",  notes = "It retrieves the list of diseases for which there are annotations in Reactome")
+    @ApiOperation(value = "The list of disease objects",  notes = "It retrieves the list of diseases annotated in Reactome")
     @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Disease> getDiseases() {
@@ -37,7 +37,7 @@ public class DiseasesController {
         return schemaService.getByClass(Disease.class);
     }
 
-    @ApiOperation(value = "The list of diseases DOID",  notes = "It retrieves the list of diseases DOIDs for which there are annotations in Reactome")
+    @ApiOperation(value = "The list of diseases DOID",  notes = "It retrieves the list of disease DOIDs annotated in Reactome")
     @RequestMapping(value = "/diseases/doid", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public String getDiseasesSummary() {
