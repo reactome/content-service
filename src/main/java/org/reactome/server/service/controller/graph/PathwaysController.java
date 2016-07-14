@@ -3,10 +3,10 @@ package org.reactome.server.service.controller.graph;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.reactome.server.graph.domain.model.*;
-import org.reactome.server.graph.domain.result.Participant;
+import org.reactome.server.graph.domain.model.Event;
+import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.model.TopLevelPathway;
 import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
-import org.reactome.server.graph.service.ParticipantService;
 import org.reactome.server.graph.service.PathwaysService;
 import org.reactome.server.graph.service.TopLevelPathwayService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
@@ -30,9 +30,6 @@ import java.util.Collection;
 public class PathwaysController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
-
-    @Autowired
-    private ParticipantService participantService;
 
     @Autowired
     private PathwaysService pathwaysService;
@@ -60,38 +57,6 @@ public class PathwaysController {
         if (containedEvents == null || containedEvents.isEmpty()) throw new NotFoundException("No contained events found in the given event: " + id);
         infoLogger.info("Request for contained events of event with id: {}", id);
         return ControllerUtils.getProperties(containedEvents, attributeName);
-    }
-
-    @ApiOperation(value = "A list of participants for a given pathway",
-            notes = "Participants contains a PhysicalEntity (dbId, displayName) and a collection of ReferenceEntities (dbId, name, identifier, url)",
-            response = Participant.class, responseContainer = "List")
-    @RequestMapping(value = "/pathway/{id}/participants", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<Participant> getParticipants(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "5205685",required = true) @PathVariable String id)  {
-        Collection<Participant> participants = participantService.getParticipants(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
-        infoLogger.info("Request for participants of event with id: {}", id);
-        return participants;
-    }
-
-    @ApiOperation(value = "A list of participating PhysicalEntities for a given pathway", notes = "This method retrieves all the PhysicalEntities that take part in a given pathway. It is worth mentioning that because a pathway can contain smaller pathways (subpathways), the method also recursively retrieves the PhysicalEntities from every constituent pathway.")
-    @RequestMapping(value = "/pathway/{id}/participatingPhysicalEntities", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<PhysicalEntity> getParticipatingPhysicalEntities(@ApiParam(value = "The pathway for which the participating PhysicalEntities are requested", defaultValue = "R-HSA-5205685",required = true) @PathVariable String id)  {
-        Collection<PhysicalEntity> participants = participantService.getParticipatingPhysicalEntities(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
-        infoLogger.info("Request for participants of event with id: {}", id);
-        return participants;
-    }
-
-    @ApiOperation(value = "A list of participating ReferenceEntities for a given pathway", notes = "PhysicalEntity instances that represent, e.g., the same chemical in different compartments, or different post-translationally modified forms of a single protein, share numerous invariant features such as names, molecular structure and links to external databases like UniProt or ChEBI.<br>To enable storage of this shared information in a single place, and to create an explicit link among all the variant forms of what can also be seen as a single chemical entity, Reactome creates instances of the separate ReferenceEntity class. A ReferenceEntity instance captures the invariant features of a molecule.<br>This method retrieves the ReferenceEntities of all PhysicalEntities that take part in a given pathway. It is worth mentioning that because a pathway can contain smaller pathways (subpathways), this method also recursively retrieves the ReferenceEntities for all PhysicalEntities in every constituent pathway.")
-    @RequestMapping(value = "/pathway/{id}/participatingReferenceEntities", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public Collection<ReferenceEntity> getParticipationgReferenceEntities(@ApiParam(value = "The pathway for which the participating ReferenceEntities are requested", defaultValue = "5205685",required = true) @PathVariable String id)  {
-        Collection<ReferenceEntity> participants = participantService.getParticipatingReferenceEntities(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
-        infoLogger.info("Request for participants of event with id: {}", id);
-        return participants;
     }
 
     @ApiOperation(value = "All Reactome top level pathways", notes = "This method retrieves the list of top level pathways for the given species") //, response = Pathway.class, responseContainer = "List")

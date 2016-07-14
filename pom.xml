@@ -35,7 +35,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <graph.version>0.0.4-SNAPSHOT</graph.version>
-        <search.version>0.0.4-SNAPSHOT</search.version>
+        <search.version>0.0.5-SNAPSHOT</search.version>
         <interactors.version>1.0.3-SNAPSHOT</interactors.version>
         <spring.version>4.2.4.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
