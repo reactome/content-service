@@ -31,7 +31,7 @@ public class DownloadController {
                                                          @RequestParam String content,
                                                          @ApiParam(name = "filename", value = "the file name for the downloaded information", required = true, defaultValue = "result.csv")
                                                          @PathVariable String filename) throws IOException {
-
+        infoLogger.info("Download interactor file {} has submitted", filename);
         String ext = FilenameUtils.getExtension(filename);
         File file = File.createTempFile(filename, ext);
         FileWriter fw = new FileWriter(file);

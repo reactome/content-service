@@ -36,6 +36,7 @@ public class StaticInteractionsController {
     @RequestMapping(value = "/molecule/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Interactors getProteinSummaryByAcc(@ApiParam(value = "Accession", required = true) @PathVariable String acc) {
+        infoLogger.info("Static interaction summary query for accession {}", acc);
         return interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
 
@@ -45,6 +46,7 @@ public class StaticInteractionsController {
     public Interactors getProteinDetailsByAcc(@ApiParam(value = "Interactor accession (or identifier)", required = true) @PathVariable String acc,
                                               @ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                               @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
+        infoLogger.info("Static interaction details query for accession {}", acc);
         return interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
     }
 
@@ -52,6 +54,7 @@ public class StaticInteractionsController {
     @RequestMapping(value = "/molecules/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsSummaryByAccs(@ApiParam(value = "Interactor accessions (or identifiers)", required = true) @RequestBody String proteins) {
+        infoLogger.info("Static interaction summary query for accessions by POST");
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         return interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
@@ -64,6 +67,7 @@ public class StaticInteractionsController {
     public Interactors getProteinsDetailsByAccs(@ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                 @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize,
                                                 @ApiParam(value = "Interactor accessions (or identifiers)", required = true) @RequestBody String proteins) {
+        infoLogger.info("Static interaction details query for accessions by POST");
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         return interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);

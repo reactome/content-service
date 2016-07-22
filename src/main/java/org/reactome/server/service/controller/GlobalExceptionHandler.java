@@ -3,9 +3,11 @@ package org.reactome.server.service.controller;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
+import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
 import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.search.exception.SolrSearcherException;
+import org.reactome.server.service.controller.graph.NotFoundTextPlainException;
 import org.reactome.server.service.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,14 @@ class GlobalExceptionHandler {
         return new ErrorInfo(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundTextPlainException.class)
+    @ResponseBody
+    String handleNotFoundTextPlainException(HttpServletRequest request, NotFoundTextPlainException e) {
+        //no logging here!
+        return null;
+    }
+
     //================================================================================
     // SOLR
     //================================================================================
@@ -67,10 +77,9 @@ class GlobalExceptionHandler {
     @ExceptionHandler(PsicquicContentException.class)
     @ResponseBody
     ErrorInfo handlePsicquicContentException(HttpServletRequest request, PsicquicContentException e) {
-        logger.warn("PsicquicException was caught");
+        logger.warn("PsicquicContentException was caught");
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicQueryException.class)
@@ -78,6 +87,14 @@ class GlobalExceptionHandler {
     ErrorInfo handlePsicquicQueryException(HttpServletRequest request, PsicquicQueryException e) {
         logger.warn("PsicquicQueryException was caught");
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, "PSICQUIC resource is not responding");
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(PsicquicResourceNotFoundException.class)
+    @ResponseBody
+    ErrorInfo handlePsicquicResourceNotFoundException(HttpServletRequest request, PsicquicResourceNotFoundException e) {
+        logger.warn("PsicquicResourceNotFoundException was caught");
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -40,7 +40,7 @@ public class TokenController {
                                       @PathVariable String token,
                                       @ApiParam(value = "Interactors accessions", required = true)
                                       @RequestBody String proteins) throws CustomPsicquicInteractionClusterException {
-
+        infoLogger.info("Token {} query has been submitted", token);
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
         Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);

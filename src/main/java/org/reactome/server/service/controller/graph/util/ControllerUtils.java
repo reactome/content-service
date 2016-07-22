@@ -1,7 +1,7 @@
 package org.reactome.server.service.controller.graph.util;
 
 import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.controller.graph.NotFoundTextPlainException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class ControllerUtils {
     public static String getProperty(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {
         Object property = getPropertyObject(object, attributeName);
         if (property != null) return toTSV(property);
-        throw new NotFoundException("Attribute: " + attributeName + " has not been found for object: " + object.getClass());
+        throw new NotFoundTextPlainException("Attribute: " + attributeName + " has not been found for object: " + object.getClass());
     }
 
     private static Object getPropertyObject(Object object, String attributeName) throws InvocationTargetException, IllegalAccessException {

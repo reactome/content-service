@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
+import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
 import org.reactome.server.interactors.model.PsicquicResource;
 import org.reactome.server.service.exception.PsicquicContentException;
 import org.reactome.server.service.manager.InteractionManager;
@@ -36,6 +37,7 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<PsicquicResource> getResources() {
+        infoLogger.info("Querying Psicquic Resources");
         /** Get values from the in-memory list **/
         List<PsicquicResource> resources = PsicquicResourceCachingScheduler.getPsicquicResources();
 
@@ -51,8 +53,8 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/{resource}/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Interactors getProteinDetailsByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                   @ApiParam(value = "Single Accession", required = true) @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException {
-
+                                                   @ApiParam(value = "Single Accession", required = true) @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+        infoLogger.info("Psicquic details query for resource {} and accession {}", resource, acc);
         return interactions.getPsicquicProteinsDetails(Collections.singletonList(acc), resource);
     }
 
@@ -60,8 +62,8 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/molecules/{resource}/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsDetailsByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException {
-
+                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+        infoLogger.info("Psicquic details query for resource {} by POST", resource);
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
 
@@ -72,8 +74,8 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/molecule/{resource}/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Interactors getProteinSummaryByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                   @ApiParam(value = "Single Accession", required = true) @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException {
-
+                                                   @ApiParam(value = "Single Accession", required = true) @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+        infoLogger.info("Psicquic summary query for resource {} and accession {}", resource, acc);
         return interactions.getPsicquicProteinsSummary(Collections.singletonList(acc), resource);
     }
 
@@ -81,8 +83,8 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/molecules/{resource}/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Interactors getProteinsSummaryByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException {
-
+                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+        infoLogger.info("Psicquic summary query for resource {} by POST", resource);
         /** Split param and put into a Set to avoid duplicates **/
         Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
 

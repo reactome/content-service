@@ -35,7 +35,7 @@ public class CustomPsicquicController {
                                            @RequestParam(required = true) String name,
                                                       @ApiParam(name = "url", required = true, value = "A URL pointing to the Custom PSICQUIC Resource")
                                            @RequestBody String url) throws ParserException {
-
+        infoLogger.info("Custom Psicquic resource {} has been submitted", name);
         return customInteractionManager.registryCustomPsicquic(name, url);
 
     }

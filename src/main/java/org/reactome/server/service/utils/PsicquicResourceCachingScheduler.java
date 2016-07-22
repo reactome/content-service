@@ -1,9 +1,9 @@
 package org.reactome.server.service.utils;
 
-import org.apache.log4j.Logger;
 import org.reactome.server.interactors.exception.PsicquicInteractionClusterException;
 import org.reactome.server.interactors.model.PsicquicResource;
 import org.reactome.server.interactors.service.PsicquicService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 public class PsicquicResourceCachingScheduler {
 
-    private static Logger logger = Logger.getLogger(PsicquicResourceCachingScheduler.class.getName());
+    private static final org.slf4j.Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     private static List<PsicquicResource> psicquicResources = null;
 
@@ -36,7 +36,7 @@ public class PsicquicResourceCachingScheduler {
     public void queryPsicquicResources() {
         try {
             psicquicResources = psicquicService.getResources();
-            logger.debug("Psicquic Resources have been cached.");
+            infoLogger.debug("Psicquic Resources have been cached.");
         } catch (PsicquicInteractionClusterException e) {
             /**
              * If we do not catch exception here, then Spring won't be able to instantiate the bean
@@ -44,7 +44,7 @@ public class PsicquicResourceCachingScheduler {
              * If in the meantime PSICQUIC is down, clean previous cached list and return a 500 HTTP Status as is.
              */
             psicquicResources = null;
-            logger.warn("Couldn't load the PSICQUIC Resources");
+            infoLogger.warn("Couldn't load the PSICQUIC Resources");
         }
     }
 

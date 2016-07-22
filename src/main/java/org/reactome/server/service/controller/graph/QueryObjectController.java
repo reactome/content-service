@@ -59,7 +59,7 @@ public class QueryObjectController {
     public String findById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
-        if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        if (databaseObject == null) throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.interactors.exception.InvalidInteractionResourceException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
+import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
 import org.reactome.server.interactors.model.Interaction;
 import org.reactome.server.interactors.model.InteractionDetails;
 import org.reactome.server.interactors.service.InteractionService;
@@ -13,8 +14,6 @@ import org.reactome.server.service.exception.InteractorResourceNotFound;
 import org.reactome.server.service.model.interactors.Interactor;
 import org.reactome.server.service.model.interactors.InteractorEntity;
 import org.reactome.server.service.model.interactors.Interactors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.tab.PsimiTabException;
@@ -69,7 +68,7 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException {
+    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
         /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
         Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
         return getDetailInteractionResult(interactionMap, resource);
@@ -100,7 +99,7 @@ public class InteractionManager {
      * @param resource PSICQUIC Resource
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
-    public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException {
+    public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
 
         /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
         Map<String, Integer> interactionMap;

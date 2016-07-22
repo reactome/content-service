@@ -41,7 +41,7 @@ public class CustomInteractorsController {
                                 @RequestParam(required = true) String name,
                                 @ApiParam(name = "file", required = true, value = "Upload your custom interactor file")
                                 @RequestPart(required = true) MultipartFile file) throws IOException, ParserException {
-
+        infoLogger.info("Custom Interaction form request has been submitted");
         return customInteractionManager.getUserDataContainerFromFile(name, file);
     }
 
@@ -52,7 +52,7 @@ public class CustomInteractorsController {
                                        @RequestParam(required = true) String name,
                                        @ApiParam(name = "file content", value = "Paste custom interactors file content", required = true)
                                        @RequestBody String fileContent) throws ParserException {
-
+        infoLogger.info("Custom Interaction content request has been submitted");
         return customInteractionManager.getUserDataContainerFromContent(name, fileContent);
     }
 
@@ -63,9 +63,8 @@ public class CustomInteractorsController {
                                @RequestParam(required = true) String name,
                                @ApiParam(name = "url", required = true, value = "A URL pointing to the Interactors file")
                                @RequestBody String url) throws ParserException {
-
+        infoLogger.info("Custom Interaction url request has been submitted");
         String fileNamefromUrl = customInteractionManager.getFileNameFromURL(url);
-
         return customInteractionManager.getUserDataContainerFromURL(name, fileNamefromUrl, url);
 
     }

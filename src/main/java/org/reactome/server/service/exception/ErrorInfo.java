@@ -2,9 +2,6 @@ package org.reactome.server.service.exception;
 
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Created by:
  *
@@ -16,13 +13,6 @@ public class ErrorInfo {
     public final int code;
     public final HttpStatus reason;
     public String[] message = null;
-
-//    public ErrorInfo(HttpStatus status, StringBuffer url, List<String> message) {
-//        this.status = status;
-//        this.url = url.toString();
-//        this.reason = status.getReasonPhrase();
-//        this.message = message;
-//    }
 
     public ErrorInfo(HttpStatus status, String... message) {
         this.code = status.value();

@@ -49,14 +49,14 @@ public class PathwaysController {
 
 
     @ApiOperation(value = "A single property for each event contained in the given event", notes = "Events are the building blocks used in Reactome to represent all biological processes, and they include pathways and reactions. Typically, an event can contain other events. For example, a pathway can contain smaller pathways (subpathways) and reactions.<br> This method recursively retrieves a single attribute for each of the events contained in the given event.")
-    @RequestMapping(value = "/pathway/{id}/containedEvents/{attributeName}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/pathway/{id}/containedEvents/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
-    public Collection<String> getContainedEvents(@ApiParam(value = "The event for which the contained events are requested", defaultValue = "R-HSA-5673001", required = true) @PathVariable String id,
+    public String getContainedEvents(@ApiParam(value = "The event for which the contained events are requested", defaultValue = "R-HSA-5673001", required = true) @PathVariable String id,
                                                  @ApiParam(value = "Attribute to be filtered", defaultValue = "stId", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         Collection<Event> containedEvents = pathwaysService.getContainedEvents(id);
-        if (containedEvents == null || containedEvents.isEmpty()) throw new NotFoundException("No contained events found in the given event: " + id);
+        if (containedEvents == null || containedEvents.isEmpty()) throw new NotFoundTextPlainException("No contained events found in the given event: " + id);
         infoLogger.info("Request for contained events of event with id: {}", id);
-        return ControllerUtils.getProperties(containedEvents, attributeName);
+        return ControllerUtils.getProperties(containedEvents, attributeName).toString();
     }
 
     @ApiOperation(value = "All Reactome top level pathways", notes = "This method retrieves the list of top level pathways for the given species") //, response = Pathway.class, responseContainer = "List")
