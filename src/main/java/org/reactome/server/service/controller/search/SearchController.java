@@ -64,8 +64,8 @@ class SearchController {
                                    @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
                                    @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
                                    @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords) throws SolrSearcherException {
-        Query queryObject = new Query(query, species, types, compartments, keywords);
         infoLogger.info("Request for faceting information for query: {}", query);
+        Query queryObject = new Query(query, species, types, compartments, keywords);
         return searchService.getFacetingInformation(queryObject);
     }
 
@@ -80,8 +80,8 @@ class SearchController {
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false) Boolean cluster,
                                    @RequestParam(value = "Start row", required = false) Integer start,
                                    @RequestParam(value = "Number of rows to include", required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         infoLogger.info("Search request for query: {}", query);
+        Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         GroupedResult result = searchService.getEntries(queryObject, cluster);
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) throw new NotFoundException("No entries found for query: " + query);
         return result;
@@ -96,8 +96,8 @@ class SearchController {
                                               @ApiParam(defaultValue = "Protein") @RequestParam(required = false) List<String> types,
                                               @RequestParam(required = false) Integer start,
                                               @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, species, types, null, null, start, rows);
         infoLogger.info("Fireworks request for query: {}", query);
+        Query queryObject = new Query(query, species, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
     }
 }

@@ -32,7 +32,7 @@ public class CustomPsicquicController {
     @RequestMapping(value = "/url", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
     public CustomPsicquicResource registryPsicquicURL(@ApiParam(name = "name", required = true, value = "Name which identifies the custom psicquic")
-                                           @RequestParam(required = true) String name,
+                                           @RequestParam String name,
                                                       @ApiParam(name = "url", required = true, value = "A URL pointing to the Custom PSICQUIC Resource")
                                            @RequestBody String url) throws ParserException {
         infoLogger.info("Custom Psicquic resource {} has been submitted", name);

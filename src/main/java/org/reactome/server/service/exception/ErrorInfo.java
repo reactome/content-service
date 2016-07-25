@@ -12,11 +12,13 @@ public class ErrorInfo {
 
     public final int code;
     public final HttpStatus reason;
+    public final String url;
     public String[] message = null;
 
-    public ErrorInfo(HttpStatus status, String... message) {
+    public ErrorInfo(HttpStatus status, StringBuffer url, String... message) {
         this.code = status.value();
         this.reason = status;
+        this.url = url.toString();
         if (message != null && message.length > 0) {
             this.message = message;
         }

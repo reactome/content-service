@@ -10,6 +10,7 @@ import org.reactome.server.graph.service.DetailsService;
 import org.reactome.server.graph.service.helper.ContentDetails;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.NotFoundTextPlainException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +142,7 @@ public class QueryObjectController {
     public String findByIdNoRelations(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
                                       @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findById(id);
-        if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        if (databaseObject == null) throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }

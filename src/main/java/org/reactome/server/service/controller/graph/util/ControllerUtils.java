@@ -1,7 +1,7 @@
 package org.reactome.server.service.controller.graph.util;
 
 import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.service.controller.graph.NotFoundTextPlainException;
+import org.reactome.server.service.exception.NotFoundTextPlainException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

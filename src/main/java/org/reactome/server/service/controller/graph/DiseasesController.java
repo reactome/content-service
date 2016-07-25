@@ -41,8 +41,8 @@ public class DiseasesController {
     @RequestMapping(value = "/diseases/doid", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public String getDiseasesSummary() {
-        List<String> diseases = schemaService.getByClass(Disease.class).stream().map(d -> d.getId() + "\t" + d.getDatabaseName() + ":" + d.getIdentifier()).collect(Collectors.toList());
         infoLogger.info("Request for all diseases");
+        List<String> diseases = schemaService.getByClass(Disease.class).stream().map(d -> d.getId() + "\t" + d.getDatabaseName() + ":" + d.getIdentifier()).collect(Collectors.toList());
         return String.join("\n", diseases);
     }
 }

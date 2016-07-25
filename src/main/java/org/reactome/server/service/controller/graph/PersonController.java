@@ -9,6 +9,7 @@ import org.reactome.server.graph.domain.model.Publication;
 import org.reactome.server.graph.service.PersonService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.NotFoundTextPlainException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,7 @@ public class PersonController {
     public String findPerson(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069",required = true) @PathVariable String id,
                              @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         Person person = personService.findPerson(id);
-        if (person == null)  throw new NotFoundException("No person found for id: " + id);
+        if (person == null)  throw new NotFoundTextPlainException("No person found for id: " + id);
         infoLogger.info("Request for person with id: {}", id);
         return ControllerUtils.getProperty(person, attributeName);
     }

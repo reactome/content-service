@@ -11,6 +11,7 @@ import org.reactome.server.graph.service.PathwaysService;
 import org.reactome.server.graph.service.TopLevelPathwayService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.NotFoundTextPlainException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

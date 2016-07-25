@@ -81,7 +81,7 @@ public class SchemaController {
     }
 
     @ApiOperation(value = "Number of entries belonging to the specified schema class", notes = "This method counts the total number of entries in Reactome that belong to the specified schema class. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity.")
-    @RequestMapping(value = "/schema/{className}/count", method = RequestMethod.GET)
+    @RequestMapping(value = "/schema/{className}/count", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Long countEntries(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
                              @ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species) throws ClassNotFoundException {

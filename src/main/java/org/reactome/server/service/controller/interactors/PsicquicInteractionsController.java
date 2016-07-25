@@ -37,7 +37,9 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<PsicquicResource> getResources() {
-        infoLogger.info("Querying Psicquic Resources");
+        /** This method is invoked by Spring Scheduler, we are logging this all the time. Keep it as debug **/
+        infoLogger.debug("Querying Psicquic Resources");
+
         /** Get values from the in-memory list **/
         List<PsicquicResource> resources = PsicquicResourceCachingScheduler.getPsicquicResources();
 
