@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -232,6 +233,14 @@ class GlobalExceptionHandler {
     ErrorInfo handleHttpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
         logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
         return new ErrorInfo(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request.getRequestURL(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseBody
+    ErrorInfo handleMissingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException e) {
+        logger.warn("MissingServletRequestParameterException: " + request.getRequestURL(), e.getMessage());
+        return new ErrorInfo(HttpStatus.BAD_REQUEST, request.getRequestURL(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
