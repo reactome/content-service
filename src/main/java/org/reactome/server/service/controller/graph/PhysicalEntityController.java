@@ -7,7 +7,7 @@ import org.reactome.server.graph.domain.model.PhysicalEntity;
 import org.reactome.server.graph.domain.model.ReferenceMolecule;
 import org.reactome.server.graph.domain.model.ReferenceSequence;
 import org.reactome.server.graph.domain.result.ComponentOf;
-import org.reactome.server.graph.service.ComponentService;
+import org.reactome.server.graph.service.AdvancedLinkageService;
 import org.reactome.server.graph.service.PhysicalEntityService;
 import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.service.exception.NotFoundException;
@@ -38,7 +38,7 @@ public class PhysicalEntityController {
     private PhysicalEntityService physicalEntityService;
 
     @Autowired
-    private ComponentService componentService;
+    private AdvancedLinkageService advancedLinkageService;
 
     @Autowired
     private SchemaService schemaService;
@@ -60,7 +60,7 @@ public class PhysicalEntityController {
     @RequestMapping(value = "/entity/{id}/componentOf", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<ComponentOf> getComponentsOf(@ApiParam(defaultValue = "R-HSA-199420", required = true) @PathVariable String id) {
-        Collection<ComponentOf> componentOfs = componentService.getComponentsOf(id);
+        Collection<ComponentOf> componentOfs = advancedLinkageService.getComponentsOf(id);
         if (componentOfs == null || componentOfs.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for all components of Entry with id: {}", id);
