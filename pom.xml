@@ -34,7 +34,7 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.version>0.1.0-SNAPSHOT</graph.version>
+        <graph.version>0.1.3</graph.version>
         <search.version>0.0.5-SNAPSHOT</search.version>
         <interactors.version>1.0.4-SNAPSHOT</interactors.version>
         <spring.version>4.2.4.RELEASE</spring.version>
