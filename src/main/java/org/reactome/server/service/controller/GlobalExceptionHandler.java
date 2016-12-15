@@ -12,6 +12,8 @@ import org.reactome.server.service.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpMediaTypeException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -233,6 +235,14 @@ class GlobalExceptionHandler {
     ErrorInfo handleHttpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
         logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
         return new ErrorInfo(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request.getRequestURL(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    @ResponseBody
+    ErrorInfo handleHttpMediaTypeNotAcceptableException(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
+        logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
+        return new ErrorInfo(HttpStatus.NOT_ACCEPTABLE, request.getRequestURL(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
