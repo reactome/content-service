@@ -70,7 +70,7 @@ public class DiagramExportManager {
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
         if (!diagramJsonFolder.endsWith("/")) diagramJsonFolder += "/";
 
-        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/" + colorProfile);
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/pptx/" + colorProfile);
         if (!outputFolder.exists()) {
             infoLogger.debug("Creating the directory tree for storing pptx files");
             if (!outputFolder.mkdirs())
