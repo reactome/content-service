@@ -1,5 +1,7 @@
 package org.reactome.server.service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.neo4j.ogm.exception.ConnectionException;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
@@ -9,10 +11,15 @@ import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.*;
+import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
+import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
+import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
+import org.reactome.server.tools.diagram.exporter.pptx.exception.LicenseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.HttpMediaTypeException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -191,6 +198,65 @@ class GlobalExceptionHandler {
     ErrorInfo handleNeo4jConnectionException(HttpServletRequest request, ConnectionException e) {
         logger.error("Neo4j ConnectionException was caught for request: " + request.getRequestURL(), e);
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+    }
+
+    //================================================================================
+    // Diagram Exporter
+    //================================================================================
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(DiagramJsonNotFoundException.class)
+    @ResponseBody
+    ResponseEntity<String> handleDiagramJsonNotFoundException(HttpServletRequest request, DiagramJsonNotFoundException e) {
+        logger.warn("DiagramJsonNotFoundException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DiagramJsonDeserializationException.class)
+    @ResponseBody
+    ResponseEntity<String> handleDiagramJsonDeserializationException(HttpServletRequest request, DiagramJsonDeserializationException e) {
+        logger.warn("DiagramJsonDeserializationException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(DiagramProfileException.class)
+    @ResponseBody
+    ResponseEntity<String> handleDiagramProfileException(HttpServletRequest request, DiagramProfileException e) {
+        logger.warn("DiagramProfileException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
+    }
+
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(LicenseException.class)
+    @ResponseBody
+    ResponseEntity handleLicenseException(HttpServletRequest request, LicenseException e) {
+        // Aspose License is expired. The file is not generated and 503 is thrown
+        logger.warn("LicenseException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.SERVICE_UNAVAILABLE, request, e);
+    }
+
+    /*
+     * Adding a JSON String manually to the response.
+     *
+     * The export service returns a binary file and in an unlikely case of returning exception, then an error Info
+     * instance is manually converted to JSON and written down in the response body.
+     * Right now we use this method only for the errors propagated by the diagram exporter.
+     */
+    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, Exception e) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type", "application/json");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return ResponseEntity.status(status)
+                    .headers(responseHeaders)
+                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), e.getMessage())));
+        } catch (JsonProcessingException e1) {
+            logger.error("Could not process to JSON the given ErrorInfo instance", e1);
+            return ResponseEntity.status(status)
+                    .headers(responseHeaders).body("");
+        }
     }
 
     //================================================================================

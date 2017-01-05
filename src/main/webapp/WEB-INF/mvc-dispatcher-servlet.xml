@@ -97,4 +97,5 @@
         <property name="enableAOP" value="false"/>
     </bean>
 
+    <bean id="diagramService" class="org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService" />
 </beans>

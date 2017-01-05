@@ -43,6 +43,7 @@
         <graph.core>1.0.0</graph.core>
         <search.core>1.0.0</search.core>
         <interactors.core>1.0.7</interactors.core>
+        <diagram.exporter>1.0-SNAPSHOT</diagram.exporter>
         <spring.version>4.2.4.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -183,6 +184,13 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
             <version>2.22</version>
+        </dependency>
+
+        <!-- diagram exporter -->
+        <dependency>
+            <groupId>org.reactome.server.tools</groupId>
+            <artifactId>diagram-exporter</artifactId>
+            <version>${diagram.exporter}</version>
         </dependency>
 
     </dependencies>
