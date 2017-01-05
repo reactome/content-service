@@ -45,27 +45,7 @@ public class DiagramExportManager {
     private String diagramExporterTempFolder;
 
     public File toPPTX(String stId, String colorProfile, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, LicenseException {
-        // Sometimes a pathway does not have diagram, then we check the first ancestor that has diagram.
-        // We generate the powerpoint based on this ancestorStId, but final pptx filename has the stId received in the URL
-        String ancestorStId = null;
-        Collection<Collection<Pathway>> ancestors = eventsService.getEventAncestors(stId);
-        if (ancestors != null && !ancestors.isEmpty()) {
-            // This is not a Collection of Collection<Pathway> it is a Collection<Collection<LinkedHashMap<String, Object>>
-            // SDN neither map to Pathway nor throw an error
-            for (Collection<Pathway> ancestorsList : ancestors) {
-                for (Object pathwayMap : ancestorsList) {
-                    //noinspection unchecked
-                    LinkedHashMap<String, Object> pathway = (LinkedHashMap<String, Object>) pathwayMap;
-                    if (pathway != null && !pathway.isEmpty() && pathway.containsKey("hasDiagram")) {
-                        Boolean hasDiagram = (Boolean) pathway.get("hasDiagram");
-                        if (hasDiagram) {
-                            ancestorStId = (String) pathway.get("stId");
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        String ancestorStId = getAncestorStId(stId);
 
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
         if (!diagramJsonFolder.endsWith("/")) diagramJsonFolder += "/";
@@ -97,5 +77,34 @@ public class DiagramExportManager {
             response.setHeader("Content-Disposition", "attachment; filename=" + newFile.getName());
             return newFile;
         }
+    }
+
+    /**
+     * Sometimes a pathway does not have diagram, then we check the first ancestor that has diagram.
+     * We generate the powerpoint based on this ancestorStId, but final pptx filename has the stId received in the URL
+     */
+    private String getAncestorStId(String stId) {
+        String ancestorStId = null;
+
+        Collection<Collection<Pathway>> ancestors = eventsService.getEventAncestors(stId);
+        if (ancestors != null && !ancestors.isEmpty()) {
+            // This is not a Collection of Collection<Pathway> it is a Collection<Collection<LinkedHashMap<String, Object>>
+            // SDN neither map to Pathway nor throw an error
+            for (Collection<Pathway> ancestorsList : ancestors) {
+                for (Object pathwayMap : ancestorsList) {
+                    //noinspection unchecked
+                    LinkedHashMap<String, Object> pathway = (LinkedHashMap<String, Object>) pathwayMap;
+                    if (pathway != null && !pathway.isEmpty() && pathway.containsKey("hasDiagram")) {
+                        Boolean hasDiagram = (Boolean) pathway.get("hasDiagram");
+                        if (hasDiagram) {
+                            ancestorStId = (String) pathway.get("stId");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ancestorStId;
     }
 }
