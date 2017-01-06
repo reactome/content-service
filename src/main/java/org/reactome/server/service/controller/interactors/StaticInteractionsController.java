@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
@@ -39,7 +38,7 @@ public class StaticInteractionsController {
     })
     @RequestMapping(value = "/molecule/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Interactors getProteinSummaryByAcc(@ApiParam(value = "Accession", required = true) @PathVariable String acc) {
+    public Interactors getProteinSummaryByAcc(@ApiParam(value = "Accession", required = true, defaultValue = "Q13501") @PathVariable String acc) {
         infoLogger.info("Static interaction summary query for accession {}", acc);
         return interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
     }
@@ -52,7 +51,7 @@ public class StaticInteractionsController {
     })
     @RequestMapping(value = "/molecule/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Interactors getProteinDetailsByAcc(@ApiParam(value = "Interactor accession (or identifier)", required = true) @PathVariable String acc,
+    public Interactors getProteinDetailsByAcc(@ApiParam(value = "Interactor accession (or identifier)", required = true, defaultValue = "Q13501") @PathVariable String acc,
                                               @ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                               @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
         infoLogger.info("Static interaction details query for accession {}", acc);
@@ -67,10 +66,14 @@ public class StaticInteractionsController {
     })
     @RequestMapping(value = "/molecules/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public Interactors getProteinsSummaryByAccs(@ApiParam(value = "Interactor accessions (or identifiers)", required = true) @RequestBody String proteins) {
+    public Interactors getProteinsSummaryByAccs(@ApiParam(value = "Interactor accessions (or identifiers)", required = true, defaultValue = "O95631") @RequestBody String proteins) {
         infoLogger.info("Static interaction summary query for accessions by POST");
         // Split param and put into a Set to avoid duplicates
-        Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
+        Collection<String> accs = new HashSet<>();
+        for (String id : proteins.split(",|;|\\n|\\t")) {
+            accs.add(id.trim());
+        }
+
         return interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
 
     }
@@ -85,10 +88,14 @@ public class StaticInteractionsController {
     @ResponseBody
     public Interactors getProteinsDetailsByAccs(@ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                 @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize,
-                                                @ApiParam(value = "Interactor accessions (or identifiers)", required = true) @RequestBody String proteins) {
+                                                @ApiParam(value = "Interactor accessions (or identifiers)", required = true, defaultValue = "O95631") @RequestBody String proteins) {
         infoLogger.info("Static interaction details query for accessions by POST");
         // Split param and put into a Set to avoid duplicates
-        Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
+        Collection<String> accs = new HashSet<>();
+        for (String id : proteins.split(",|;|\\n|\\t")) {
+            accs.add(id.trim());
+        }
+
         return interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
     }
 }

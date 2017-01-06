@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
@@ -48,7 +51,10 @@ public class TokenController {
                                       @RequestBody String proteins) throws CustomPsicquicInteractionClusterException {
         infoLogger.info("Token {} query has been submitted", token);
         // Split param and put into a Set to avoid duplicates
-        Set<String> accs = new HashSet<>(Arrays.asList(proteins.split("\\s*,\\s*")));
+        Set<String> accs = new HashSet<>();
+        for (String id : proteins.split(",|;|\\n|\\t")) {
+            accs.add(id.trim());
+        }
         Map<String, List<Interaction>> interactionMap = customInteractionManager.getInteractionsByTokenAndProteins(token, accs);
         return interactionManager.getCustomInteractionResult(interactionMap, CUSTOM_RESOURCE_NAME, token);
     }
