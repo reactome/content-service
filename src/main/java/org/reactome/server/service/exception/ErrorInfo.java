@@ -11,13 +11,13 @@ import org.springframework.http.HttpStatus;
 public class ErrorInfo {
 
     public final int code;
-    public final HttpStatus reason;
+    public final String reason;
     public final String url;
     public String[] messages = null;
 
     public ErrorInfo(HttpStatus status, StringBuffer url, String... messages) {
         this.code = status.value();
-        this.reason = status;
+        this.reason = status.name();
         this.url = url.toString();
         if (messages != null && messages.length > 0) {
             this.messages = messages;

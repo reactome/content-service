@@ -1,14 +1,13 @@
 package org.reactome.server.service.controller.search;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.reactome.server.search.domain.FacetMapping;
 import org.reactome.server.search.domain.FireworksResult;
 import org.reactome.server.search.domain.GroupedResult;
 import org.reactome.server.search.domain.Query;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
+import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import java.util.List;
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
  * @since 18.05.16.
  */
+@SuppressWarnings("unused")
 @RestController
 @Api(tags = "search", description = "Reactome Search")
 @RequestMapping("/search")
@@ -33,6 +33,10 @@ class SearchController {
     private SearchService searchService;
 
     @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
     public List<String> spellcheckSuggestions(@ApiParam(value = "Search term", defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
@@ -41,6 +45,10 @@ class SearchController {
     }
 
     @ApiOperation(value = "Auto-suggestions for a given query", notes = "This method retrieves a list of suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
     public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
@@ -49,6 +57,10 @@ class SearchController {
     }
 
     @ApiOperation(value = "A list of facets corresponding to the whole Reactome search data", notes = "This method retrieves faceting information on the whole Reactome search data.", response = FacetMapping.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/facet", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet() throws SolrSearcherException {
@@ -57,6 +69,10 @@ class SearchController {
     }
 
     @ApiOperation(value = "A list of facets corresponding to a specific query", notes = "This method retrieves faceting information on a specific query", response = FacetMapping.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
@@ -70,6 +86,10 @@ class SearchController {
     }
 
     @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.", response = GroupedResult.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
@@ -83,9 +103,12 @@ class SearchController {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         GroupedResult result = searchService.getEntries(queryObject, cluster);
-        if (result == null || result.getResults() == null || result.getResults().isEmpty()) throw new NotFoundException("No entries found for query: " + query);
+        if (result == null || result.getResults() == null || result.getResults().isEmpty())
+            throw new NotFoundException("No entries found for query: " + query);
         return result;
     }
+
+    // ##################### API Ignored but still available for internal purposes #####################//
 
     @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")

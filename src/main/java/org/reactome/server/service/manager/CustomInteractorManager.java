@@ -42,6 +42,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class CustomInteractorManager {
@@ -71,7 +72,6 @@ public class CustomInteractorManager {
             }
             return result;
         } catch (IOException | ClassCastException e) {
-            // will be logged in GlobalExceptionHandler
             throw new UnprocessableEntityException(); //TODO: Place the right exception here
         }
     }
@@ -84,34 +84,27 @@ public class CustomInteractorManager {
         if (!file.isEmpty()) {
             try {
                 String mimeType = detectMimeType(TikaInputStream.get(file.getInputStream()));
-
                 if (!isAcceptedContentType(mimeType)) {
-                    // will be logged in GlobalExceptionHandler
                     throw new UnsupportedMediaTypeException();
                 }
 
                 try {
                     return getUserDataContainer(name, file.getOriginalFilename(), IOUtils.toString(file.getInputStream()));
                 } catch (IOException e) {
-                    // will be logged in GlobalExceptionHandler
                     throw new UnprocessableEntityException();
                 }
-
             } catch (IOException | NoSuchMethodError e) {
-                // will be logged in GlobalExceptionHandler
                 throw new UnsupportedMediaTypeException();
             }
         }
-
         throw new UnsupportedMediaTypeException();
-
     }
 
     public TupleResult getUserDataContainerFromURL(String name, String filename, String url) throws ParserException {
         if (url != null && !url.isEmpty()) {
             InputStream is;
             try {
-                /** Check in the URL if the filename is encoded **/
+                // Check in the URL if the filename is encoded
                 String decodeFilename = URLDecoder.decode(filename, "UTF-8");
                 boolean encoded = !filename.equals(decodeFilename);
 
@@ -136,29 +129,24 @@ public class CustomInteractorManager {
                 }
 
                 if (conn.getContentLength() > multipartResolver.getFileUpload().getSizeMax()) {
-                    // will be logged in GlobalExceptionHandler
                     throw new RequestEntityTooLargeException();
                 }
 
                 String mimeType = detectMimeType(TikaInputStream.get(aux));
                 if (!isAcceptedContentType(mimeType)) {
-                    // will be logged in GlobalExceptionHandler
                     throw new UnsupportedMediaTypeException();
                 }
 
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-                // will be logged in GlobalExceptionHandler
                 throw new UnprocessableEntityException();
             }
 
             try {
                 return getUserDataContainer(name, filename, IOUtils.toString(is));
             } catch (IOException e) {
-                // will be logged in GlobalExceptionHandler
                 throw new UnprocessableEntityException();
             }
         }
-// will be logged in GlobalExceptionHandler
         throw new UnsupportedMediaTypeException();
     }
 
@@ -171,21 +159,12 @@ public class CustomInteractorManager {
             } else {
                 aux.openConnection();
             }
-
-            // THIS VALIDATION IS NOT WORKING. PSIQUIC Service does not have landing page, then it returns 404
-            /*if (conn.getResponseCode() != HttpStatus.OK.value()) {
-                throw new UnreachableException(conn.getResponseCode());
-            }*/
-
         } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-            // will be logged in GlobalExceptionHandler
             throw new UnprocessableEntityException();
         }
-
-            CustomPsicquicResource cpr = ParserUtils.processCustomPsicquic(name, psicquicURL);
-            tupleManager.saveToken(cpr.getSummary().getToken(), cpr);
-            return cpr;
-
+        CustomPsicquicResource cpr = ParserUtils.processCustomPsicquic(name, psicquicURL);
+        tupleManager.saveToken(cpr.getSummary().getToken(), cpr);
+        return cpr;
     }
 
     /**
@@ -211,13 +190,11 @@ public class CustomInteractorManager {
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, trustAllCerts, new SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        HostnameVerifier hv = new HostnameVerifier() {
-            public boolean verify(String urlHostName, SSLSession session) {
-                if (!urlHostName.equalsIgnoreCase(session.getPeerHost())) {
-                    logger.warn("Warning: URL host '" + urlHostName + "' is different to SSLSession host '" + session.getPeerHost() + "'.");
-                }
-                return true;
+        HostnameVerifier hv = (urlHostName, session) -> {
+            if (!urlHostName.equalsIgnoreCase(session.getPeerHost())) {
+                logger.warn("Warning: URL host '" + urlHostName + "' is different to SSLSession host '" + session.getPeerHost() + "'.");
             }
+            return true;
         };
         HttpsURLConnection.setDefaultHostnameVerifier(hv);
     }
@@ -231,17 +208,17 @@ public class CustomInteractorManager {
         for (CustomInteraction customInteraction : customInteractionSet) {
             Interaction interaction = new Interaction();
 
-            /** create interactor A **/
+            // create interactor A
             Interactor interactorA = new Interactor();
             interactorA.setAcc(customInteraction.getInteractorIdA());
             interactorA.setAlias(customInteraction.getInteractorAliasA());
 
-            /** create interactor B **/
+            // create interactor B
             Interactor interactorB = new Interactor();
             interactorB.setAcc(customInteraction.getInteractorIdB());
             interactorB.setAlias(customInteraction.getInteractorAliasB());
 
-            /** keep the search term, always in side A **/
+            // keep the search term, always in side A
             if (searchTerm.equals(interactorA.getAcc())) {
                 interaction.setInteractorA(interactorA);
                 interaction.setInteractorB(interactorB);
@@ -250,28 +227,26 @@ public class CustomInteractorManager {
                 interaction.setInteractorB(interactorA);
             }
 
-            /** set score **/
+            // set score
             if (customInteraction.getConfidenceValue() != null) {
                 interaction.setIntactScore(customInteraction.getConfidenceValue());
             }
 
-            /** set evidences list **/
+            // set evidences list
             if (customInteraction.getEvidence() != null && customInteraction.getEvidence().size() > 0) {
                 for (String evidence : customInteraction.getEvidence()) {
                     interaction.addInteractionDetails(new InteractionDetails(evidence));
                 }
             }
 
-            /** add into interactions list **/
+            // add into interactions list
             interactions.add(interaction);
-
         }
 
         Collections.sort(interactions);
         Collections.reverse(interactions);
 
         return interactions;
-
     }
 
     /**
@@ -281,7 +256,7 @@ public class CustomInteractorManager {
      * @return for a given pr
      */
     public Map<String, List<Interaction>> getInteractionsByTokenAndProteins(String tokenStr, Set<String> proteins) throws CustomPsicquicInteractionClusterException {
-        /**
+        /*
          * Check if token exists in the Repository.
          */
         Object token = tupleManager.readToken(tokenStr);
@@ -299,32 +274,21 @@ public class CustomInteractorManager {
 
     private Map<String, List<Interaction>> getInteractorFromCustomResource(CustomResource customResource, Set<String> proteins) {
         Map<String, List<Interaction>> interactionMap = new HashMap<>();
-
         for (String singleAccession : proteins) {
             Set<CustomInteraction> customInteractionSet = new HashSet<>();
-
             // Check if singleAccession contains in A or B in the Interaction List
-            for (CustomInteraction cust : customResource.get(singleAccession)) {
-                if (singleAccession.equals(cust.getInteractorIdA()) ||
-                        singleAccession.equals(cust.getInteractorIdB())) {
-
-                    //Ok, interacts with something.
-                    customInteractionSet.add(cust);
-                }
-            }
-
+            //Ok, interacts with something.
+            customInteractionSet.addAll(customResource.get(singleAccession).stream().filter(cust -> singleAccession.equals(cust.getInteractorIdA()) ||
+                    singleAccession.equals(cust.getInteractorIdB())).collect(Collectors.toList()));
             List<Interaction> interactions = convertCustomInteraction(singleAccession, customInteractionSet);
-
             interactionMap.put(singleAccession, interactions);
-
         }
-
         return interactionMap;
     }
 
     private Map<String, List<Interaction>> getInteractorFromCustomPsicquic(String url, Set<String> proteins) throws CustomPsicquicInteractionClusterException {
         Map<String, List<Interaction>> interactionMap;
-         interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);
+        interactionMap = psicquicService.getInteractionFromCustomPsicquic(url, proteins);
         return interactionMap;
     }
 
@@ -366,5 +330,4 @@ public class CustomInteractorManager {
     private boolean isAcceptedContentType(String contentType) {
         return contentType.contains("text/plain") || contentType.contains("text/csv");
     }
-
 }

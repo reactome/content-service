@@ -8,7 +8,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-
+@SuppressWarnings("unused")
 @Controller
 public class EntryPointController {
 

@@ -1,10 +1,9 @@
 package org.reactome.server.service.controller.interactors;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.model.TupleResult;
+import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.manager.CustomInteractorManager;
 import org.reactome.server.service.manager.InteractionManager;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import java.io.IOException;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-
+@SuppressWarnings("unused")
 @Api(tags = "interactors", description = "Molecule interactors")
 @RequestMapping(value = "/interactors/upload/tuple")
 @RestController
@@ -33,8 +32,15 @@ public class CustomInteractorsController {
     @Autowired
     public InteractionManager interactionManager;
 
-
     @ApiOperation(value = "Parse file and retrieve a summary associated with a token", response = TupleResult.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "Bad request", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 413, message = "Payload too Large", response = ErrorInfo.class),
+            @ApiResponse(code = 415, message = "Unsupported Media Type ('text/plain' or 'text/csv')", response = ErrorInfo.class),
+            @ApiResponse(code = 422, message = "Unprocessable Entity", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/form", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @ResponseBody
     public TupleResult postFile(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
@@ -46,6 +52,14 @@ public class CustomInteractorsController {
     }
 
     @ApiOperation(value = "Paste file content and get a summary associated with a token", response = TupleResult.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "Bad request", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 413, message = "Payload too Large", response = ErrorInfo.class),
+            @ApiResponse(code = 415, message = "Unsupported Media Type ('text/plain' or 'text/csv')", response = ErrorInfo.class),
+            @ApiResponse(code = 422, message = "Unprocessable Entity", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/content", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
     public TupleResult postFileContent(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
@@ -57,6 +71,14 @@ public class CustomInteractorsController {
     }
 
     @ApiOperation(value = "Send file via URL and get a summary associated with a token", response = TupleResult.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "Bad request", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 415, message = "Unsupported Media Type ('text/plain' or 'text/csv')", response = ErrorInfo.class),
+            @ApiResponse(code = 422, message = "Unprocessable Entity", response = ErrorInfo.class),
+            @ApiResponse(code = 431, message = "Request Header Fields Too Large", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+    })
     @RequestMapping(value = "/url", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
     public TupleResult postUrl(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")
@@ -66,6 +88,5 @@ public class CustomInteractorsController {
         infoLogger.info("Custom Interaction url request has been submitted");
         String fileNamefromUrl = customInteractionManager.getFileNameFromURL(url);
         return customInteractionManager.getUserDataContainerFromURL(name, fileNamefromUrl, url);
-
     }
 }

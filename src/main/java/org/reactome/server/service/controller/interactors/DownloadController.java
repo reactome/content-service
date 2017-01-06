@@ -16,14 +16,15 @@ import java.io.IOException;
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@RestController
+@SuppressWarnings("unused")
 //@Api(value = "/download", description = "Download Molecule interactors")
 @RequestMapping("/download")
+@RestController
 public class DownloadController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
-    @ApiIgnore // Shall we change the url just for security ?
+    @ApiIgnore
     @ApiOperation(value = "Wrap interactor content into a CSV file")
     @RequestMapping(value = "/{filename}", method = RequestMethod.POST, consumes = "text/plain", produces = "text/csv", headers = "Content-Type=application/x-www-form-urlencoded")
     @ResponseBody

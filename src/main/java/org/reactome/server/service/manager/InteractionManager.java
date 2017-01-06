@@ -11,6 +11,7 @@ import org.reactome.server.interactors.service.InteractionService;
 import org.reactome.server.interactors.service.PsicquicService;
 import org.reactome.server.interactors.util.Toolbox;
 import org.reactome.server.service.exception.InteractorResourceNotFound;
+import org.reactome.server.service.exception.StaticInteractionException;
 import org.reactome.server.service.model.interactors.Interactor;
 import org.reactome.server.service.model.interactors.InteractorEntity;
 import org.reactome.server.service.model.interactors.Interactors;
@@ -32,7 +33,7 @@ public class InteractionManager {
 
     /**
      * Holds the services that query the DB
-     **/
+     */
     @Autowired
     private InteractionService interactionService;
 
@@ -40,7 +41,6 @@ public class InteractionManager {
     private PsicquicService psicquicService;
 
     public InteractionManager() {
-
     }
 
     /**
@@ -50,16 +50,13 @@ public class InteractionManager {
      */
     public Interactors getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
         try {
-            /** Query database. Generic Layer. Don't need to know the DB to communicate here **/
             Map<String, List<Interaction>> interactionMaps = interactionService.getInteractions(accs, resource, page, pageSize);
-
             return getDetailInteractionResult(interactionMaps, resource);
-
-        } catch (SQLException | InvalidInteractionResourceException s) {
-            // will be logged in GlobalExceptionHandler
+        } catch (InvalidInteractionResourceException s) {
             throw new InteractorResourceNotFound(resource);
+        } catch (SQLException e) {
+            throw new StaticInteractionException(e);
         }
-
     }
 
     /**
@@ -69,7 +66,7 @@ public class InteractionManager {
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
     public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
-        /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
+        // Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45
         Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs);
         return getDetailInteractionResult(interactionMap, resource);
     }
@@ -81,16 +78,13 @@ public class InteractionManager {
      */
     public Interactors getStaticProteinsSummary(Collection<String> accs, String resource) {
         try {
-            /** Query database and get the count **/
             Map<String, Integer> interactionCountMap = interactionService.countInteractionsByAccessions(accs, resource);
-
             return getSummaryInteractionResult(interactionCountMap, resource);
-
-        } catch (SQLException | InvalidInteractionResourceException s) {
-            // will be logged in GlobalExceptionHandler
+        } catch (InvalidInteractionResourceException s) {
             throw new InteractorResourceNotFound(resource);
+        } catch (SQLException e) {
+            throw new StaticInteractionException(e);
         }
-
     }
 
     /**
@@ -100,10 +94,8 @@ public class InteractionManager {
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
     public Interactors getPsicquicProteinsSummary(Collection<String> accs, String resource) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
-
-        /** Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45 **/
-        Map<String, Integer> interactionMap;
-        interactionMap = psicquicService.countInteraction(resource, accs);
+        // Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45
+        Map<String, Integer> interactionMap = psicquicService.countInteraction(resource, accs);
         return getSummaryInteractionResult(interactionMap, resource);
     }
 
@@ -126,15 +118,14 @@ public class InteractionManager {
     private Interactors getInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
         Interactors interactionMapper = new Interactors();
 
-        /** Entities are a JSON Object **/
+        // Entities are a JSON Object
         List<InteractorEntity> entities = new ArrayList<>();
 
         int count = 1;
         for (String accKey : interactionMaps.keySet()) {
-
             List<Interaction> interactions = interactionMaps.get(accKey);
 
-            /** Remove from output if there is no interaction **/
+            // Remove from output if there is no interaction
             if (interactions.size() == 0) {
                 continue;
             }
@@ -148,16 +139,15 @@ public class InteractionManager {
                 Interactor interactor = new Interactor();
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
-
                 interactor.setAlias(interaction.getInteractorB().getAliasWithoutSpecies(true));
 
-                /** Set Id as auto increment **/
+                // Set Id as auto increment
                 interactor.setId(count++);
 
-                /** This list holds evidences that we are going to use to build the evidences URL. **/
+                // This list holds evidences that we are going to use to build the evidences URL.
                 List<String> evidencesWithDbNames = new ArrayList<>();
 
-                /** Set Evidences as the others Interactions identifiers **/
+                // Set Evidences as the others Interactions identifiers
                 if (interaction.getInteractionDetailsList() != null) {
                     for (InteractionDetails interactionDetail : interaction.getInteractionDetailsList()) {
                         String evidence = interactionDetail.getInteractionAc();
@@ -169,31 +159,27 @@ public class InteractionManager {
                     interactor.setEvidences(interaction.getInteractionDetailsList().size());
                 }
 
-                /** Accession URL **/
+                // Accession URL
                 interactor.setAccURL(Toolbox.getAccessionURL(interaction.getInteractorB().getAcc(), resource));
 
-                /** Interaction URL **/
+                // Interaction URL
                 interactor.setEvidencesURL(Toolbox.getEvidencesURL(evidencesWithDbNames, resource));
-
                 interactorsResultList.add(interactor);
             }
 
             entity.setInteractors(interactorsResultList);
-
             entities.add(entity);
         }
 
         interactionMapper.setResource(resource);
 
-        // THis is needed for the custom interaction
+        // This is needed for the custom interaction
         if (StringUtils.isNotEmpty(token)) {
             interactionMapper.setResource(token);
         }
 
         interactionMapper.setEntities(entities);
-
         return interactionMapper;
-
     }
 
     /**
@@ -206,27 +192,21 @@ public class InteractionManager {
      */
     private Interactors getSummaryInteractionResult(Map<String, Integer> summaryMap, String resource) {
         Interactors interactionMapper = new Interactors();
-
-        /** Entities are a JSON Object **/
+        // Entities are a JSON Object
         List<InteractorEntity> entities = new ArrayList<>();
-
         for (String accKey : summaryMap.keySet()) {
             Integer interactionsCount = summaryMap.get(accKey);
-
             InteractorEntity entity = new InteractorEntity();
             entity.setAcc(accKey.trim());
             entity.setCount(interactionsCount);
 
-            /** Remove from output if there is no interaction **/
+            // Remove from output if there is no interaction
             if (interactionsCount > 0) {
                 entities.add(entity);
             }
         }
-
         interactionMapper.setResource(resource);
         interactionMapper.setEntities(entities);
-
         return interactionMapper;
-
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import psidev.psi.mi.tab.PsimiTabException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,9 +65,9 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundTextPlainException.class)
     @ResponseBody
-    String handleNotFoundTextPlainException(HttpServletRequest request, NotFoundTextPlainException e) {
+    ResponseEntity<String> handleNotFoundTextPlainException(HttpServletRequest request, NotFoundTextPlainException e) {
         //no logging here!
-        return null;
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
     }
 
     //================================================================================
@@ -84,6 +85,14 @@ class GlobalExceptionHandler {
     //================================================================================
     // Interactors
     //================================================================================
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(StaticInteractionException.class)
+    @ResponseBody
+    ErrorInfo handleStaticInteractionException(HttpServletRequest request, StaticInteractionException e) {
+        logger.warn("StaticInteractionException was caught for request: " + request.getRequestURL());
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+    }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicContentException.class)
@@ -189,6 +198,15 @@ class GlobalExceptionHandler {
         return new ErrorInfo(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request.getRequestURL(), e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseBody
+    ErrorInfo handleMaxUploadSizeExceededException(HttpServletRequest request, MaxUploadSizeExceededException e) {
+        logger.warn("UnsupportedMediaTypeException was caught for request: " + request.getRequestURL());
+        String msg = "Maximum upload size of " + e.getMaxUploadSize() + " bytes exceeded";
+        return new ErrorInfo(HttpStatus.PAYLOAD_TOO_LARGE, request.getRequestURL(), msg);
+    }
+
     //================================================================================
     // Neo4j
     //================================================================================
@@ -235,28 +253,6 @@ class GlobalExceptionHandler {
         // Aspose License is expired. The file is not generated and 503 is thrown
         logger.warn("LicenseException: " + e.getMessage() + " for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.SERVICE_UNAVAILABLE, request, e);
-    }
-
-    /*
-     * Adding a JSON String manually to the response.
-     *
-     * The export service returns a binary file and in an unlikely case of returning exception, then an error Info
-     * instance is manually converted to JSON and written down in the response body.
-     * Right now we use this method only for the errors propagated by the diagram exporter.
-     */
-    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, Exception e) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add("Content-Type", "application/json");
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return ResponseEntity.status(status)
-                    .headers(responseHeaders)
-                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), e.getMessage())));
-        } catch (JsonProcessingException e1) {
-            logger.error("Could not process to JSON the given ErrorInfo instance", e1);
-            return ResponseEntity.status(status)
-                    .headers(responseHeaders).body("");
-        }
     }
 
     //================================================================================
@@ -325,5 +321,26 @@ class GlobalExceptionHandler {
     ErrorInfo handleUnclassified(HttpServletRequest request, Exception e) {
         logger.error("An unspecified exception was caught for request: " + request.getRequestURL(), e);
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "An unspecified exception was caught");
+    }
+
+    /*
+     * Adding a JSON String manually to the response.
+     *
+     * Some services return a binary file or text/plain, etc. Then an ErrorInfo instance is manually converted
+     * to JSON and written down in the response body.
+     */
+    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, Exception e) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type", "application/json");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return ResponseEntity.status(status)
+                    .headers(responseHeaders)
+                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), e.getMessage())));
+        } catch (JsonProcessingException e1) {
+            logger.error("Could not process to JSON the given ErrorInfo instance", e1);
+            return ResponseEntity.status(status)
+                    .headers(responseHeaders).body("");
+        }
     }
 }
