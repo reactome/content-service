@@ -70,8 +70,14 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
+    <logger name="org.neo4j" level="ERROR" /> <!-- Remove neo4j info logging. It prints user credentials -->
+    <logger name="org.springframework" level="ERROR" />
+    <logger name="org.reflections" level="WARN" />
+    <logger name="springfox.documentation" level="WARN" />
+
     <!--Root logger will log all messages to file that are are caught by other loggers-->
     <root level="INFO">
         <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
