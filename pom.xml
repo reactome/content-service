@@ -53,7 +53,6 @@
         <lang.version>3.4</lang.version>
         <mail.version>1.5.4</mail.version>
         <activation.version>1.1.1</activation.version>
-        <logging.version>1.1.7</logging.version>
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>
@@ -166,11 +165,11 @@
             <version>${activation.version}</version>
         </dependency>
 
-        <!--Logging: will trasitively add logback core and slf4j-api-->
+        <!--Logging: will transitively add logback core and slf4j-api-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logging.version}</version>
+            <version>LATEST</version>
         </dependency>
 
         <dependency>
