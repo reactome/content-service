@@ -63,7 +63,7 @@ public class PsicquicInteractionsController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/{resource}/{acc}/details", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/molecule/{resource}/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Interactors getProteinDetailsByResource(@ApiParam(value = "PSICQUIC Resource", required = true, defaultValue = "MINT") @PathVariable String resource,
                                                    @ApiParam(value = "Single Accession", required = true, defaultValue = "Q13501") @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
