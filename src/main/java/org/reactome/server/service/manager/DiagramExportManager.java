@@ -1,6 +1,9 @@
 package org.reactome.server.service.manager;
 
+import org.apache.commons.lang3.StringUtils;
+import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.DiagramExporterController;
@@ -38,6 +41,9 @@ public class DiagramExportManager {
     @Autowired
     private EventsService eventsService;
 
+    @Autowired
+    private DatabaseObjectService databaseObjectService;
+
     @Value("${diagram.json.folder}")
     private String diagramJsonFolder;
 
@@ -45,6 +51,7 @@ public class DiagramExportManager {
     private String diagramExporterTempFolder;
 
     public File toPPTX(String stId, String colorProfile, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, LicenseException {
+        String pptxFileName = getPPTXFileName(stId);
         String ancestorStId = getAncestorStId(stId);
 
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
@@ -62,11 +69,12 @@ public class DiagramExportManager {
             pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + DiagramExporterController.FILE_EXTENSION);
         }
 
+        // The pptx is save in the temp folder using only the StId, then when we write in the response header
+        // we rename it using the [stId] displayName
         if (pptxFile.exists()) { // just return the file previously generated.
             infoLogger.debug("Diagram {} has been generated previously.", pptxFile.getName());
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-            response.setHeader("Content-Disposition", "attachment; filename=" + pptxFile.getName());
-
+            response.setHeader("Content-Disposition", "attachment; filename=" + pptxFileName);
             return pptxFile;
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
@@ -74,7 +82,7 @@ public class DiagramExportManager {
             String diagramJsonFile = diagramJsonFolder + pptxFile.getName().replace(".pptx", ".json");
             File newFile = diagramService.exportToPPTX(diagramJsonFile, colorProfile, pptxFile.getAbsolutePath());
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-            response.setHeader("Content-Disposition", "attachment; filename=" + newFile.getName());
+            response.setHeader("Content-Disposition", "attachment; filename=" + pptxFileName);
             return newFile;
         }
     }
@@ -106,5 +114,20 @@ public class DiagramExportManager {
         }
 
         return ancestorStId;
+    }
+
+    /**
+     * Query the graph database in order to the get the display name that will be used to in the file name.
+     * In an unlikely case of empty display name this method will return the stable identifier.
+     *
+     * @return displayName (otherwise keep the stId)
+     */
+    private String getPPTXFileName(String stId){
+        DatabaseObject dbOb = databaseObjectService.findByIdNoRelations(stId);
+        String displayName = stId;
+        if(StringUtils.isNotEmpty(dbOb.getDisplayName())){
+            displayName = "["+ stId +"] " + dbOb.getDisplayName();
+        }
+        return displayName + ".pptx";
     }
 }
