@@ -26,7 +26,7 @@ public class DiagramExporterController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
-    public static final String FILE_EXTENSION = ".pptx";
+    public static final String PPT_FILE_EXTENSION = ".pptx";
 
     @Autowired
     private DiagramExportManager manager;
@@ -38,7 +38,7 @@ public class DiagramExporterController {
             @ApiResponse(code = 500, message = "Could not deserialize diagram file."),
             @ApiResponse(code = 503, message = "Service was unable to export to Power Point.")
     })
-    @RequestMapping(value = "/diagram/{stId}" + FILE_EXTENSION, method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/{stId}" + PPT_FILE_EXTENSION, method = RequestMethod.GET)
     @ResponseBody
     public FileSystemResource toPPTX(@ApiParam(value = "Stable Identifier", required = true, defaultValue = "R-HSA-177929")
                                      @PathVariable String stId,
