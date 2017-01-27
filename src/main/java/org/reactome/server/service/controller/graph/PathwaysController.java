@@ -141,6 +141,17 @@ public class PathwaysController {
         return rtn;
     }
 
+    @ApiOperation(value = "A list of lower level pathways with diagram containing any form of a given identifier", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @RequestMapping(value = "/pathways/low/diagram/identifier/{identifier}/allForms", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<SimpleDatabaseObject> getLowerLevelPathwaysForIdentifier(@ApiParam(value = "The entity (in any of its forms) that has to be present in the pathways", defaultValue = "PTEN") @PathVariable String identifier,
+                                                                                @ApiParam(value = "The species for which the pathways are requested (SpeciesName or SpeciesTaxId)", defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
+        Collection<SimpleDatabaseObject> rtn = pathwaysService.getLowerLevelPathwaysForIdentifier(identifier, speciesId);
+        if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + identifier + " in " + speciesId);
+        infoLogger.info("Request for all lower level pathways (containing diagrams) of entry with identifier: {}", identifier);
+        return rtn;
+    }
+
     //##################### API Ignored but still available for internal purposes #####################//
 
 
