@@ -64,9 +64,9 @@ public class DiagramExportManager {
                 infoLogger.error("Could not create the folder for the given DBVersion and profile");
         }
 
-        File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + stId + DiagramExporterController.FILE_EXTENSION);
+        File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + stId + DiagramExporterController.PPT_FILE_EXTENSION);
         if (ancestorStId != null) {
-            pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + DiagramExporterController.FILE_EXTENSION);
+            pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + DiagramExporterController.PPT_FILE_EXTENSION);
         }
 
         // The pptx is save in the temp folder using only the StId, then when we write in the response header
@@ -124,6 +124,7 @@ public class DiagramExportManager {
      */
     private String getPPTXFileName(String stId){
         DatabaseObject dbOb = databaseObjectService.findByIdNoRelations(stId);
+        if (dbOb == null) return null;
         String displayName = stId;
         if(StringUtils.isNotEmpty(dbOb.getDisplayName())){
             displayName = "["+ stId +"] " + dbOb.getDisplayName();
