@@ -74,7 +74,7 @@ public class DiagramExportManager {
         if (pptxFile.exists()) { // just return the file previously generated.
             infoLogger.debug("Diagram {} has been generated previously.", pptxFile.getName());
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return pptxFile;
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
@@ -82,7 +82,7 @@ public class DiagramExportManager {
             String diagramJsonFile = diagramJsonFolder + pptxFile.getName().replace(".pptx", ".json");
             File newFile = diagramService.exportToPPTX(diagramJsonFile, colorProfile, pptxFile.getAbsolutePath());
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return newFile;
         }
     }
