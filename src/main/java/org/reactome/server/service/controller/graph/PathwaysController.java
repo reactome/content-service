@@ -19,6 +19,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -154,6 +156,29 @@ public class PathwaysController {
 
     //##################### API Ignored but still available for internal purposes #####################//
 
+    @ApiIgnore
+    @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
+    @RequestMapping(value = "/diagram/{pathwayId}/entities/{identifier}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<SimpleDatabaseObject> getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
+                                                                             @PathVariable String pathwayId,
+                                                                              @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
+                                                                             @PathVariable String identifier,
+                                                                              @ApiParam(value = "Encapsulated pathways to be checked (comma separated list - 20 max)", defaultValue = "R-HSA-199977,R-HSA-4085001")
+                                                                             @RequestParam (required = false) Collection<String> pathways){
+
+        if (pathways != null && pathways.size() > 20) pathways = pathways.stream().skip(0).limit(20).collect(Collectors.toSet());
+
+        Collection<SimpleDatabaseObject> rtn = new HashSet<>();
+        Collection<SimpleDatabaseObject> aux = pathwaysService.getDiagramEntitiesForIdentifier(pathwayId, identifier);
+        if (aux != null && !aux.isEmpty()) rtn.addAll(aux);
+        if (pathways != null) {
+            aux = pathwaysService.getPathwaysForIdentifier(identifier, pathways);
+            if (aux != null && !aux.isEmpty()) rtn.addAll(aux);
+        }
+        if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + identifier + "' found for " + pathwayId + (pathways != null ? " nor for pathways " + pathways : ""));
+        return rtn;
+    }
 
     @ApiIgnore
     @ApiOperation(value = "All Reactome top level pathways", notes = "This method retrieves a list containing only curated top level pathways for the given species")
