@@ -148,7 +148,7 @@ public class PathwaysController {
     @ResponseBody
     public Collection<SimpleDatabaseObject> getLowerLevelPathwaysForIdentifier(@ApiParam(value = "The entity (in any of its forms) that has to be present in the pathways", defaultValue = "PTEN") @PathVariable String identifier,
                                                                                 @ApiParam(value = "The species for which the pathways are requested (SpeciesName or SpeciesTaxId)", defaultValue = "48887") @RequestParam(required = false, defaultValue = "48887") Long speciesId) {
-        Collection<SimpleDatabaseObject> rtn = pathwaysService.getLowerLevelPathwaysForIdentifier(identifier, speciesId);
+        Collection<SimpleDatabaseObject> rtn = pathwaysService.getLowerLevelPathwaysForIdentifier(identifier.toUpperCase(), speciesId);
         if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No result for " + identifier + " in " + speciesId);
         infoLogger.info("Request for all lower level pathways (containing diagrams) of entry with identifier: {}", identifier);
         return rtn;
@@ -170,13 +170,14 @@ public class PathwaysController {
         if (pathways != null && pathways.size() > 20) pathways = pathways.stream().skip(0).limit(20).collect(Collectors.toSet());
 
         Collection<SimpleDatabaseObject> rtn = new HashSet<>();
-        Collection<SimpleDatabaseObject> aux = pathwaysService.getDiagramEntitiesForIdentifier(pathwayId, identifier);
+        Collection<SimpleDatabaseObject> aux = pathwaysService.getDiagramEntitiesForIdentifier(pathwayId, identifier.toUpperCase());
         if (aux != null && !aux.isEmpty()) rtn.addAll(aux);
         if (pathways != null) {
-            aux = pathwaysService.getPathwaysForIdentifier(identifier, pathways);
+            aux = pathwaysService.getPathwaysForIdentifier(identifier.toUpperCase(), pathways);
             if (aux != null && !aux.isEmpty()) rtn.addAll(aux);
         }
         if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + identifier + "' found for " + pathwayId + (pathways != null ? " nor for pathways " + pathways : ""));
+        infoLogger.info("Request for all entities in diagram with identifier: {}", identifier);
         return rtn;
     }
 
