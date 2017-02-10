@@ -39,3 +39,6 @@ header.jsp
 
 #Execution time file
 test.txt
+
+*.lic
+*.lic.xml
