@@ -14,7 +14,6 @@ import org.reactome.server.service.exception.*;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
-import org.reactome.server.tools.diagram.exporter.pptx.exception.LicenseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -57,9 +56,9 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     @ResponseBody
-    ErrorInfo handleNotFoundException(HttpServletRequest request, NotFoundException e) {
+    ResponseEntity<String> handleNotFoundException(HttpServletRequest request, NotFoundException e) {
         //no logging here!
-        return new ErrorInfo(HttpStatus.NOT_FOUND, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -67,7 +66,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleNotFoundTextPlainException(HttpServletRequest request, NotFoundTextPlainException e) {
         //no logging here!
-        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     //================================================================================
@@ -77,9 +76,9 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(SolrSearcherException.class)
     @ResponseBody
-    ErrorInfo handleSolrException(HttpServletRequest request, SolrSearcherException e) {
+    ResponseEntity<String> handleSolrException(HttpServletRequest request, SolrSearcherException e) {
         logger.error("Solr exception was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     //================================================================================
@@ -89,57 +88,57 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(StaticInteractionException.class)
     @ResponseBody
-    ErrorInfo handleStaticInteractionException(HttpServletRequest request, StaticInteractionException e) {
+    ResponseEntity<String> handleStaticInteractionException(HttpServletRequest request, StaticInteractionException e) {
         logger.warn("StaticInteractionException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicContentException.class)
     @ResponseBody
-    ErrorInfo handlePsicquicContentException(HttpServletRequest request, PsicquicContentException e) {
+    ResponseEntity<String> handlePsicquicContentException(HttpServletRequest request, PsicquicContentException e) {
         logger.warn("PsicquicContentException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicQueryException.class)
     @ResponseBody
-    ErrorInfo handlePsicquicQueryException(HttpServletRequest request, PsicquicQueryException e) {
+    ResponseEntity<String> handlePsicquicQueryException(HttpServletRequest request, PsicquicQueryException e) {
         logger.warn("PsicquicQueryException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "PSICQUIC resource is not responding");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "PSICQUIC resource is not responding");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicResourceNotFoundException.class)
     @ResponseBody
-    ErrorInfo handlePsicquicResourceNotFoundException(HttpServletRequest request, PsicquicResourceNotFoundException e) {
+    ResponseEntity<String> handlePsicquicResourceNotFoundException(HttpServletRequest request, PsicquicResourceNotFoundException e) {
         logger.warn("PsicquicResourceNotFoundException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsimiTabException.class)
     @ResponseBody
-    ErrorInfo handlePsimiTabException(HttpServletRequest request, PsimiTabException e) {
+    ResponseEntity<String> handlePsimiTabException(HttpServletRequest request, PsimiTabException e) {
         logger.warn("PsimiTabException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "Couldn't parse PSICQUIC result");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Couldn't parse PSICQUIC result");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(PsicquicRegistryClientException.class)
     @ResponseBody
-    ErrorInfo handlePsicquicRegistryClientException(HttpServletRequest request, PsicquicRegistryClientException e) {
+    ResponseEntity<String> handlePsicquicRegistryClientException(HttpServletRequest request, PsicquicRegistryClientException e) {
         logger.warn("PsicquicRegistryClientException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "Couldn't query PSICQUIC Resources");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Couldn't query PSICQUIC Resources");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(CustomPsicquicInteractionClusterException.class)
     @ResponseBody
-    ErrorInfo handleCustomPsicquicInteractionClusterException(HttpServletRequest request, CustomPsicquicInteractionClusterException e) {
+    ResponseEntity<String> handleCustomPsicquicInteractionClusterException(HttpServletRequest request, CustomPsicquicInteractionClusterException e) {
         logger.warn("CustomPsicquicInteractionClusterException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "Error querying your PSICQUIC Resource.");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Error querying your PSICQUIC Resource.");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -153,58 +152,58 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ParserException.class)
     @ResponseBody
-    ErrorInfo handleParserException(HttpServletRequest request, ParserException e) {
+    ResponseEntity<String> handleParserException(HttpServletRequest request, ParserException e) {
         logger.warn("ParserException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.BAD_REQUEST, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(InteractorResourceNotFound.class)
     @ResponseBody
-    ErrorInfo handleInteractorResourceNotFound(HttpServletRequest request, InteractorResourceNotFound e) {
+    ResponseEntity<String> handleInteractorResourceNotFound(HttpServletRequest request, InteractorResourceNotFound e) {
         logger.warn("InteractorResourceNotFound was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.NOT_FOUND, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE)
     @ExceptionHandler(RequestEntityTooLargeException.class)
     @ResponseBody
-    ErrorInfo handleRequestEntityTooLargeException(HttpServletRequest request, RequestEntityTooLargeException e) {
+    ResponseEntity<String> handleRequestEntityTooLargeException(HttpServletRequest request, RequestEntityTooLargeException e) {
         logger.warn("RequestEntityTooLargeException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(UnprocessableEntityException.class)
     @ResponseBody
-    ErrorInfo handleUnprocessableEntityException(HttpServletRequest request, UnprocessableEntityException e) {
+    ResponseEntity<String> handleUnprocessableEntityException(HttpServletRequest request, UnprocessableEntityException e) {
         logger.warn("UnprocessableEntityException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.UNPROCESSABLE_ENTITY, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(TokenNotFoundException.class)
     @ResponseBody
-    ErrorInfo handleTokenNotFoundException(HttpServletRequest request, TokenNotFoundException e) {
+    ResponseEntity<String> handleTokenNotFoundException(HttpServletRequest request, TokenNotFoundException e) {
         logger.warn("TokenNotFoundException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.NOT_FOUND, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     @ExceptionHandler(UnsupportedMediaTypeException.class)
     @ResponseBody
-    ErrorInfo handleUnsupportedMediaTypeException(HttpServletRequest request, UnsupportedMediaTypeException e) {
+    ResponseEntity<String> handleUnsupportedMediaTypeException(HttpServletRequest request, UnsupportedMediaTypeException e) {
         logger.warn("UnsupportedMediaTypeException was caught for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseBody
-    ErrorInfo handleMaxUploadSizeExceededException(HttpServletRequest request, MaxUploadSizeExceededException e) {
+    ResponseEntity<String> handleMaxUploadSizeExceededException(HttpServletRequest request, MaxUploadSizeExceededException e) {
         logger.warn("UnsupportedMediaTypeException was caught for request: " + request.getRequestURL());
         String msg = "Maximum upload size of " + e.getMaxUploadSize() + " bytes exceeded";
-        return new ErrorInfo(HttpStatus.PAYLOAD_TOO_LARGE, request.getRequestURL(), msg);
+        return toJsonResponse(HttpStatus.PAYLOAD_TOO_LARGE, request, e.getMessage());
     }
 
     //================================================================================
@@ -213,9 +212,9 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ConnectionException.class)
     @ResponseBody
-    ErrorInfo handleNeo4jConnectionException(HttpServletRequest request, ConnectionException e) {
+    ResponseEntity<String> handleNeo4jConnectionException(HttpServletRequest request, ConnectionException e) {
         logger.error("Neo4j ConnectionException was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     //================================================================================
@@ -227,7 +226,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleDiagramJsonNotFoundException(HttpServletRequest request, DiagramJsonNotFoundException e) {
         logger.warn("DiagramJsonNotFoundException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -235,7 +234,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleDiagramJsonDeserializationException(HttpServletRequest request, DiagramJsonDeserializationException e) {
         logger.warn("DiagramJsonDeserializationException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e);
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -243,16 +242,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleDiagramProfileException(HttpServletRequest request, DiagramProfileException e) {
         logger.warn("DiagramProfileException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.NOT_FOUND, request, e);
-    }
-
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(LicenseException.class)
-    @ResponseBody
-    ResponseEntity handleLicenseException(HttpServletRequest request, LicenseException e) {
-        // Aspose License is expired. The file is not generated and 503 is thrown
-        logger.warn("LicenseException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.SERVICE_UNAVAILABLE, request, e);
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
     //================================================================================
@@ -262,65 +252,65 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CertificateException.class)
     @ResponseBody
-    ErrorInfo handleCertificateException(HttpServletRequest request, CertificateException e) {
+    ResponseEntity<String> handleCertificateException(HttpServletRequest request, CertificateException e) {
         logger.error("CertificateException was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.BAD_REQUEST, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({InvocationTargetException.class, IllegalAccessException.class})
     @ResponseBody
-    ErrorInfo handleReflectionError(HttpServletRequest request, Exception e) {
+    ResponseEntity<String> handleReflectionError(HttpServletRequest request, Exception e) {
         logger.error("ReflectionException was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ClassNotFoundException.class)
     @ResponseBody
-    ErrorInfo handleClassNotFoundException(HttpServletRequest request, ClassNotFoundException e) {
+    ResponseEntity<String> handleClassNotFoundException(HttpServletRequest request, ClassNotFoundException e) {
         logger.error("ClassNotFoundException was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "Class specified was not found");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Specified class was not found");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
-    ErrorInfo handleHttpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
+    ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
         logger.warn("HttpRequestMethodNotSupportedException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseBody
-    ErrorInfo handleHttpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
+    ResponseEntity<String> handleHttpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
         logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
-        return new ErrorInfo(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     @ResponseBody
-    ErrorInfo handleHttpMediaTypeNotAcceptableException(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
+    ResponseEntity<String> handleHttpMediaTypeNotAcceptableException(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
         logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
-        return new ErrorInfo(HttpStatus.NOT_ACCEPTABLE, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.NOT_ACCEPTABLE, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseBody
-    ErrorInfo handleMissingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException e) {
+    ResponseEntity<String> handleMissingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException e) {
         logger.warn("MissingServletRequestParameterException: " + request.getRequestURL(), e.getMessage());
-        return new ErrorInfo(HttpStatus.BAD_REQUEST, request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    ErrorInfo handleUnclassified(HttpServletRequest request, Exception e) {
+    ResponseEntity<String> handleUnclassified(HttpServletRequest request, Exception e) {
         logger.error("An unspecified exception was caught for request: " + request.getRequestURL(), e);
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURL(), "An unspecified exception was caught");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     /*
@@ -329,14 +319,14 @@ class GlobalExceptionHandler {
      * Some services return a binary file or text/plain, etc. Then an ErrorInfo instance is manually converted
      * to JSON and written down in the response body.
      */
-    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, Exception e) {
+    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, String exceptionMessage) {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type", "application/json");
         try {
             ObjectMapper mapper = new ObjectMapper();
             return ResponseEntity.status(status)
                     .headers(responseHeaders)
-                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), e.getMessage())));
+                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), exceptionMessage)));
         } catch (JsonProcessingException e1) {
             logger.error("Could not process to JSON the given ErrorInfo instance", e1);
             return ResponseEntity.status(status)
