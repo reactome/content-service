@@ -11,7 +11,7 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService;
-import org.reactome.server.tools.diagram.exporter.pptx.exception.LicenseException;
+import org.reactome.server.tools.diagram.exporter.pptx.model.Decorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
@@ -50,7 +51,7 @@ public class DiagramExportManager {
     @Value("${diagram.exporter.temp.folder}")
     private String diagramExporterTempFolder;
 
-    public File toPPTX(String stId, String colorProfile, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, LicenseException {
+    public File getPPTX(String stId, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, IOException {
         String pptxFileName = getPPTXFileName(stId);
         String ancestorStId = getAncestorStId(stId);
 
@@ -69,18 +70,19 @@ public class DiagramExportManager {
             pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + DiagramExporterController.PPT_FILE_EXTENSION);
         }
 
+        // We don't want to cache neither read from cache if the diagram has selection and flags.
+        //boolean isDecorated = ((flags != null && !flags.isEmpty()) || (selected != null && !selected.isEmpty()));
+
         // The pptx is save in the temp folder using only the StId, then when we write in the response header
         // we rename it using the [stId] displayName
-        if (pptxFile.exists()) { // just return the file previously generated.
+        if (pptxFile.exists() && !decorator.isDecorated()) { // just return the file previously generated.
             infoLogger.debug("Diagram {} has been generated previously.", pptxFile.getName());
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return pptxFile;
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
-            // The stId might not have diagram, then collect the json based on the ancestorStId.
-            String diagramJsonFile = diagramJsonFolder + pptxFile.getName().replace(".pptx", ".json");
-            File newFile = diagramService.exportToPPTX(diagramJsonFile, colorProfile, pptxFile.getAbsolutePath());
+            File newFile = diagramService.exportToPPTX(stId, diagramJsonFolder, colorProfile, outputFolder.getPath(), decorator);
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return newFile;
