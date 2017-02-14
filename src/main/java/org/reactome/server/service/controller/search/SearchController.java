@@ -97,7 +97,7 @@ class SearchController {
                                    @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
                                    @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
                                    @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords,
-                                   @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false) Boolean cluster,
+                                   @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
                                    @RequestParam(value = "Start row", required = false) Integer start,
                                    @RequestParam(value = "Number of rows to include", required = false) Integer rows) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
