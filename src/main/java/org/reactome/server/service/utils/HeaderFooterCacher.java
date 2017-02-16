@@ -85,6 +85,7 @@ public class HeaderFooterCacher extends Thread {
             String rtn = IOUtils.toString(url.openConnection().getInputStream());
             rtn = getReplaced(rtn, TITLE_OPEM, TITLE_CLOSE, TITLE_REPLACE);
             rtn = getReplaced(rtn, HEADER_CLOSE, HEADER_CLOSE, HEADER_CLOSE_REPLACE);
+            rtn = rtn.replaceAll("(http|https)://", "//");
             return  rtn;
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,7 +106,9 @@ public class HeaderFooterCacher extends Thread {
     private String getFooter() {
         try {
             URL url = new URL(this.server + "common/footer.php");
-            return IOUtils.toString(url.openConnection().getInputStream());
+            String rtn = IOUtils.toString(url.openConnection().getInputStream());
+            rtn = rtn.replaceAll("(http|https)://", "//");
+            return rtn;
         } catch (IOException e) {
             e.printStackTrace();
             return String.format("<span style='color:red'>%s</span>", e.getMessage());
