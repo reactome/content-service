@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -303,6 +304,14 @@ class GlobalExceptionHandler {
     ResponseEntity<String> handleMissingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException e) {
         logger.warn("MissingServletRequestParameterException: " + request.getRequestURL(), e.getMessage());
         return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    ResponseEntity<String> handleHttpMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException e) {
+        logger.warn("HttpMessageNotReadableException was caught for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.UNPROCESSABLE_ENTITY, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
