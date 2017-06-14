@@ -18,7 +18,7 @@ The Content Service is the Reactome API to access the data. It is based on Sprin
 ##### Git Clone
 
 ```console
-git clone https://github.com/reactome-pwp/content-service.git
+git clone https://github.com/reactome/content-service.git
 cd content-service
 ```
 
