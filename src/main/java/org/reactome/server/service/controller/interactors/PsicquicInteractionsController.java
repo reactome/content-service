@@ -32,7 +32,8 @@ import java.util.List;
 public class PsicquicInteractionsController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
-    private static final int THRESHOLD = 10; //
+    // Number of accessions that will define if we run in one thread or two
+    private static final int THRESHOLD = 10;
 
     @Autowired
     private InteractionManager interactions;
