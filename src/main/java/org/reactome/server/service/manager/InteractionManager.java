@@ -72,6 +72,22 @@ public class InteractionManager {
     }
 
     /**
+     * Retrieve PSICQUIC interactions
+     *
+     * @param resource PSICQUIC Resource
+     * @return InteractionMapper which will be serialized to JSON by Jackson
+     */
+    public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource, int numberOfThreads, boolean cache) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
+        if(numberOfThreads >= 20){
+            // no more than 20 threads.....
+            numberOfThreads = 20;
+        }
+        // Query PSICQUIC service and retrieve Interactions sorted by score and higher than 0.45
+        Map<String, List<Interaction>> interactionMap = psicquicService.getInteractions(resource, accs, numberOfThreads, cache);
+        return getDetailInteractionResult(interactionMap, resource);
+    }
+
+    /**
      * Generic method that queries the database and build the JSON Object
      *
      * @return InteractionMapper

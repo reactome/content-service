@@ -32,6 +32,7 @@ import java.util.List;
 public class PsicquicInteractionsController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    private static final int THRESHOLD = 10; //
 
     @Autowired
     private InteractionManager interactions;
@@ -44,13 +45,13 @@ public class PsicquicInteractionsController {
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<PsicquicResource> getResources() {
-        /** This method is invoked by Spring Scheduler, we are logging this all the time. Keep it as debug **/
+        // This method is invoked by Spring Scheduler, we are logging this all the time. Keep it as debug
         infoLogger.debug("Querying Psicquic Resources");
 
-        /** Get values from the in-memory list **/
+        // Get values from the in-memory list
         List<PsicquicResource> resources = PsicquicResourceCachingScheduler.getPsicquicResources();
 
-        /** Resources will be null in case the Scheduler couldn't query PSICQUIC **/
+        // Resources will be null in case the Scheduler couldn't query PSICQUIC
         if (resources == null) {
             throw new PsicquicContentException("Couldn't load PSICQUIC Resources");
         }
@@ -86,7 +87,7 @@ public class PsicquicInteractionsController {
         for (String id : proteins.split(",|;|\\n|\\t")) {
             accs.add(id.trim());
         }
-        return interactions.getPsicquicProteinsDetails(accs, resource);
+        return interactions.getPsicquicProteinsDetails(accs, resource, accs.size() < THRESHOLD ? 1 : 2, true);
     }
 
     @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = Interactors.class, produces = "application/json")
