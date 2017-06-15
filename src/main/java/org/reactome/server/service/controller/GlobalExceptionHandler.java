@@ -3,6 +3,7 @@ package org.reactome.server.service.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
+import org.neo4j.ogm.drivers.http.request.HttpRequestException;
 import org.neo4j.ogm.exception.ConnectionException;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
@@ -312,6 +313,14 @@ class GlobalExceptionHandler {
     ResponseEntity<String> handleHttpMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException e) {
         logger.warn("HttpMessageNotReadableException was caught for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.UNPROCESSABLE_ENTITY, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(HttpRequestException.class)
+    @ResponseBody
+    ResponseEntity<String> handleHttpRequestException(HttpServletRequest request, HttpRequestException e) {
+        logger.warn("HttpRequestException was caught for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Cannot connect to Neo4j Server. Please contact Reactome at help@reactome.org.");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
