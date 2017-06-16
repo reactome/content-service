@@ -25,7 +25,7 @@ import java.util.List;
  */
 @SuppressWarnings({"unused", "ConstantConditions"})
 @RestController
-@Api(tags = "exporter", description = "Diagram Exporters")
+@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
 @RequestMapping("/exporter")
 public class DiagramExporterController {
 
@@ -82,7 +82,7 @@ public class DiagramExporterController {
     @ApiOperation(value = "Export given Pathway to SBML")
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier not found"),
-            @ApiResponse(code = 422, message = "Given identifier does not belong to a pathway"),
+            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     @RequestMapping(value = "/sbml/{id}" + SBML_FILE_EXTENSION, method = RequestMethod.GET)

@@ -141,7 +141,7 @@ public class DiagramExportManager {
         if (obj == null) {
             throw new NotFoundException("Identifier '" + id + "' not found");
         } else if (!(obj instanceof Pathway)) {
-            throw new UnprocessableEntityException("The identifier '" + id + "' does not belong to a pathway");
+            throw new UnprocessableEntityException("The identifier '" + id + "' does not correspond to a 'Pathway' but to a '" + obj.getClass().getSimpleName() + "' instead.");
         }
 
         String stId = obj.getStId();
