@@ -7,6 +7,9 @@ import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.DiagramExporterController;
+import org.reactome.server.service.exception.MissingSBMLException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
@@ -32,17 +35,11 @@ import java.util.LinkedHashMap;
 public class DiagramExportManager {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
 
-    @Autowired
     private DiagramService diagramService;
-
-    @Autowired
     private GeneralService generalService;
-
-    @Autowired
     private EventsService eventsService;
-
-    @Autowired
     private DatabaseObjectService databaseObjectService;
 
     @Value("${diagram.json.folder}")
@@ -132,5 +129,61 @@ public class DiagramExportManager {
             displayName = "["+ stId +"] " + dbOb.getDisplayName();
         }
         return displayName + ".pptx";
+    }
+
+
+    /* =========================================================== */
+    /* ---------------------- SBML EXPORTER ---------------------- */
+    /* =========================================================== */
+
+    public File getSBML(String id, HttpServletResponse response) {
+        DatabaseObject obj = databaseObjectService.findById(id);
+        if (obj == null) {
+            throw new NotFoundException("Identifier '" + id + "' not found");
+        } else if (!(obj instanceof Pathway)) {
+            throw new UnprocessableEntityException("The identifier '" + id + "' does not belong to a pathway");
+        }
+
+        String stId = obj.getStId();
+        String sbmlFileName = stId + DiagramExporterController.SBML_FILE_EXTENSION;
+
+        if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
+
+        // This folder will be created during release phase, double checking just in case
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/sbml");
+        if (!outputFolder.exists()) {
+            infoLogger.debug("Creating the directory tree for storing SBML files");
+            if (!outputFolder.mkdirs())
+                infoLogger.error("Could not create the folder for the given DBVersion");
+        }
+
+        File sbml = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
+        if (!sbml.exists()) {
+            throw new MissingSBMLException("There was a problem generating the SBML file for '" + id + "'. The error has been reported, please try again in a while.");
+        }
+
+        response.setContentType("application/sbml+xml");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + sbmlFileName + "\"");
+        return sbml;
+    }
+
+    @Autowired
+    public void setDiagramService(DiagramService diagramService) {
+        this.diagramService = diagramService;
+    }
+
+    @Autowired
+    public void setGeneralService(GeneralService generalService) {
+        this.generalService = generalService;
+    }
+
+    @Autowired
+    public void setEventsService(EventsService eventsService) {
+        this.eventsService = eventsService;
+    }
+
+    @Autowired
+    public void setDatabaseObjectService(DatabaseObjectService databaseObjectService) {
+        this.databaseObjectService = databaseObjectService;
     }
 }

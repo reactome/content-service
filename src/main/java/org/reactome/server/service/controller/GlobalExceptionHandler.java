@@ -324,6 +324,14 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(MissingSBMLException.class)
+    @ResponseBody
+    ResponseEntity<String> handleMissingSBMLExceptionn(HttpServletRequest request, MissingSBMLException e) {
+        logger.error("MissingSBMLException was caught for request: " + request.getRequestURL(), e);
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
     ResponseEntity<String> handleUnclassified(HttpServletRequest request, Exception e) {

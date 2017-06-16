@@ -6,6 +6,10 @@ package org.reactome.server.service.exception;
 //Do NOT annotate it with "ResponseStatus" because it is treated in "HandlerExceptionResolverImpl"
 public final class UnprocessableEntityException extends RuntimeException {
 
+    public UnprocessableEntityException(String message) {
+        super(message);
+    }
+
     public UnprocessableEntityException() {
         super();
     }

@@ -32,8 +32,8 @@ public class DiagramExporterController {
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     public static final String PPT_FILE_EXTENSION = ".pptx";
+    public static final String SBML_FILE_EXTENSION = ".xml";
 
-    @Autowired
     private DiagramExportManager manager;
 
     @ApiIgnore
@@ -77,5 +77,33 @@ public class DiagramExporterController {
                 infoLogger.error("Could not delete the temporary file {}", pptx.getPath());
             }
         }
+    }
+
+    @ApiOperation(value = "Export given Pathway to SBML")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Identifier not found"),
+            @ApiResponse(code = 422, message = "Given identifier does not belong to a pathway"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    @RequestMapping(value = "/sbml/{id}" + SBML_FILE_EXTENSION, method = RequestMethod.GET)
+    public synchronized void toSBML(@ApiParam(value = "DbId or StId of the requested database object", required = true, defaultValue = "R-HSA-68616")
+                                    @PathVariable String id,
+                                    HttpServletResponse response) throws Exception {
+        File sbml = manager.getSBML(id, response);
+
+        // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
+        // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
+        // delete only the temporary file.
+        OutputStream out = response.getOutputStream();
+        FileInputStream in = new FileInputStream(sbml);
+        IOUtils.copy(in,out);
+        out.flush();
+        out.close();
+        in.close();
+    }
+
+    @Autowired
+    public void setManager(DiagramExportManager manager) {
+        this.manager = manager;
     }
 }
