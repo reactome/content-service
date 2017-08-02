@@ -73,11 +73,11 @@
 		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
 		<init-param>
 			<param-name>proxyHost</param-name>
-			<param-value>reactomedev.oicr.on.ca</param-value>
+			<param-value>localhost</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxyPort</param-name>
-			<param-value>80</param-value>
+			<param-value>8080</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxyPath</param-name>
@@ -87,6 +87,28 @@
 	<servlet-mapping>
 		<servlet-name>Content</servlet-name>
 		<url-pattern>/content/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Testing -->
+	<servlet>
+		<servlet-name>Joomla</servlet-name>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>proxyHost</param-name>
+			<param-value>localhost</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPort</param-name>
+			<param-value>8888</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPath</param-name>
+			<param-value>/website/</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Joomla</servlet-name>
+		<url-pattern>/website/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>

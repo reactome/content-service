@@ -4,6 +4,7 @@
  * @link http://swagger.io
  * @license Apache-2.0
  */
+var $ =$.noConflict(true);
 (function(){this["Handlebars"] = this["Handlebars"] || {};
 this["Handlebars"]["templates"] = this["Handlebars"]["templates"] || {};
 this["Handlebars"]["templates"]["apikey_auth"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {

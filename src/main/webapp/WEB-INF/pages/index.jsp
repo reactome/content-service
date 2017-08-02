@@ -40,12 +40,12 @@
 
             <%-- CSS tweak --%>
             <%-- swagger has <div class="footer"> which collides to wordpress footer style --%>
-            $(".swagger-section .footer").attr("class", "swagger-footer");
-            $('.swagger-footer').css('padding-top', '25px');
+            jQuery(".swagger-section .footer").attr("class", "swagger-footer");
+            jQuery('.swagger-footer').css('padding-top', '25px');
 
             <%-- Apply wordpress font style in wordpress header and footer --%>
-            $('div.footer').css('font', '13px/1.5 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif');
-            $('div.navwrapper').css('font', '13px/1.5 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif');
+            jQuery('div.footer').css('font', '13px/1.5 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif');
+            jQuery('div.navwrapper').css('font', '13px/1.5 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif');
 
         },
         docExpansion: "none",
@@ -103,5 +103,4 @@
     </div>
 </div>
 
-</div> <%--A weird thing to avoid problems--%>
 <c:import url="footer.jsp"/>
