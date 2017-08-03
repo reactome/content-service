@@ -5,7 +5,6 @@ import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DetailsService;
-import org.reactome.server.graph.service.helper.ContentDetails;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
@@ -120,18 +119,6 @@ public class QueryObjectController {
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
-    }
-
-    @ApiOperation(value = "Extended information about an entry in Reactome knowledgebase", notes = "ContentDetails contains: DatabaseObject, componentsOf, other forms of the entry, locationsTree")
-    @RequestMapping(value = "/query/{id}/extended", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public ContentDetails getContentDetail(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
-                                           @ApiParam(value = "Include direct participants (proteins or molecules directly involved in Reactions)", defaultValue = "false") @RequestParam(required = false) Boolean directParticipants) {
-        ContentDetails contentDetails = detailsService.getContentDetails(id, directParticipants);
-        if (contentDetails == null || contentDetails.getDatabaseObject() == null)
-            throw new NotFoundException("Id: " + id + " has not been found in the System");
-        infoLogger.info("Request for extended DatabaseObject for id: {}", id);
-        return contentDetails;
     }
 
     //##################### API Ignored but still available for internal purposes #####################//
