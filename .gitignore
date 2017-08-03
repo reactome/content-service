@@ -42,3 +42,5 @@ test.txt
 
 *.lic
 *.lic.xml
+
+*.log
