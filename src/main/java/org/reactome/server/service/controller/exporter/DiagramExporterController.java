@@ -2,7 +2,13 @@ package org.reactome.server.service.controller.exporter;
 
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
+import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.GeneralService;
+import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.service.manager.DiagramExportManager;
+import org.reactome.server.tools.SBMLFactory;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
@@ -33,6 +39,12 @@ public class DiagramExporterController {
 
     public static final String PPT_FILE_EXTENSION = ".pptx";
     public static final String SBML_FILE_EXTENSION = ".xml";
+
+    @Autowired
+    private GeneralService generalService;
+
+    @Autowired
+    private DatabaseObjectService databaseObjectService;
 
     private DiagramExportManager manager;
 
@@ -89,17 +101,19 @@ public class DiagramExporterController {
     public synchronized void toSBML(@ApiParam(value = "DbId or StId of the requested database object", required = true, defaultValue = "R-HSA-68616")
                                     @PathVariable String id,
                                     HttpServletResponse response) throws Exception {
-        File sbml = manager.getSBML(id, response);
+        String sbml;
+        try {
+            Pathway p = databaseObjectService.findById(id);
+            if (p == null) throw new NotFoundException("The identifier " + id + " does not correspond to any object");
+            sbml = SBMLFactory.getSBML(p, generalService.getDBVersion());
+        } catch (ClassCastException ex){
+            throw new UnprocessableEntityException("The identifier " + id + " does not belong to a Pathway");
+        }
 
-        // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
-        // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
-        // delete only the temporary file.
         OutputStream out = response.getOutputStream();
-        FileInputStream in = new FileInputStream(sbml);
-        IOUtils.copy(in,out);
+        IOUtils.write(sbml, out);
         out.flush();
         out.close();
-        in.close();
     }
 
     @Autowired
