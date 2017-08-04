@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
+import org.reactome.server.service.exception.MissingSBMLException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.service.manager.DiagramExportManager;
@@ -20,16 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@SuppressWarnings({"unused", "ConstantConditions"})
+@SuppressWarnings({"unused", "ConstantConditions", "SpringAutowiredFieldsWarningInspection", "WeakerAccess"})
 @RestController
 @Api(tags = "exporter", description = "Reactome Data: Format Exporter")
 @RequestMapping("/exporter")
@@ -101,17 +99,32 @@ public class DiagramExporterController {
     public synchronized void toSBML(@ApiParam(value = "DbId or StId of the requested database object", required = true, defaultValue = "R-HSA-68616")
                                     @PathVariable String id,
                                     HttpServletResponse response) throws Exception {
-        String sbml;
+        Pathway p;
         try {
-            Pathway p = databaseObjectService.findById(id);
-            if (p == null) throw new NotFoundException("The identifier " + id + " does not correspond to any object");
-            sbml = SBMLFactory.getSBML(p, generalService.getDBVersion());
-        } catch (ClassCastException ex){
-            throw new UnprocessableEntityException("The identifier " + id + " does not belong to a Pathway");
+            p = databaseObjectService.findById(id);
+        } catch (ClassCastException ex) {
+            throw new UnprocessableEntityException("The identifier '" + id + "' does not correspond to a 'Pathway'");
+        }
+        if (p == null) throw new NotFoundException("Identifier '" + id + "' not found");
+
+        String sbmlFileName = p.getStId() + DiagramExporterController.SBML_FILE_EXTENSION;
+        InputStream sbml;
+        try {
+            File file = manager.getSBML(p, sbmlFileName);
+            sbml = new FileInputStream(file);
+            infoLogger.info("Exporting the pathway {} to SBML retrieved from previously generated file", p.getStId());
+        } catch (MissingSBMLException | IOException e) {
+            String content = SBMLFactory.getSBML(p, generalService.getDBVersion());
+            manager.saveSBML(content, sbmlFileName);
+            sbml = IOUtils.toInputStream(content);
+            infoLogger.info("Exporting the pathway {} to SBML", p.getStId());
         }
 
+        response.setContentType("application/sbml+xml");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + sbmlFileName + "\"");
+
         OutputStream out = response.getOutputStream();
-        IOUtils.write(sbml, out);
+        IOUtils.copy(sbml, out);
         out.flush();
         out.close();
     }

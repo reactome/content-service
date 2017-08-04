@@ -1,5 +1,6 @@
 package org.reactome.server.service.manager;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Pathway;
@@ -8,8 +9,6 @@ import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.DiagramExporterController;
 import org.reactome.server.service.exception.MissingSBMLException;
-import org.reactome.server.service.exception.NotFoundException;
-import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
@@ -121,12 +120,12 @@ public class DiagramExportManager {
      *
      * @return displayName (otherwise keep the stId)
      */
-    private String getPPTXFileName(String stId){
+    private String getPPTXFileName(String stId) {
         DatabaseObject dbOb = databaseObjectService.findByIdNoRelations(stId);
         if (dbOb == null) return null;
         String displayName = stId;
-        if(StringUtils.isNotEmpty(dbOb.getDisplayName())){
-            displayName = "["+ stId +"] " + dbOb.getDisplayName();
+        if (StringUtils.isNotEmpty(dbOb.getDisplayName())) {
+            displayName = "[" + stId + "] " + dbOb.getDisplayName();
         }
         return displayName + ".pptx";
     }
@@ -136,20 +135,20 @@ public class DiagramExportManager {
     /* ---------------------- SBML EXPORTER ---------------------- */
     /* =========================================================== */
 
-    public File getSBML(String id, HttpServletResponse response) {
-        DatabaseObject obj = databaseObjectService.findById(id);
-        if (obj == null) {
-            throw new NotFoundException("Identifier '" + id + "' not found");
-        } else if (!(obj instanceof Pathway)) {
-            throw new UnprocessableEntityException("The identifier '" + id + "' does not correspond to a 'Pathway' but to a '" + obj.getClass().getSimpleName() + "' instead.");
-        }
-
-        String stId = obj.getStId();
-        String sbmlFileName = stId + DiagramExporterController.SBML_FILE_EXTENSION;
-
+    public File getSBML(Pathway pathway, String sbmlFileName) throws MissingSBMLException {
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
 
         // This folder will be created during release phase, double checking just in case
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/sbml");
+        if (outputFolder.exists()) {
+            File sbml = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
+            if (sbml.exists()) return sbml;
+        }
+
+        throw new MissingSBMLException("SBML hasn't been previously generated for " + pathway.getStId());
+    }
+
+    public void saveSBML(String sbml, String sbmlFileName) {
         File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/sbml");
         if (!outputFolder.exists()) {
             infoLogger.debug("Creating the directory tree for storing SBML files");
@@ -157,14 +156,16 @@ public class DiagramExportManager {
                 infoLogger.error("Could not create the folder for the given DBVersion");
         }
 
-        File sbml = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
-        if (!sbml.exists()) {
-            throw new MissingSBMLException("There was a problem generating the SBML file for '" + id + "'. The error has been reported, please try again in a while.");
+        File file = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
+        if (!file.exists()) {
+            try {
+                FileUtils.writeStringToFile(file, sbml);
+            } catch (IOException e) {
+                errorLogger.error(e.getMessage());
+            }
+        } else {
+            errorLogger.error("Trying to write a file that already exists");
         }
-
-        response.setContentType("application/sbml+xml");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + sbmlFileName + "\"");
-        return sbml;
     }
 
     @Autowired
