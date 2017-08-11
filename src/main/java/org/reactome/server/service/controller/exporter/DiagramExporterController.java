@@ -2,7 +2,14 @@ package org.reactome.server.service.controller.exporter;
 
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
+import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.GeneralService;
+import org.reactome.server.service.exception.MissingSBMLException;
+import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.service.manager.DiagramExportManager;
+import org.reactome.server.tools.SBMLFactory;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
@@ -14,16 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@SuppressWarnings({"unused", "ConstantConditions"})
+@SuppressWarnings({"unused", "ConstantConditions", "SpringAutowiredFieldsWarningInspection", "WeakerAccess"})
 @RestController
 @Api(tags = "exporter", description = "Reactome Data: Format Exporter")
 @RequestMapping("/exporter")
@@ -33,6 +37,12 @@ public class DiagramExporterController {
 
     public static final String PPT_FILE_EXTENSION = ".pptx";
     public static final String SBML_FILE_EXTENSION = ".xml";
+
+    @Autowired
+    private GeneralService generalService;
+
+    @Autowired
+    private DatabaseObjectService databaseObjectService;
 
     private DiagramExportManager manager;
 
@@ -89,17 +99,34 @@ public class DiagramExporterController {
     public synchronized void toSBML(@ApiParam(value = "DbId or StId of the requested database object", required = true, defaultValue = "R-HSA-68616")
                                     @PathVariable String id,
                                     HttpServletResponse response) throws Exception {
-        File sbml = manager.getSBML(id, response);
+        Pathway p;
+        try {
+            p = databaseObjectService.findById(id);
+        } catch (ClassCastException ex) {
+            throw new UnprocessableEntityException("The identifier '" + id + "' does not correspond to a 'Pathway'");
+        }
+        if (p == null) throw new NotFoundException("Identifier '" + id + "' not found");
 
-        // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
-        // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
-        // delete only the temporary file.
+        String sbmlFileName = p.getStId() + DiagramExporterController.SBML_FILE_EXTENSION;
+        InputStream sbml;
+        try {
+            File file = manager.getSBML(p, sbmlFileName);
+            sbml = new FileInputStream(file);
+            infoLogger.info("Exporting the pathway {} to SBML retrieved from previously generated file", p.getStId());
+        } catch (MissingSBMLException | IOException e) {
+            String content = SBMLFactory.getSBML(p, generalService.getDBVersion());
+            manager.saveSBML(content, sbmlFileName);
+            sbml = IOUtils.toInputStream(content);
+            infoLogger.info("Exporting the pathway {} to SBML", p.getStId());
+        }
+
+        response.setContentType("application/sbml+xml");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + sbmlFileName + "\"");
+
         OutputStream out = response.getOutputStream();
-        FileInputStream in = new FileInputStream(sbml);
-        IOUtils.copy(in,out);
+        IOUtils.copy(sbml, out);
         out.flush();
         out.close();
-        in.close();
     }
 
     @Autowired

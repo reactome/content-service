@@ -22,11 +22,11 @@
 
 	<!-- Adds the headers to support cross-origin resource sharing in the web clients -->
 	<filter>
-		<filter-name>cors</filter-name>
-		<filter-class>org.reactome.server.service.utils.CORSFilter</filter-class>
+		<filter-name>crs</filter-name>
+		<filter-class>org.reactome.server.service.utils.CustomRequestFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>cors</filter-name>
+		<filter-name>crs</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 

@@ -112,12 +112,12 @@ mvn tomcat7:run \
 Check if Tomcat has been initialised
 ```rb
 [INFO] Using existing Tomcat server configuration at /Users/reactome/content-service/target/tomcat
-INFO: Starting ProtocolHandler ["http-bio-8585"]
+INFO: Starting ProtocolHandler ["http-bio-8686"]
 ```
 
 #### Usage
 
-* :computer: Access your local [installation](http://localhost:8585/)
+* :computer: Access your local [installation](http://localhost:8686/)
 
 <img width="966" alt="content-service-1" src="https://cloud.githubusercontent.com/assets/6883670/23139777/05b17160-f7a6-11e6-9199-bfad5d179268.png">
 <img width="969" alt="content-service-2" src="https://cloud.githubusercontent.com/assets/6883670/23139778/05b24c5c-f7a6-11e6-89c6-a833c2a5f133.png">
