@@ -9,6 +9,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Collections;
+
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
@@ -26,14 +28,16 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
+
         return new ApiInfo(
-                "Reactome Content Service",
+                "Content Service",
                 "RESTFul service for Reactome content",
-                "0.1",
-                "Terms of service",
+                "1.0",
+                "about/license-agreement",
                 new Contact("Reactome","http://www.reactome.org","help@reactome.org"),
                 "Creative Commons Attribution 3.0 Unported License",
-                "http://creativecommons.org/licenses/by/3.0/legalcode");
+                "http://creativecommons.org/licenses/by/3.0/legalcode",
+                Collections.emptyList());
     }
 
 }

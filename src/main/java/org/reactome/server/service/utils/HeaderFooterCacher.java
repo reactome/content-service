@@ -147,11 +147,10 @@ public class HeaderFooterCacher extends Thread {
     private static final String TITLE_REPLACE = "<title>Reactome | Content Service API</title>";
 
     private static final String HEADER_CLOSE = "</head>";
-    private static final String HEADER_CLOSE_REPLACE = "<jsp:include page=\"script.jsp\"/>\n</head>";
+    private static final String HEADER_CLOSE_REPLACE = "<jsp:include page=\"additional.jsp\"/>\n</head>";
 
-
-    // Name of the template page in Joomls
-    private static final String TEMPLATE_PAGE = "template-page-v1";
+    // Name of the template page in Joomla
+    private static final String TEMPLATE_PAGE = "template-swagger";
 
     private static final Integer MINUTES = 15;
 
@@ -168,6 +167,7 @@ public class HeaderFooterCacher extends Thread {
         String template = getTemplate();
         //noinspection InfiniteLoopStatement
         while (true) {
+            System.out.println("EXECUTED");
             getHeaderAndFooter(template);
             try {
                 Thread.sleep(1000 * 60 * MINUTES);
@@ -208,7 +208,8 @@ public class HeaderFooterCacher extends Thread {
             rtn = rtn.replace("<base href=\"" + this.server + "/" + TEMPLATE_PAGE + "\" />", "");
             rtn = rtn.replaceAll("(http|https)://", "//");
 
-//            rtn = rtn.replaceAll("favth-content-block", "");
+            // remove joomla template default class
+            rtn = rtn.replaceAll("favth-content-block", "");
 
             return  rtn;
         } catch (IOException e) {
@@ -224,7 +225,7 @@ public class HeaderFooterCacher extends Thread {
         for (String line : lines) {
             html += line + "\n";
             if(isHeaderLine) {
-                if (line.contains("search-placeholder")) {
+                if (line.contains("template-placeholder")) {
                     isHeaderLine = false;
                     writeFile("header.jsp", html);
                     html = "";

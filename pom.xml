@@ -49,10 +49,10 @@
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
         <jstl.version>1.2</jstl.version>
-        <jackson.version>2.7.3</jackson.version>
-        <swagger.version>2.4.0</swagger.version>
-        <lang.version>3.4</lang.version>
-        <mail.version>1.5.6</mail.version>
+        <jackson.version>2.9.0</jackson.version>
+        <swagger.version>2.7.0</swagger.version>
+        <lang.version>3.6</lang.version>
+        <mail.version>1.6.0</mail.version>
         <activation.version>1.1.1</activation.version>
 
         <tomcat.version>2.2</tomcat.version>

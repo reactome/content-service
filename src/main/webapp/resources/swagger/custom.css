@@ -1,0 +1,52 @@
+.swagger-ui .info .title small pre { /* api version */
+    margin: 0;
+    font-family: Titillium Web, sans-serif;
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 9px;
+    display: block;
+}
+
+.swagger-ui .info {
+    margin: 10px 0;
+}
+
+.swagger-ui .info a {
+    color: #58C3E5;
+}
+
+.swagger-ui p {
+    color: #FFFFFF;
+}
+
+.swagger-ui .opblock-body pre {
+    max-height: 400px;
+}
+
+.swagger-ui .info hgroup.main  {
+    margin: 0;
+}
+
+.swagger-ui .tab li {
+    font-size: 11px;
+}
+
+/* hide some elements */
+.swagger-ui .info .base-url,
+.swagger-ui .info a>span.url,
+.swagger-ui .scheme-container, .swagger-ui .topbar {
+    display: none !important;
+}
+
+/* in case we want to reduce padding */
+.swagger-ui .opblock-tag {
+    padding: 5px 0;
+    font-size: 20px;
+}
+
+.swagger-ui .btn:hover {
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
+    box-shadow: 0 0 5px rgba(0,0,0,.3);
+}

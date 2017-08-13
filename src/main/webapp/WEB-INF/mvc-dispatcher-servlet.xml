@@ -35,7 +35,7 @@
 
     <mvc:resources mapping="/**" location="/resources/" />
 
-    <!-- Enables swgger ui-->
+    <!-- Enables swagger ui-->
     <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
     <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
