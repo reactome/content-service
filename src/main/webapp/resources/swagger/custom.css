@@ -1,4 +1,8 @@
-.swagger-ui .info .title small pre { /* api version */
+/* Swagger Custom css */
+/* Overwriting some default styles, in order to make them fit into the new template */
+
+.swagger-ui .info .title small pre {
+    /* api version next to name */
     margin: 0;
     font-family: Titillium Web, sans-serif;
     color: #fff;
@@ -17,15 +21,32 @@
     color: #58C3E5;
 }
 
-.swagger-ui p {
-    color: #FFFFFF;
+.swagger-ui .response p {
+    color: #333;
 }
 
 .swagger-ui .opblock-body pre {
+    /* result div */
     max-height: 400px;
+    hyphens: none;
+    -webkit-hyphens: none;
+    -ms-hyphens: none;
+    background-color: #fcf6db;
+    border: 1px solid #e5e0c6;
+    color: #333;
 }
 
-.swagger-ui .info hgroup.main  {
+.swagger-ui .opblock-body pre span {
+    /* swagger css forces color white as important. */
+    color: #333 !important;
+}
+
+.swagger-ui .response-col_description__inner span {
+    background-color: #fcf6db;
+    border: 1px solid #e5e0c6;
+}
+
+.swagger-ui .info hgroup.main {
     margin: 0;
 }
 
@@ -33,9 +54,9 @@
     font-size: 11px;
 }
 
-/* hide some elements */
+/* Hiding some elements. The configuration does not allow us to remove */
 .swagger-ui .info .base-url,
-.swagger-ui .info a>span.url,
+.swagger-ui .info a > span.url,
 .swagger-ui .scheme-container, .swagger-ui .topbar {
     display: none !important;
 }
@@ -46,7 +67,92 @@
     font-size: 20px;
 }
 
-.swagger-ui .btn:hover {
-    -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
-    box-shadow: 0 0 5px rgba(0,0,0,.3);
+.swagger-ui .btn:hover,
+.swagger-ui .btn:focus,
+.swagger-ui .btn:active {
+    background: none;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+    border: 2px solid #888;
+    color: inherit;
+}
+
+.swagger-ui .btn.cancel:hover,
+.swagger-ui .btn.cancel:focus,
+.swagger-ui .btn.cancel:active {
+    border-color: #ff6060;
+    color: #ff6060;
+}
+
+@media only screen and (max-width: 1024px) {
+    .swagger-ui .opblock .opblock-summary {
+        display: block;
+    }
+
+    .swagger-ui .opblock .opblock-summary-operation-id, .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-path__deprecated {
+        display: inline;
+        word-wrap: break-word;
+    }
+}
+
+@media only screen and (max-width: 425px) {
+    .swagger-ui .opblock .opblock-section-header, .swagger-ui .opblock .opblock-section-header label {
+        display: block;
+    }
+
+    .swagger-ui .opblock .opblock-summary-description {
+        padding-top: 10px;
+    }
+
+    .swagger-ui .opblock-tag {
+        font-size: 16px;
+    }
+
+    .swagger-ui .opblock-tag small {
+        font-size: 12px;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    .swagger-ui .opblock .opblock-section-header, .swagger-ui .opblock .opblock-section-header label {
+        display: block;
+    }
+
+    .swagger-ui .opblock .opblock-summary {
+        display: block;
+    }
+
+    .swagger-ui .opblock .opblock-summary-operation-id, .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-path__deprecated {
+        font-size: 13px;
+        display: block;
+        padding-top: 5px;
+        padding-left: 0;
+        word-wrap: break-word;
+    }
+
+    .swagger-ui .opblock .opblock-summary-description {
+        padding-top: 2px;
+    }
+
+    .swagger-ui .tab {
+        display: none;
+        padding-top: 10px
+    }
+
+    .swagger-ui .body-param {
+        padding-top: 10px
+    }
+
+    select {
+        width: 145px;
+    }
+
+    .swagger-ui .opblock-body select {
+        min-width: 145px;
+    }
+
+    .swagger-ui section.models {
+        display: none;
+    }
+
 }
