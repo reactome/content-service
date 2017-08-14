@@ -54,9 +54,15 @@
         <lang.version>3.6</lang.version>
         <mail.version>1.6.0</mail.version>
         <activation.version>1.1.1</activation.version>
+        <kryo.version>2.22</kryo.version>
+        <tika.version>1.12</tika.version>
+        <lru.version>1.4-SNAPSHOT</lru.version>
+        <reactome.utils.version>1.0.2</reactome.utils.version>
+        <logback.classic.version>1.1.10</logback.classic.version>
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>
+        <maven.resources.version>3.0.1</maven.resources.version>
         <jdk.version>1.8</jdk.version>
         <maven.site.version>3.4</maven.site.version>
         <jackrabbit.version>2.10</jackrabbit.version>
@@ -129,7 +135,7 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.12</version>
+            <version>${tika.version}</version>
         </dependency>
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
@@ -140,7 +146,7 @@
         <dependency>
             <groupId>org.reactome.server.lru</groupId>
             <artifactId>reactome-lru</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>${lru.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -175,20 +181,20 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.10</version>
+            <version>${logback.classic.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.reactome.server.utils</groupId>
             <artifactId>reactome-utils</artifactId>
-            <version>1.0.2</version>
+            <version>${reactome.utils.version}</version>
         </dependency>
 
         <!-- Kryo serializer -->
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
-            <version>2.22</version>
+            <version>${kryo.version}</version>
         </dependency>
 
         <!-- diagram exporter -->
@@ -214,7 +220,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>${maven.resources.version}</version>
             </plugin>
 
             <plugin>
