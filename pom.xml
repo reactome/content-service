@@ -40,16 +40,16 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.0.8</graph.core>
+        <graph.core>1.1.0</graph.core>
         <search.core>1.0.0</search.core>
         <interactors.core>1.0.8</interactors.core>
-        <diagram.exporter>1.0.1-SNAPSHOT</diagram.exporter>
+        <diagram.exporter>1.1.0</diagram.exporter>
         <sbml-exporter>1.0.0</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
         <jstl.version>1.2</jstl.version>
-        <jackson.version>2.9.0</jackson.version>
+        <jackson.version>2.8.9</jackson.version>
         <swagger.version>2.7.0</swagger.version>
         <lang.version>3.6</lang.version>
         <mail.version>1.6.0</mail.version>
@@ -294,6 +294,26 @@
     </reporting>
 
     <repositories>
+        <!-- MAVEN central -->
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>central-bck</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
         <!-- EBI repo -->
         <repository>
             <id>nexus-ebi-repo</id>
