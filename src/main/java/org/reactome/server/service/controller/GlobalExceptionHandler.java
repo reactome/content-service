@@ -271,7 +271,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ClassNotFoundException.class)
     @ResponseBody
     ResponseEntity<String> handleClassNotFoundException(HttpServletRequest request, ClassNotFoundException e) {
-        logger.error("ClassNotFoundException was caught for request: " + request.getRequestURL(), e);
+        logger.warn("ClassNotFoundException was caught for request: " + request.getRequestURL(), e);
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Specified class was not found");
     }
 
