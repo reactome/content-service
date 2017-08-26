@@ -34,14 +34,11 @@ public class QueryObjectController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
-    private final DatabaseObjectService databaseObjectService;
-    private final AdvancedDatabaseObjectService advancedDatabaseObjectService;
+    @Autowired
+    private DatabaseObjectService databaseObjectService;
 
     @Autowired
-    public QueryObjectController(DatabaseObjectService databaseObjectService, AdvancedDatabaseObjectService advancedDatabaseObjectService) {
-        this.databaseObjectService = databaseObjectService;
-        this.advancedDatabaseObjectService = advancedDatabaseObjectService;
-    }
+    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
 
     @ApiOperation(value = "An entry in Reactome knowledgebase", notes = "This method queries for an entry in Reactome knowledgebase based on the given identifier, i.e. stable id or database id. It is worth mentioning that the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled.")
     @ApiResponses({
@@ -82,11 +79,11 @@ public class QueryObjectController {
     @ResponseBody //TODO: Swagger is not showing the defaultValue
     public Collection<DatabaseObject> findByIds(@ApiParam(value = "A comma separated list of identifiers", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true) @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
-        for (String id : post.split("[,;\n\t]")) {
+        for (String id : post.split(",|;|\\n|\\t")) {
             ids.add(id.trim());
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
-        Collection<DatabaseObject> databaseObjects = databaseObjectService.findByIdNoRelations(ids);
+        Collection<DatabaseObject> databaseObjects = advancedDatabaseObjectService.findById(ids, RelationshipDirection.OUTGOING);
         if (databaseObjects == null || databaseObjects.isEmpty())
             throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
         infoLogger.info("Request for DatabaseObjects for ids: {}", ids);
@@ -99,11 +96,11 @@ public class QueryObjectController {
     public Map<String, DatabaseObject> findByIdsMap(@ApiParam(value = "A comma separated list of identifiers ", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
                                                     @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
-        for (String id : post.split("[,;\n\t]")) ids.add(id.trim());
+        for (String id : post.split(",|;|\\n|\\t")) ids.add(id.trim());
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
         Map<String, DatabaseObject> map = new HashMap<>();
         for (String id : ids) {
-            DatabaseObject object = databaseObjectService.findByIdNoRelations(id);
+            DatabaseObject object = advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);
             if (object != null) map.put(id, object);
         }
         if (map.isEmpty()) throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
