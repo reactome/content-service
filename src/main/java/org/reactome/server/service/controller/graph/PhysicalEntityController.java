@@ -75,7 +75,7 @@ public class PhysicalEntityController {
         return componentOfs;
     }
 
-    @ApiOperation(value = "A list with the entities contained in a given complex", notes = "Retrieves the list of subunits that constitute any given complex. In case the complex comprises other complexes, this method recursively breaks all of them into their subunits.")
+    @ApiOperation(value = "A list with the entities contained in a given complex", notes = "Retrieves the list of subunits that constitute any given complex. In case the complex comprises other complexes, this method recursively traverses the content returning each contained PhysicalEntity. Contained complexes and entity sets can be excluded setting the 'excludeStructures' optional parameter to 'true'")
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier does not match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
@@ -83,8 +83,16 @@ public class PhysicalEntityController {
     })
     @RequestMapping(value = "/complex/{id}/subunits", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<PhysicalEntity> getComplexSubunits(@ApiParam(defaultValue = "R-HSA-5674003", required = true) @PathVariable String id) {
-        Collection<PhysicalEntity> componentOfs = physicalEntityService.getComplexSubunits(id);
+    public Collection<PhysicalEntity> getComplexSubunits( @ApiParam(value = "The complex for which subunits are requested", defaultValue = "R-HSA-5674003", required = true)
+                                                         @PathVariable String id,
+                                                          @ApiParam(value = "Specifies whether contained complexes and entity sets are excluded in the response", defaultValue = "false")
+                                                         @RequestParam(defaultValue = "false") boolean excludeStructures) {
+        Collection<PhysicalEntity> componentOfs;
+        if (excludeStructures) {
+            componentOfs = physicalEntityService.getComplexSubunitsNoStructures(id);
+        } else {
+            componentOfs = physicalEntityService.getComplexSubunits(id);
+        }
         if (componentOfs == null || componentOfs.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for subunits of Complex with id: {}", id);

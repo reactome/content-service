@@ -4,7 +4,7 @@ import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
-import org.reactome.server.graph.service.DetailsService;
+import org.reactome.server.graph.service.helper.RelationshipDirection;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
@@ -34,14 +34,14 @@ public class QueryObjectController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
-    @Autowired
-    private DatabaseObjectService databaseObjectService;
+    private final DatabaseObjectService databaseObjectService;
+    private final AdvancedDatabaseObjectService advancedDatabaseObjectService;
 
     @Autowired
-    private DetailsService detailsService;
-
-    @Autowired
-    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
+    public QueryObjectController(DatabaseObjectService databaseObjectService, AdvancedDatabaseObjectService advancedDatabaseObjectService) {
+        this.databaseObjectService = databaseObjectService;
+        this.advancedDatabaseObjectService = advancedDatabaseObjectService;
+    }
 
     @ApiOperation(value = "An entry in Reactome knowledgebase", notes = "This method queries for an entry in Reactome knowledgebase based on the given identifier, i.e. stable id or database id. It is worth mentioning that the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled.")
     @ApiResponses({
@@ -52,7 +52,7 @@ public class QueryObjectController {
     @RequestMapping(value = "/query/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject findById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id) {
-        DatabaseObject databaseObject = databaseObjectService.findById(id);
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for DatabaseObject for id: {}", id);
         return databaseObject;
@@ -67,7 +67,7 @@ public class QueryObjectController {
     @ResponseBody
     public String findById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
-        DatabaseObject databaseObject = databaseObjectService.findById(id);
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);
         if (databaseObject == null) throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
@@ -82,11 +82,11 @@ public class QueryObjectController {
     @ResponseBody //TODO: Swagger is not showing the defaultValue
     public Collection<DatabaseObject> findByIds(@ApiParam(value = "A comma separated list of identifiers", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true) @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
-        for (String id : post.split(",|;|\\n|\\t")) {
+        for (String id : post.split("[,;\n\t]")) {
             ids.add(id.trim());
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
-        Collection<DatabaseObject> databaseObjects = databaseObjectService.findByIdsNoRelations(ids);
+        Collection<DatabaseObject> databaseObjects = databaseObjectService.findByIdNoRelations(ids);
         if (databaseObjects == null || databaseObjects.isEmpty())
             throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
         infoLogger.info("Request for DatabaseObjects for ids: {}", ids);
@@ -99,11 +99,11 @@ public class QueryObjectController {
     public Map<String, DatabaseObject> findByIdsMap(@ApiParam(value = "A comma separated list of identifiers ", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
                                                     @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
-        for (String id : post.split(",|;|\\n|\\t")) ids.add(id.trim());
+        for (String id : post.split("[,;\n\t]")) ids.add(id.trim());
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
         Map<String, DatabaseObject> map = new HashMap<>();
         for (String id : ids) {
-            DatabaseObject object = databaseObjectService.findById(id);
+            DatabaseObject object = databaseObjectService.findByIdNoRelations(id);
             if (object != null) map.put(id, object);
         }
         if (map.isEmpty()) throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
@@ -141,7 +141,7 @@ public class QueryObjectController {
     @ResponseBody
     public String findByIdNoRelations(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
                                       @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
-        DatabaseObject databaseObject = databaseObjectService.findById(id);
+        DatabaseObject databaseObject = databaseObjectService.findByIdNoRelations(id);
         if (databaseObject == null)
             throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
