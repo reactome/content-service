@@ -106,8 +106,6 @@ public class PersonController {
     @ResponseBody
     public Collection<Publication> getPublicationsOfPerson(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
         Collection<Publication> publications = personService.getPublicationsOfPerson(id);
-        if (publications == null || publications.isEmpty())
-            throw new NotFoundException("No publications found for person with id: " + id);
         infoLogger.info("Request for all publications of person with id: {}", id);
         return publications;
     }
@@ -122,8 +120,6 @@ public class PersonController {
     @ResponseBody
     public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
         Collection<Pathway> pathways = personService.getAuthoredPathways(id);
-        if (pathways == null || pathways.isEmpty())
-            throw new NotFoundException("No pathways found for person with id: " + id);
         infoLogger.info("Request for all authored pathways of person with id: {}", id);
         return pathways;
     }
