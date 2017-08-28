@@ -6,7 +6,6 @@ import org.reactome.server.graph.domain.model.ReferenceEntity;
 import org.reactome.server.graph.domain.result.Participant;
 import org.reactome.server.graph.service.ParticipantService;
 import org.reactome.server.service.exception.ErrorInfo;
-import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,6 @@ public class ParticipantsController {
     @ResponseBody
     public Collection<Participant> getParticipants(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "5205685",required = true) @PathVariable String id)  {
         Collection<Participant> participants = participantService.getParticipants(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
         infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
@@ -59,7 +57,6 @@ public class ParticipantsController {
     @ResponseBody
     public Collection<PhysicalEntity> getParticipatingPhysicalEntities(@ApiParam(value = "The event for which the participating PhysicalEntities are requested", defaultValue = "R-HSA-5205685",required = true) @PathVariable String id)  {
         Collection<PhysicalEntity> participants = participantService.getParticipatingPhysicalEntities(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
         infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
@@ -74,7 +71,6 @@ public class ParticipantsController {
     @ResponseBody
     public Collection<ReferenceEntity> getParticipatingReferenceEntities(@ApiParam(value = "The event for which the participating ReferenceEntities are requested", defaultValue = "5205685",required = true) @PathVariable String id)  {
         Collection<ReferenceEntity> participants = participantService.getParticipatingReferenceEntities(id);
-        if (participants == null || participants.isEmpty())  throw new NotFoundException("No participants found for id: " + id);
         infoLogger.info("Request for participants of event with id: {}", id);
         return participants;
     }
