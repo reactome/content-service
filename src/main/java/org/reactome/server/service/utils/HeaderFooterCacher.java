@@ -100,20 +100,9 @@ public class HeaderFooterCacher extends Thread {
     }
 
     private void getHeaderAndFooter(String file) {
-        String html = "";
-        String[] lines = file.split(System.getProperty("line.separator"));
-        boolean isHeaderLine = true;
-        for (String line : lines) {
-            html += line + "\n";
-            if(isHeaderLine) {
-                if (line.contains("template-placeholder")) {
-                    isHeaderLine = false;
-                    writeFile("header.jsp", html);
-                    html = "";
-                }
-            }
-        }
-        writeFile("footer.jsp", html);
+        String[] parts = file.split("<!-- template-placeholder -->");
+        writeFile("header.jsp", parts[0]);
+        writeFile("footer.jsp", parts[1]);
     }
 
     private String getReplaced(String target, String open, String close, String replace){
