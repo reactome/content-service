@@ -1,9 +1,11 @@
 package org.reactome.server.service.utils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.net.URL;
 /**
  * Generates the header and the footer every MINUTES defined below.
  * The header.jsp and footer.jsp are placed under jsp folder in WEB-INF
- *
+ * <p>
  * IMPORTANT
  * ---------
  * We assume the war file runs exploded, because there is no way of writing
@@ -24,6 +26,9 @@ import java.net.URL;
  */
 @Component
 public class HeaderFooterCacher extends Thread {
+
+    private static Logger logger = Logger.getLogger(HeaderFooterCacher.class.getName());
+
     private static final String TITLE_OPEN = "<title>";
     private static final String TITLE_CLOSE = "</title>";
     private static final String TITLE_REPLACE = "<title>Reactome | Content Service API</title>";
@@ -46,10 +51,9 @@ public class HeaderFooterCacher extends Thread {
 
     @Override
     public void run() {
-        String template = getTemplate();
         //noinspection InfiniteLoopStatement
         while (true) {
-            getHeaderAndFooter(template);
+            getHeaderAndFooter(getTemplate());
             try {
                 Thread.sleep(1000 * 60 * MINUTES);
             } catch (InterruptedException e) {
@@ -58,41 +62,43 @@ public class HeaderFooterCacher extends Thread {
         }
     }
 
-    private synchronized void writeFile(String fileName, String content){
+    private synchronized void writeFile(String fileName, String content) {
         try {
             //noinspection ConstantConditions
             String path = getClass().getClassLoader().getResource("").getPath();
             //HACK!
-            if(path.contains("WEB-INF")) {
+            if (path.contains("WEB-INF")) {
                 //When executing in a deployed war file in tomcat, the WEB-INF folder is just one bellow the classes
                 path += "../pages/";
-            }else{
+            } else {
                 //When executing in local we need to write the files in the actual resources
                 path += "../../src/main/webapp/WEB-INF/pages/";
             }
-            FileOutputStream out = new FileOutputStream(path + fileName);
+            String file = path + fileName;
+            FileOutputStream out = new FileOutputStream(file);
             out.write(content.getBytes());
             out.close();
-        } catch (NullPointerException | IOException e){
-            e.printStackTrace();
+            logger.debug(file + " updated successfully");
+        } catch (NullPointerException | IOException e) {
+            logger.error("Error updating " + fileName, e);
         }
     }
 
     private String getTemplate() {
         try {
-            URL url = new URL(this.server + "/" + TEMPLATE_PAGE);
+            URL url = new URL(this.server + TEMPLATE_PAGE);
             String rtn = IOUtils.toString(url.openConnection().getInputStream());
 
             rtn = getReplaced(rtn, TITLE_OPEN, TITLE_CLOSE, TITLE_REPLACE);
             rtn = getReplaced(rtn, HEADER_CLOSE, HEADER_CLOSE, HEADER_CLOSE_REPLACE);
 
-            rtn = rtn.replace("<base href=\"" + this.server + "/" + TEMPLATE_PAGE + "\" />", "");
+            rtn = rtn.replaceFirst("<base.*/>", "");
             rtn = rtn.replaceAll("(http|https)://", "//");
 
             // remove joomla template default class
             rtn = rtn.replaceAll("favth-content-block", "");
 
-            return  rtn;
+            return rtn;
         } catch (IOException e) {
             e.printStackTrace();
             return String.format("<span style='color:red'>%s</span>", e.getMessage());
@@ -100,17 +106,19 @@ public class HeaderFooterCacher extends Thread {
     }
 
     private void getHeaderAndFooter(String file) {
-        String[] parts = file.split("<!-- template-placeholder -->");
-        writeFile("header.jsp", parts[0]);
-        writeFile("footer.jsp", parts[1]);
+        if (file != null && !file.isEmpty()) {
+            String[] parts = StringUtils.split(file, "<!-- template-placeholder -->");
+            writeFile("header.jsp", parts[0]);
+            writeFile("footer.jsp", parts[1]);
+        }
     }
 
-    private String getReplaced(String target, String open, String close, String replace){
+    private String getReplaced(String target, String open, String close, String replace) {
         try {
             String pre = target.substring(0, target.indexOf(open));
             String suf = target.substring(target.indexOf(close) + close.length(), target.length());
             return pre + replace + suf;
-        }catch (StringIndexOutOfBoundsException e){
+        } catch (StringIndexOutOfBoundsException e) {
             return target;
         }
     }
