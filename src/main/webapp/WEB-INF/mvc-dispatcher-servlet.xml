@@ -74,10 +74,6 @@
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
-    <bean id="templateCacher" class="org.reactome.server.service.utils.HeaderFooterCacher">
-        <constructor-arg name="server" value="${template.server}"/>
-    </bean>
-
     <bean id="psicquicService" class="org.reactome.server.interactors.service.PsicquicService"/>
 
     <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController">
