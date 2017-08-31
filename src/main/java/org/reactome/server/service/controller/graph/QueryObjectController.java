@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -112,8 +113,12 @@ public class QueryObjectController {
     @RequestMapping(value = "/query/{id}/more", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject findEnhancedObjectById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true) @PathVariable String id) {
-        DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id);
+        DatabaseObject aux = databaseObjectService.findByIdNoRelations(id);
+        DatabaseObject databaseObject = (aux.getStId() == null || aux.getStId().isEmpty()) ?
+                                        advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING):    //similar to findById
+                                        advancedDatabaseObjectService.findEnhancedObjectById(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        postMapper(databaseObject);
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
     }
@@ -143,5 +148,18 @@ public class QueryObjectController {
             throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
         return ControllerUtils.getProperty(databaseObject, attributeName);
+    }
+
+
+    private void postMapper(DatabaseObject databaseObject){
+        try {
+            Method orthologousEvent = databaseObject.getClass().getMethod("getOrthologousEvent");
+            for (Object orthologous : (Collection) orthologousEvent.invoke(databaseObject)){
+                Method species =  orthologous.getClass().getMethod("getSpecies");
+                species.invoke(orthologous);
+            }
+        } catch (NullPointerException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            //Nothing here
+        }
     }
 }
