@@ -2,9 +2,11 @@ package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.exception.CustomQueryException;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.helper.RelationshipDirection;
+import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
@@ -113,10 +115,9 @@ public class QueryObjectController {
     @RequestMapping(value = "/query/{id}/more", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject findEnhancedObjectById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true) @PathVariable String id) {
-        DatabaseObject aux = databaseObjectService.findByIdNoRelations(id);
-        DatabaseObject databaseObject = (aux.getStId() == null || aux.getStId().isEmpty()) ?
-                                        advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING):    //similar to findById
-                                        advancedDatabaseObjectService.findEnhancedObjectById(id);
+        DatabaseObject databaseObject = isEnhancedTarget(id) ?
+                                        advancedDatabaseObjectService.findEnhancedObjectById(id):
+                                        advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         postMapper(databaseObject);
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
@@ -150,6 +151,21 @@ public class QueryObjectController {
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 
+    private boolean isEnhancedTarget(String id){
+        boolean rtn = false;
+        try {
+            if (DatabaseObjectUtils.isStId(id)) {
+                rtn = true;
+            } else {
+                Map<String, Object> parameters = new HashMap<>();
+                String query = "MATCH (n:DatabaseObject{dbId:{id}}) " +
+                               "RETURN NOT ((n:Species) OR (n:Summation) OR (n:Person) OR (n:Compartment))";
+                parameters.put("id", Long.valueOf(id));
+                rtn =  advancedDatabaseObjectService.customBooleanQueryResult(query, parameters);
+            }
+        } catch (CustomQueryException e) { /* Nothing here */ }
+        return rtn;
+    }
 
     private void postMapper(DatabaseObject databaseObject){
         try {
