@@ -18,9 +18,9 @@ import java.net.URL;
  * IMPORTANT
  * ---------
  * We assume the war file runs exploded, because there is no way of writing
- * a file in a none-exploded war and the jsp template needs the templates
- * to be in the defined resources to parse the content (and this is used
- * to keep the species and other filtering options)
+ * a file in a none-exploded war and the jsp template need the templates to
+ * be in the defined resources to parse the content (and this is used to
+ * keep the species and other filtering options)
  *
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
