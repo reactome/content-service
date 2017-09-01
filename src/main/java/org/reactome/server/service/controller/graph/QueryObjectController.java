@@ -159,7 +159,7 @@ public class QueryObjectController {
             } else {
                 Map<String, Object> parameters = new HashMap<>();
                 String query = "MATCH (n:DatabaseObject{dbId:{id}}) " +
-                               "RETURN NOT ((n:Species) OR (n:Summation) OR (n:Person))";
+                               "RETURN NOT ((n:Species) OR (n:Summation) OR (n:Person) OR (n:Compartment))";
                 parameters.put("id", Long.valueOf(id));
                 rtn =  advancedDatabaseObjectService.customBooleanQueryResult(query, parameters);
             }
