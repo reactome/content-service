@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,7 +50,8 @@ public class QueryObjectController {
     })
     @RequestMapping(value = "/query/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject findById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id) {
+    public DatabaseObject findById( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
+                                   @PathVariable String id) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for DatabaseObject for id: {}", id);
@@ -65,8 +65,10 @@ public class QueryObjectController {
     })
     @RequestMapping(value = "/query/{id}/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
-    public String findById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
-                           @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
+    public String findById( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
+                           @PathVariable String id,
+                            @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true)
+                           @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);
         if (databaseObject == null) throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for DatabaseObject for id: {}", id);
@@ -80,7 +82,8 @@ public class QueryObjectController {
     })
     @RequestMapping(value = "/query/ids", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody //TODO: Swagger is not showing the defaultValue
-    public Collection<DatabaseObject> findByIds(@ApiParam(value = "A comma separated list of identifiers", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true) @RequestBody String post) {
+    public Collection<DatabaseObject> findByIds( @ApiParam(value = "A comma separated list of identifiers", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
+                                                @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
         for (String id : post.split(",|;|\\n|\\t")) {
             ids.add(id.trim());
@@ -96,7 +99,7 @@ public class QueryObjectController {
     @ApiOperation(value = "A list of entries with their mapping to the provided identifiers", notes = "This method queries for a set of entries in Reactome knowledgebase based on the given list of identifiers. The provided list of identifiers can include stable ids, database ids, old stable ids or a mixture of all. It should be underlined that any duplicated ids are eliminated while only requests containing up to 20 ids are processed.<br>This method is particularly useful for users that still rely on the previous version of stable identifiers to query this API. Please note that those are no longer part of the retrieved objects.")
     @RequestMapping(value = "/query/ids/map", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody //TODO: Swagger is not showing the defaultValue
-    public Map<String, DatabaseObject> findByIdsMap(@ApiParam(value = "A comma separated list of identifiers ", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
+    public Map<String, DatabaseObject> findByIdsMap( @ApiParam(value = "A comma separated list of identifiers ", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
                                                     @RequestBody String post) {
         Collection<String> ids = new ArrayList<>();
         for (String id : post.split(",|;|\\n|\\t")) ids.add(id.trim());
@@ -114,12 +117,12 @@ public class QueryObjectController {
     @ApiOperation(value = "More information on an entry in Reactome knowledgebase", notes = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
     @RequestMapping(value = "/query/{id}/more", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject findEnhancedObjectById(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true) @PathVariable String id) {
+    public DatabaseObject findEnhancedObjectById( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true)
+                                                 @PathVariable String id) {
         DatabaseObject databaseObject = isEnhancedTarget(id) ?
                                         advancedDatabaseObjectService.findEnhancedObjectById(id):
                                         advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
-        postMapper(databaseObject);
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
     }
@@ -130,8 +133,8 @@ public class QueryObjectController {
     @ApiOperation(value = "Retrieves a DatabaseObject", notes = "DatabaseObject will only be filled with primitive properties but no relationships")
     @RequestMapping(value = "/query/{id}/less", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject findByIdNoRelations(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id) {
-
+    public DatabaseObject findByIdNoRelations( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
+                                              @PathVariable String id) {
         DatabaseObject databaseObject = databaseObjectService.findByIdNoRelations(id);
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for abridged DatabaseObject for id: {}", id);
@@ -142,8 +145,10 @@ public class QueryObjectController {
     @ApiOperation(value = "Retrieves a DatabaseObject property", notes = "Retrieves a single property from the DatabaseObject. Using this version it is not possible to retrieve any relationships")
     @RequestMapping(value = "/query/{id}/less/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
-    public String findByIdNoRelations(@ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true) @PathVariable String id,
-                                      @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true) @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
+    public String findByIdNoRelations( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
+                                      @PathVariable String id,
+                                       @ApiParam(value = "Attribute to be filtered", defaultValue = "displayName", required = true)
+                                      @PathVariable String attributeName) throws InvocationTargetException, IllegalAccessException {
         DatabaseObject databaseObject = databaseObjectService.findByIdNoRelations(id);
         if (databaseObject == null)
             throw new NotFoundTextPlainException("Id: " + id + " has not been found in the System");
@@ -167,15 +172,4 @@ public class QueryObjectController {
         return rtn;
     }
 
-    private void postMapper(DatabaseObject databaseObject){
-        try {
-            Method orthologousEvent = databaseObject.getClass().getMethod("getOrthologousEvent");
-            for (Object orthologous : (Collection) orthologousEvent.invoke(databaseObject)){
-                Method species =  orthologous.getClass().getMethod("getSpecies");
-                species.invoke(orthologous);
-            }
-        } catch (NullPointerException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            //Nothing here
-        }
-    }
 }
