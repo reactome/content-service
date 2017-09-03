@@ -40,7 +40,7 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.0</graph.core>
+        <graph.core>1.1.1-SNAPSHOT</graph.core>
         <search.core>1.0.0</search.core>
         <interactors.core>1.0.8</interactors.core>
         <diagram.exporter>1.0.0</diagram.exporter>
