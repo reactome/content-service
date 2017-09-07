@@ -84,12 +84,12 @@ public class QueryObjectController {
     @ResponseBody //TODO: Swagger is not showing the defaultValue
     public Collection<DatabaseObject> findByIds( @ApiParam(value = "A comma separated list of identifiers", defaultValue = "R-HSA-1640170, R-HSA-109581, 199420", required = true)
                                                 @RequestBody String post) {
-        Collection<String> ids = new ArrayList<>();
+        Collection<Object> ids = new ArrayList<>();
         for (String id : post.split(",|;|\\n|\\t")) {
             ids.add(id.trim());
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
-        Collection<DatabaseObject> databaseObjects = advancedDatabaseObjectService.findById(ids, RelationshipDirection.OUTGOING);
+        Collection<DatabaseObject> databaseObjects = advancedDatabaseObjectService.findByIds(ids, RelationshipDirection.OUTGOING);
         if (databaseObjects == null || databaseObjects.isEmpty())
             throw new NotFoundException("Ids: " + ids.toString() + " have not been found in the System");
         infoLogger.info("Request for DatabaseObjects for ids: {}", ids);
@@ -115,13 +115,13 @@ public class QueryObjectController {
     }
 
     @ApiOperation(value = "More information on an entry in Reactome knowledgebase", notes = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
-    @RequestMapping(value = "/query/{id}/more", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/query/enhanced/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject findEnhancedObjectById( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true)
-                                                 @PathVariable String id) {
+                                                  @PathVariable String id) {
         DatabaseObject databaseObject = isEnhancedTarget(id) ?
-                                        advancedDatabaseObjectService.findEnhancedObjectById(id):
-                                        advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
+                advancedDatabaseObjectService.findEnhancedObjectById(id):
+                advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
@@ -129,9 +129,18 @@ public class QueryObjectController {
 
     //##################### API Ignored but still available for internal purposes #####################//
 
+    @ApiIgnore //Kept for backwards compatibility. It can be removed when logs show no activity under this mapping
+    @ApiOperation(value = "More information on an entry in Reactome knowledgebase", notes = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
+    @RequestMapping(value = "/query/{id}/more", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public DatabaseObject findMoreObjectById( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-60140", required = true)
+                                                 @PathVariable String id) {
+        return findEnhancedObjectById(id);
+    }
+
     @ApiIgnore
     @ApiOperation(value = "Retrieves a DatabaseObject", notes = "DatabaseObject will only be filled with primitive properties but no relationships")
-    @RequestMapping(value = "/query/{id}/less", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/query/abridged/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DatabaseObject findByIdNoRelations( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
                                               @PathVariable String id) {
@@ -143,7 +152,7 @@ public class QueryObjectController {
 
     @ApiIgnore
     @ApiOperation(value = "Retrieves a DatabaseObject property", notes = "Retrieves a single property from the DatabaseObject. Using this version it is not possible to retrieve any relationships")
-    @RequestMapping(value = "/query/{id}/less/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
+    @RequestMapping(value = "/query/abridged/{id}/{attributeName}", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public String findByIdNoRelations( @ApiParam(value = "DbId or StId of the requested database object", defaultValue = "R-HSA-1640170", required = true)
                                       @PathVariable String id,
@@ -168,7 +177,7 @@ public class QueryObjectController {
                 parameters.put("id", Long.valueOf(id));
                 rtn =  advancedDatabaseObjectService.customBooleanQueryResult(query, parameters);
             }
-        } catch (CustomQueryException e) { /* Nothing here */ }
+        } catch (CustomQueryException | NullPointerException e) { /* Nothing here */ }
         return rtn;
     }
 
