@@ -177,7 +177,7 @@ public class QueryObjectController {
                 parameters.put("id", Long.valueOf(id));
                 rtn =  advancedDatabaseObjectService.customBooleanQueryResult(query, parameters);
             }
-        } catch (CustomQueryException | NullPointerException e) { /* Nothing here */ }
+        } catch (CustomQueryException | NullPointerException | NumberFormatException e) { /* Nothing here */ }
         return rtn;
     }
 
