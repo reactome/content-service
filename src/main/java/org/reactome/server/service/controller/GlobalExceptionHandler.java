@@ -2,6 +2,7 @@ package org.reactome.server.service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.connector.ClientAbortException;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.neo4j.ogm.drivers.http.request.HttpRequestException;
 import org.neo4j.ogm.exception.ConnectionException;
@@ -323,6 +324,15 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Cannot connect to Neo4j Server. Please contact Reactome at help@reactome.org.");
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ClientAbortException.class)
+    @ResponseBody
+    ResponseEntity<String> handleClientAbortException(HttpServletRequest request, ClientAbortException e) {
+        // Wrap an IOException identifying it as being caused by an abort of a request by a remote client.
+        logger.warn("ClientAbortException was caught, we can ignore it");
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MissingSBMLException.class)
     @ResponseBody
@@ -349,10 +359,11 @@ class GlobalExceptionHandler {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type", "application/json");
         try {
+            StringBuffer requestURL = (request == null) ? new StringBuffer("") : request.getRequestURL();
             ObjectMapper mapper = new ObjectMapper();
             return ResponseEntity.status(status)
                     .headers(responseHeaders)
-                    .body(mapper.writeValueAsString(new ErrorInfo(status, request.getRequestURL(), exceptionMessage)));
+                    .body(mapper.writeValueAsString(new ErrorInfo(status, requestURL, exceptionMessage)));
         } catch (JsonProcessingException e1) {
             logger.error("Could not process to JSON the given ErrorInfo instance", e1);
             return ResponseEntity.status(status)
