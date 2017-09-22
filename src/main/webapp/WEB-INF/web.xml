@@ -48,7 +48,7 @@
 	</filter-mapping>
 
 	<servlet>
-		<servlet-name>Wordpress</servlet-name>
+		<servlet-name>Plugins</servlet-name>
 		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
 		<init-param>
 			<param-name>proxyHost</param-name>
@@ -60,12 +60,76 @@
 		</init-param>
 		<init-param>
 			<param-name>proxyPath</param-name>
-			<param-value>/wordpress</param-value>
+			<param-value>/plugins</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Wordpress</servlet-name>
-		<url-pattern>/wordpress/*</url-pattern>
+		<servlet-name>Plugins</servlet-name>
+		<url-pattern>/plugins/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Media</servlet-name>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>proxyHost</param-name>
+			<param-value>reactomedev.oicr.on.ca</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPort</param-name>
+			<param-value>80</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPath</param-name>
+			<param-value>/media</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Media</servlet-name>
+		<url-pattern>/media/*</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>Templates</servlet-name>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>proxyHost</param-name>
+			<param-value>reactomedev.oicr.on.ca</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPort</param-name>
+			<param-value>80</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPath</param-name>
+			<param-value>/templates</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Templates</servlet-name>
+		<url-pattern>/templates/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Modules</servlet-name>
+		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
+		<init-param>
+			<param-name>proxyHost</param-name>
+			<param-value>reactomedev.oicr.on.ca</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPort</param-name>
+			<param-value>80</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyPath</param-name>
+			<param-value>/modules</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Modules</servlet-name>
+		<url-pattern>/modules/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -73,11 +137,11 @@
 		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
 		<init-param>
 			<param-name>proxyHost</param-name>
-			<param-value>localhost</param-value>
+			<param-value>reactomedev.oicr.on.ca</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxyPort</param-name>
-			<param-value>8080</param-value>
+			<param-value>80</param-value>
 		</init-param>
 		<init-param>
 			<param-name>proxyPath</param-name>
@@ -87,28 +151,6 @@
 	<servlet-mapping>
 		<servlet-name>Content</servlet-name>
 		<url-pattern>/content/*</url-pattern>
-	</servlet-mapping>
-
-	<!-- Testing -->
-	<servlet>
-		<servlet-name>Joomla</servlet-name>
-		<servlet-class>org.reactome.server.utils.proxy.ProxyServlet</servlet-class>
-		<init-param>
-			<param-name>proxyHost</param-name>
-			<param-value>localhost</param-value>
-		</init-param>
-		<init-param>
-			<param-name>proxyPort</param-name>
-			<param-value>8888</param-value>
-		</init-param>
-		<init-param>
-			<param-name>proxyPath</param-name>
-			<param-value>/website/</param-value>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Joomla</servlet-name>
-		<url-pattern>/website/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>
