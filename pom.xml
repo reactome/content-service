@@ -43,7 +43,7 @@
         <graph.core>1.1.2</graph.core>
         <search.core>1.0.0</search.core>
         <interactors.core>1.0.8</interactors.core>
-        <diagram.exporter>1.0.0</diagram.exporter>
+        <diagram.exporter>1.1.0</diagram.exporter>
         <sbml-exporter>1.0.0</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
