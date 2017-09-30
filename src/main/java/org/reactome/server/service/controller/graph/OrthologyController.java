@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,10 +42,10 @@ public class OrthologyController {
                                        @PathVariable String id,
                                        @ApiParam(value = "The species for which the orthology is requested", defaultValue = "49633", required = true)
                                        @PathVariable Long speciesId) {
-        DatabaseObject orthology = orthologyService.getOrthology(id, speciesId);
+        Collection<DatabaseObject> orthology = orthologyService.getOrthology(id, speciesId);
         if (orthology == null) throw new NotFoundException("No orthology found for '" + id + "' in species '" + speciesId + "'");
         infoLogger.info("Request for orthology of Entry with id: {} and species: {}", id, speciesId);
-        return orthology;
+        return orthology.iterator().next(); //here we only retrieve the first one
     }
 
     @ApiOperation(value = "The orthologies of a given set of events or entities", notes = "Reactome uses the set of manually curated human reactions to computationally infer reactions in twenty evolutionarily divergent eukaryotic species for which high-quality whole-genome sequence data are available, and hence a comprehensive and high-quality set of protein predictions exists. Thus, this method retrieves the orthologies for any given set of events or entities in the specified species. <a href=\"//www.reactome.org/pages/documentation/electronically-inferred-events/\" target=\"_blank\">Here</a> you can find more information about the computationally inferred events.")
@@ -63,7 +64,11 @@ public class OrthologyController {
             ids.add(id.trim());
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
-        Map<Object, DatabaseObject> orthologies = orthologyService.getOrthologies(ids, speciesId);
+        Map<Object, DatabaseObject> orthologies = new HashMap<>();
+        Map<Object, Collection<DatabaseObject>> aux = orthologyService.getOrthologies(ids, speciesId);
+        aux.keySet().forEach(key -> {
+            orthologies.put(key, aux.get(key).iterator().next()); //Only the first one is kept
+        });
         if (orthologies.isEmpty()) throw new NotFoundException("No orthologies found");
         infoLogger.info("Request for orthology of Entries with ids: {} and species: {}", ids, speciesId);
         return orthologies;
