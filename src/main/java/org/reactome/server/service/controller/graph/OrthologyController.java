@@ -65,9 +65,11 @@ public class OrthologyController {
         }
         if (ids.size() > 20) ids = ids.stream().skip(0).limit(20).collect(Collectors.toSet());
         Map<Object, DatabaseObject> orthologies = new HashMap<>();
-        Map<Object, Collection<DatabaseObject>> aux = orthologyService.getOrthologies(ids, speciesId);
+        final Map<Object, Collection<DatabaseObject>> aux = orthologyService.getOrthologies(ids, speciesId);
         aux.keySet().forEach(key -> {
-            orthologies.put(key, aux.get(key).iterator().next()); //Only the first one is kept
+            try {
+                orthologies.put(key, aux.get(key).iterator().next()); //Only the first one is kept
+            } catch (NullPointerException ex){/* Nothing here */}
         });
         if (orthologies.isEmpty()) throw new NotFoundException("No orthologies found");
         infoLogger.info("Request for orthology of Entries with ids: {} and species: {}", ids, speciesId);
