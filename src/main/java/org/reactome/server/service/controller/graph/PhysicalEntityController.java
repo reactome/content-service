@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.Complex;
 import org.reactome.server.graph.domain.model.PhysicalEntity;
 import org.reactome.server.graph.domain.model.ReferenceMolecule;
 import org.reactome.server.graph.domain.model.ReferenceSequence;
@@ -99,6 +100,25 @@ public class PhysicalEntityController {
         return componentOfs;
     }
 
+
+    @ApiOperation(value = "A list of complexes containing the pair (identifier, resource)",
+            notes = "Retrieves the list of complexes that contain a given (identifier, resource). The method deconstructs the complexes into all its participants to do so.")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Pair (identifier, resource) does not match with any in current data", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+    })
+    @RequestMapping(value = "/complexes/{resource}/{identifier}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<Complex> getComplexesFor( @ApiParam(value = "The resource of the identifier for complexes are requested", defaultValue = "UniProt", required = true)
+                                               @PathVariable String resource,
+                                                @ApiParam(value = "The identifier for which complexes are requested", defaultValue = "P00533", required = true)
+                                               @PathVariable String identifier) {
+        Collection<Complex> complexes = physicalEntityService.getComplexesFor(identifier, resource);
+        if(complexes.isEmpty()) throw  new NotFoundException("No complexes found for (" + identifier + ", " + resource + ")");
+        infoLogger.info("Request for complexes of identifier '{}' in resource '{}'", identifier, resource);
+        return complexes;
+    }
     //##################### API Ignored but still available for internal purposes #####################//
 
     @ApiIgnore
