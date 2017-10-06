@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +66,7 @@ public class OrthologyController {
         aux.keySet().forEach(key -> {
             try {
                 orthologies.put(key, aux.get(key).iterator().next()); //Only the first one is kept
-            } catch (NullPointerException ex){/* Nothing here */}
+            } catch (NullPointerException | NoSuchElementException ex){/* Nothing here */}
         });
         if (orthologies.isEmpty()) throw new NotFoundException("No orthologies found");
         infoLogger.info("Request for orthology of Entries with ids: {} and species: {}", ids, speciesId);
