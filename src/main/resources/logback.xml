@@ -48,23 +48,6 @@
         <asynchronousSending>false</asynchronousSending>
     </appender>
 
-    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-            <driverClass>org.sqlite.JDBC</driverClass>
-            <url>jdbc:sqlite:${logging.database}</url>
-        </connectionSource>
-    </appender>
-
-    <!--Async appender, will add 10 ms per request if not used-->
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="DB" />
-        <includeCallerData>true</includeCallerData>
-    </appender>
-
-    <logger name="infoLogger" level="INFO"  >
-        <appender-ref ref="ASYNC"/>
-    </logger>
-
     <logger name="errorLogger" level="WARN">
         <appender-ref ref="EMAIL" />
         <appender-ref ref="STDOUT" />
@@ -76,7 +59,7 @@
     <logger name="springfox.documentation" level="WARN" />
 
     <!--Root logger will log all messages to file that are are caught by other loggers-->
-    <root level="INFO">
+    <root level="${logging.level}">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>
