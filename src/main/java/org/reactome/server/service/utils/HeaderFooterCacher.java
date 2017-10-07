@@ -57,7 +57,7 @@ public class HeaderFooterCacher extends Thread {
             try {
                 Thread.sleep(1000 * 60 * MINUTES);
             } catch (InterruptedException e) {
-                logger.warn("The header/footer updater has been stop for the analysis service");
+                logger.warn("The header/footer updater has been stop for the content-service");
             }
         }
     }
