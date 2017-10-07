@@ -52,7 +52,7 @@ public class HeaderFooterCacher extends Thread {
             try {
                 Thread.sleep(1000 * 60 * MINUTES);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("The header/footer updater has been stop for the content-service");
             }
         }
     }
@@ -76,6 +76,7 @@ public class HeaderFooterCacher extends Thread {
             logger.debug(file + " updated succesfully");
         } catch (Exception e) {
             logger.error("Error updating " + fileName, e);
+            interrupt();
         }
     }
 
