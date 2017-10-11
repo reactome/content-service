@@ -6,21 +6,33 @@
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${logging.level}</level>
+        </filter>
         <encoder>
             <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
         </encoder>
     </appender>
 
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d %-5level: %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logging.dir}/content-service/content-service.log</file>
+        <file>${logging.dir}/content-service-trace.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${logging.dir}/content-service/content-service-%i-log.zip</fileNamePattern>
+            <fileNamePattern>${logging.dir}/content-service-trace-%i-log.zip</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>3</maxIndex>
         </rollingPolicy>
-        <triggeringPolicy
-                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>10MB</maxFileSize>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>100MB</maxFileSize>
         </triggeringPolicy>
         <encoder>
             <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
@@ -53,14 +65,18 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
+    <logger name="callLogger" level="TRACE">
+        <appender-ref ref="FILE" />
+    </logger>
+
     <logger name="org.neo4j" level="ERROR" /> <!-- Remove neo4j info logging. It prints user credentials -->
     <logger name="org.springframework" level="ERROR" />
     <logger name="org.reflections" level="WARN" />
     <logger name="springfox.documentation" level="WARN" />
 
-    <!--Root logger will log all messages to file that are are caught by other loggers-->
-    <root level="${logging.level}">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
+    <!--Root logger will log all messages to file that are not caught by other loggers-->
+    <root>
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDERR" />
     </root>
 </configuration>
