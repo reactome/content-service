@@ -1,6 +1,16 @@
 /* Swagger Custom css */
 /* Overwriting some default styles, in order to make them fit into the new template */
 
+.swagger-ui h1 a,
+.swagger-ui h2 a,
+.swagger-ui h3 a,
+.swagger-ui h4 a,
+.swagger-ui h5 a,
+.swagger-ui h6 a {
+    color: #2F9EC2 !important;
+    font-weight: bold;
+}
+
 .swagger-ui .info .title small pre {
     /* api version next to name */
     margin: 0;
@@ -18,7 +28,7 @@
 }
 
 .swagger-ui .info a {
-    color: #58C3E5;
+    color: #2F9EC2;
 }
 
 .swagger-ui .response p {
