@@ -118,6 +118,7 @@ public class DiagramExporterController {
             manager.saveSBML(content, sbmlFileName);
             sbml = IOUtils.toInputStream(content);
             infoLogger.info("Exporting the pathway {} to SBML", p.getStId());
+            generalService.clearCache();
         }
 
         response.setContentType("application/sbml+xml");
