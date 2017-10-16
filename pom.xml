@@ -56,9 +56,7 @@
         <activation.version>1.1.1</activation.version>
         <kryo.version>2.22</kryo.version>
         <tika.version>1.12</tika.version>
-        <lru.version>1.4-SNAPSHOT</lru.version>
-        <reactome.utils.version>1.0.4</reactome.utils.version>
-        <logback.classic.version>1.1.10</logback.classic.version>
+        <reactome.utils.version>1.0.5</reactome.utils.version>
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>
@@ -142,18 +140,7 @@
             <artifactId>sbml-exporter</artifactId>
             <version>${sbml-exporter}</version>
         </dependency>
-        <!-- Reactome files-storage LRU -->
-        <dependency>
-            <groupId>org.reactome.server.lru</groupId>
-            <artifactId>reactome-lru</artifactId>
-            <version>${lru.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
         <!--Util-->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -181,14 +168,6 @@
             <artifactId>catalina</artifactId>
             <version>6.0.53</version>
             <scope>provided</scope>
-        </dependency>
-
-
-        <!--Logging: will transitively add logback core and slf4j-api-->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.classic.version}</version>
         </dependency>
 
         <dependency>

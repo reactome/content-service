@@ -3,6 +3,7 @@ package org.reactome.server.service.utils;
 import org.reactome.server.interactors.exception.PsicquicInteractionClusterException;
 import org.reactome.server.interactors.model.PsicquicResource;
 import org.reactome.server.interactors.service.PsicquicService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -24,7 +25,7 @@ import java.util.List;
 @Component
 public class PsicquicResourceCachingScheduler {
 
-    private static final org.slf4j.Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     private static List<PsicquicResource> psicquicResources = null;
 
