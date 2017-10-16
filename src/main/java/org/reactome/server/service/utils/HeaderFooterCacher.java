@@ -1,7 +1,8 @@
 package org.reactome.server.service.utils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ import java.net.URL;
 @Component
 public class HeaderFooterCacher extends Thread {
 
-    private static Logger logger = Logger.getLogger(HeaderFooterCacher.class.getName());
+    private static Logger logger = LoggerFactory.getLogger("threadLogger");
 
     private static final String TITLE_OPEN = "<title>";
     private static final String TITLE_CLOSE = "</title>";
@@ -43,22 +44,24 @@ public class HeaderFooterCacher extends Thread {
 
     private final String server;
 
+    private boolean active = true;
+
     @Autowired
     public HeaderFooterCacher(@Value("${template.server}") String server) {
+        super("CS-HeaderFooter");
         this.server = server;
         start();
     }
 
     @Override
     public void run() {
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            getHeaderAndFooter(getTemplate());
-            try {
-                Thread.sleep(1000 * 60 * MINUTES);
-            } catch (InterruptedException e) {
-                logger.warn("The header/footer updater has been stop for the content-service");
+        try {
+            while (active) {
+                getHeaderAndFooter(getTemplate());
+                if (active) Thread.sleep(1000 * 60 * MINUTES);
             }
+        } catch (InterruptedException e) {
+            logger.info("Content-Service HeaderFooterCacher interrupted");
         }
     }
 
@@ -79,15 +82,16 @@ public class HeaderFooterCacher extends Thread {
             out.write(content.getBytes());
             out.close();
             logger.debug(file + " updated successfully");
-        } catch (NullPointerException | IOException e) {
-            logger.error("Error updating " + fileName, e);
+        } catch (IllegalStateException | NullPointerException | IOException e) {
+            logger.warn("Error updating " + fileName);
             interrupt();
         }
     }
 
     private String getTemplate() {
+        String templateURL = this.server + TEMPLATE_PAGE;
         try {
-            URL url = new URL(this.server + TEMPLATE_PAGE);
+            URL url = new URL(templateURL);
             String rtn = IOUtils.toString(url.openConnection().getInputStream());
 
             rtn = getReplaced(rtn, TITLE_OPEN, TITLE_CLOSE, TITLE_REPLACE);
@@ -101,8 +105,11 @@ public class HeaderFooterCacher extends Thread {
 
             return rtn;
         } catch (IOException e) {
-            e.printStackTrace();
-            return String.format("<span style='color:red'>%s</span>", e.getMessage());
+            logger.warn("The template file is not available. Please check '" + templateURL + "'");
+            return String.format("" +
+                    "<span style='color:red'>%s is not available</span>" +
+                    "<!-- template-placeholder -->" +
+                    "<span style='color:red'>No footer available</span>", templateURL);
         }
     }
 
@@ -122,5 +129,12 @@ public class HeaderFooterCacher extends Thread {
         } catch (StringIndexOutOfBoundsException e) {
             return target;
         }
+    }
+
+    @Override
+    public void interrupt() {
+        active = false;
+        super.interrupt();
+        logger.info("Content-Service HeaderFooterCacher stopped");
     }
 }
