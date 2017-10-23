@@ -24,21 +24,6 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logging.dir}/content-service-trace.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${logging.dir}/content-service-trace-%i-log.zip</fileNamePattern>
-            <minIndex>1</minIndex>
-            <maxIndex>3</maxIndex>
-        </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>100MB</maxFileSize>
-        </triggeringPolicy>
-        <encoder>
-            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -63,10 +48,6 @@
     <logger name="errorLogger" level="WARN">
         <appender-ref ref="EMAIL" />
         <appender-ref ref="STDOUT" />
-    </logger>
-
-    <logger name="callLogger" level="TRACE">
-        <appender-ref ref="FILE" />
     </logger>
 
     <logger name="org.neo4j" level="ERROR" /> <!-- Remove neo4j info logging. It prints user credentials -->
