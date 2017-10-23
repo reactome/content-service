@@ -56,7 +56,7 @@
     </bean>
 
     <!-- Configuration for the Interactors-Core components -->
-    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase">
+    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase" destroy-method="closeConnection">
         <constructor-arg name="fileName" value="${interactors.static.db}"/>
     </bean>
 
@@ -76,13 +76,13 @@
         <constructor-arg name="database" ref="interactorsDB"/>
     </bean>
 
-    <bean id="templateCacher" class="org.reactome.server.service.utils.HeaderFooterCacher">
+    <bean id="templateCacher" class="org.reactome.server.service.utils.HeaderFooterCacher" destroy-method="interrupt">
         <constructor-arg name="server" value="${template.server}"/>
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.interactors.service.PsicquicService"/>
 
-    <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController">
+    <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController" destroy-method="interrupt">
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
         <property name="maxSize" value="2684354560"/> <!-- 2684354560 = 2.5GB // 5368709120 = 5 GB // 10737418240 = 10GB -->
         <property name="threshold" value="524288000"/> <!-- 10485760 = 10MB // 524288000 = 500MB // 1073741824 = 1GB -->
@@ -95,10 +95,8 @@
     </bean>
 
     <bean id="actionResponseLazyLoading" class="org.reactome.server.service.utils.AspectLazyLoadingPrevention" />
-    <bean id="aspectLogging" class="org.reactome.server.service.utils.AspectLogging" />
     <aop:aspectj-autoproxy>
         <aop:include name="actionResponseLazyLoading" />
-        <aop:include name="aspectLogging" />
     </aop:aspectj-autoproxy>
 
     <bean id="diagramService" class="org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService" />
