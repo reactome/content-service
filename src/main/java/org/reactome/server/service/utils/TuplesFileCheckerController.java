@@ -1,8 +1,9 @@
 package org.reactome.server.service.utils;
 
-import org.apache.log4j.Logger;
-import org.reactome.server.lru.LruFolderContentChecker;
-import org.reactome.server.lru.LruFolderContentCheckerFileDeletedHandler;
+import org.reactome.server.utils.lru.LruFolderContentChecker;
+import org.reactome.server.utils.lru.LruFolderContentCheckerFileDeletedHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -10,7 +11,8 @@ import org.springframework.context.annotation.Scope;
  */
 @Scope("singleton")
 public class TuplesFileCheckerController implements LruFolderContentCheckerFileDeletedHandler {
-    private static Logger logger = Logger.getLogger(TuplesFileCheckerController.class.getName());
+
+    private static Logger logger = LoggerFactory.getLogger("threadLogger");
 
     private static Thread checker = null;
 
@@ -68,9 +70,15 @@ public class TuplesFileCheckerController implements LruFolderContentCheckerFileD
         }
     }
 
+    public void interrupt() {
+        if (checker != null) {
+            checker.interrupt();
+            logger.info(LruFolderContentChecker.class.getSimpleName() + " interrupted");
+        }
+    }
+
     @Override
     public void onLruFolderContentCheckerFileDeleted(String fileName) {
-        //TODO!
-//        Tokenizer.removeAssociatedToken(fileName);
+        //Nothing here TODO?
     }
 }

@@ -4,7 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.shaded.org.objenesis.strategy.StdInstantiatorStrategy;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 
 import java.io.*;
@@ -15,7 +16,7 @@ import java.io.*;
 @Scope("singleton")
 public class TupleManager {
 
-    private static Logger logger = Logger.getLogger(TupleManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger("TupleManager");
 
     private String pathDirectory;
 
