@@ -3,9 +3,6 @@ package org.reactome.server.service.utils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.FileOutputStream;
@@ -25,7 +22,6 @@ import java.net.URL;
  *
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
-@Component
 public class HeaderFooterCacher extends Thread {
 
     private static Logger logger = LoggerFactory.getLogger("threadLogger");
@@ -46,8 +42,7 @@ public class HeaderFooterCacher extends Thread {
 
     private boolean active = true;
 
-    @Autowired
-    public HeaderFooterCacher(@Value("${template.server}") String server) {
+    public HeaderFooterCacher(String server) {
         super("CS-HeaderFooter");
         this.server = server;
         start();

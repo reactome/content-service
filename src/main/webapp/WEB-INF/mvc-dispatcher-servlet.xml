@@ -56,7 +56,7 @@
     </bean>
 
     <!-- Configuration for the Interactors-Core components -->
-    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase">
+    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase" destroy-method="closeConnection">
         <constructor-arg name="fileName" value="${interactors.static.db}"/>
     </bean>
 
@@ -77,6 +77,10 @@
     </bean>
 
     <bean id="psicquicService" class="org.reactome.server.interactors.service.PsicquicService"/>
+
+    <bean id="templateCacher" class="org.reactome.server.service.utils.HeaderFooterCacher" destroy-method="interrupt">
+        <constructor-arg name="server" value="${template.server}"/>
+    </bean>
 
     <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController" name="FileCheckerController" destroy-method="interrupt">
         <property name="pathDirectory" value="${tuples.custom.folder}"/>
