@@ -35,12 +35,14 @@ public class ScheduledSMTPAppender extends SMTPAppender {
         super(eventEvaluator);
     }
 
-    @Override public void start() {
+    @Override
+    public void start() {
         super.start();
         scheduler.scheduleAtFixedRate(this::sendEmail, timeInterval, timeInterval, TimeUnit.DAYS);
     }
 
-    @Override protected void sendBuffer(CyclicBuffer<ILoggingEvent> cb, ILoggingEvent lastEventObject) {
+    @Override
+    protected void sendBuffer(CyclicBuffer<ILoggingEvent> cb, ILoggingEvent lastEventObject) {
         events.addAll(cb.asList());
         if (events.size() > maxMessages) sendEmail();
     }
@@ -72,5 +74,11 @@ public class ScheduledSMTPAppender extends SMTPAppender {
 
     public void setTimeInterval(int timeInterval) {
         this.timeInterval = timeInterval;
+    }
+
+    @Override
+    public synchronized void stop() {
+        scheduler.shutdown();
+        super.stop();
     }
 }
