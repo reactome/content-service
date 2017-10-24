@@ -96,4 +96,22 @@
     </aop:aspectj-autoproxy>
 
     <bean id="diagramService" class="org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService" />
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${mail.host}" />
+        <property name="port" value="${mail.port}" />
+        <property name="username" value="${mail.username}" />
+        <property name="password" value="${mail.password}" />
+
+        <!-- The name of the property, following JavaBean naming conventions -->
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">${mail.enable.auth}</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">false</prop>
+            </props>
+        </property>
+    </bean>
+
 </beans>
