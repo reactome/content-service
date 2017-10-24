@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -37,7 +38,13 @@ public class StartupNotifier extends Thread {
     public void run() {
         try {
             logger.debug("Getting ready to send an email....");
-            sms.send(SENDER_NAME, FROM, to, PROJECT + " deployed " + getTimestamp(), PROJECT + " has been (re)deployed");
+
+            final String serverName = InetAddress.getLocalHost().getHostName();
+            final String subject = "[" + serverName + "] " + PROJECT + " deployed " + getTimestamp();
+            final String body = PROJECT + " has been (re)deployed in [" + serverName + "]";
+
+            sms.send(SENDER_NAME, FROM, to, subject, body);
+
             logger.debug("Sent!");
         } catch (Exception e) {
             // log email hasn't been sent
