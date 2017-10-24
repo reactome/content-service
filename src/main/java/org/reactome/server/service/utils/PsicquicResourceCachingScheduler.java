@@ -6,11 +6,9 @@ import org.reactome.server.interactors.service.PsicquicService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
 
 
@@ -21,36 +19,54 @@ import java.util.List;
  *
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
-@EnableScheduling
 @Component
-public class PsicquicResourceCachingScheduler {
+public class PsicquicResourceCachingScheduler extends Thread {
 
-    private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    private static Logger logger = LoggerFactory.getLogger("threadLogger");
 
     private static List<PsicquicResource> psicquicResources = null;
 
-    @Autowired
-    private PsicquicService psicquicService;
+    private final PsicquicService psicquicService;
+    private boolean active = true;
 
-    @PostConstruct
-    @Scheduled(cron = "${psicquic.cache.cron}")
-    public void queryPsicquicResources() {
+    @Autowired
+    public PsicquicResourceCachingScheduler(PsicquicService psicquicService) {
+        super("PsicquicResource");
+        this.psicquicService = psicquicService;
+        start();
+    }
+
+    @Override
+    public void run() {
         try {
-            psicquicResources = psicquicService.getResources();
-            infoLogger.debug("Psicquic Resources have been cached.");
-        } catch (PsicquicInteractionClusterException e) {
-            /**
-             * If we do not catch exception here, then Spring won't be able to instantiate the bean
-             * and consequentially failed startup.
-             * If in the meantime PSICQUIC is down, clean previous cached list and return a 500 HTTP Status as is.
-             */
-            psicquicResources = null;
-            infoLogger.warn("Couldn't load the PSICQUIC Resources");
+            while (active) {
+                try {
+                    psicquicResources = psicquicService.getResources();
+                    logger.debug("Psicquic Resources have been updated.");
+                } catch (PsicquicInteractionClusterException e) {
+                    // If we do not catch exception here, then Spring won't be able to instantiate the bean
+                    // and consequentially failed startup.
+                    // If in the meantime PSICQUIC is down, clean previous cached list and return a 500 HTTP Status as is.
+                    psicquicResources = null;
+                    logger.warn("Could not update the PSICQUIC Resources");
+                }
+                if (active) Thread.sleep(1000 * 60 * 5);
+            }
+        } catch (InterruptedException e) {
+            logger.info("Content-Service PsicquicResourceCachingScheduler interrupted");
         }
     }
 
     public static List<PsicquicResource> getPsicquicResources(){
         return psicquicResources;
+    }
+
+    @PreDestroy
+    @Override
+    public void interrupt() {
+        active = false;
+        super.interrupt();
+        logger.info("Content-Service PsicquicResourceCachingScheduler stopped");
     }
 }
 
