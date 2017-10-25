@@ -5,7 +5,7 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <name>content-service</name>
 
     <description>
@@ -19,15 +19,15 @@
 
     <developers>
         <developer>
-            <id>gviteri</id>
-            <name>Guilherme S Viteri</name>
-            <email>gviteri@ebi.ac.uk</email>
-            <organization>http://www.ebi.ac.uk/</organization>
-        </developer>
-        <developer>
             <id>fabregat</id>
             <name>Antonio Fabregat</name>
             <email>fabregat@ebi.ac.uk</email>
+            <organization>http://www.ebi.ac.uk/</organization>
+        </developer>
+        <developer>
+            <id>gviteri</id>
+            <name>Guilherme S Viteri</name>
+            <email>gviteri@ebi.ac.uk</email>
             <organization>http://www.ebi.ac.uk/</organization>
         </developer>
         <developer>
