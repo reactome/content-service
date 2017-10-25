@@ -17,15 +17,15 @@
 
     <developers>
         <developer>
-            <id>gviteri</id>
-            <name>Guilherme S Viteri</name>
-            <email>gviteri@ebi.ac.uk</email>
-            <organization>http://www.ebi.ac.uk/</organization>
-        </developer>
-        <developer>
             <id>fabregat</id>
             <name>Antonio Fabregat</name>
             <email>fabregat@ebi.ac.uk</email>
+            <organization>http://www.ebi.ac.uk/</organization>
+        </developer>
+        <developer>
+            <id>gviteri</id>
+            <name>Guilherme S Viteri</name>
+            <email>gviteri@ebi.ac.uk</email>
             <organization>http://www.ebi.ac.uk/</organization>
         </developer>
         <developer>
@@ -40,9 +40,9 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.3-SNAPSHOT</graph.core>
-        <search.core>1.0.0</search.core>
-        <interactors.core>1.0.9-SNAPSHOT</interactors.core>
+        <graph.core>1.1.3</graph.core>
+        <search.core>1.0.1</search.core>
+        <interactors.core>1.0.9</interactors.core>
         <diagram.exporter>1.1.0</diagram.exporter>
         <sbml-exporter>1.0.0</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
