@@ -28,8 +28,7 @@ public class SwaggerConfig {
                 .paths(PathSelectors.any())
                 .build().apiInfo(apiInfo());
 
-        String packageName = DatabaseObject.class.getName().replace(".DatabaseObject", "");
-        Reflections reflections = new Reflections(packageName);
+        Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
         for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
             rtn.directModelSubstitute(clazz, Void.class);
         }
