@@ -30,6 +30,31 @@
         </encoder>
     </appender>
 
+    <!-- Used to email urgent to treat exceptions -->
+    <appender name="ONLY_EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <smtpHost>${mail.host}</smtpHost>
+        <smtpPort>${mail.port}</smtpPort>
+        <to>${mail.to}</to>
+        <from>${mail.from}</from>
+        <subject>${mail.subject}</subject>
+
+        <maxMessages>1</maxMessages>
+        <timeInterval>1</timeInterval>
+
+        <layout class="ch.qos.logback.classic.html.HTMLLayout"/>
+        <asynchronousSending>false</asynchronousSending>
+    </appender>
+
+    <logger name="onlyEmailLogger" level="WARN">
+        <appender-ref ref="ONLY_EMAIL" />
+    </logger>
+
     <appender name="EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">

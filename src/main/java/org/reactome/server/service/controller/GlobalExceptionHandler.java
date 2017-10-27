@@ -51,6 +51,7 @@ import java.security.cert.CertificateException;
 class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger("errorLogger");
+    private static final Logger onlyEmailLogger = LoggerFactory.getLogger("onlyEmailLogger");
 
     //================================================================================
     // NotFound
@@ -336,7 +337,7 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MissingSBMLException.class)
     @ResponseBody
-    ResponseEntity<String> handleMissingSBMLExceptionn(HttpServletRequest request, MissingSBMLException e) {
+    ResponseEntity<String> handleMissingSBMLException(HttpServletRequest request, MissingSBMLException e) {
         logger.error("MissingSBMLException was caught for request: " + request.getRequestURL(), e);
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
@@ -347,6 +348,14 @@ class GlobalExceptionHandler {
     ResponseEntity<String> handleUnclassified(HttpServletRequest request, Exception e) {
         logger.error("An unspecified exception was caught for request: " + request.getRequestURL(), e);
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseBody
+    ResponseEntity<String> handleNullPointerException(HttpServletRequest request, NullPointerException e) {
+        onlyEmailLogger.error("NullPointerException was caught for request: " + request.getRequestURL(), e);
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Something unexpected happened and the error has been reported.");
     }
 
     /*
