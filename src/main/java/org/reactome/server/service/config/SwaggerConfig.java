@@ -1,5 +1,7 @@
 package org.reactome.server.service.config;
 
+import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reflections.Reflections;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -19,12 +21,20 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        Docket rtn = new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build().apiInfo(apiInfo());
+
+        String packageName = DatabaseObject.class.getName().replace(".DatabaseObject", "");
+        Reflections reflections = new Reflections(packageName);
+        for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
+            rtn.directModelSubstitute(clazz, Void.class);
+        }
+
+        return rtn;
     }
 
     private ApiInfo apiInfo() {

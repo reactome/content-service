@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.ReferenceEntity;
 import org.reactome.server.graph.service.ReferenceEntityService;
 import org.reactome.server.service.exception.ErrorInfo;
@@ -26,9 +27,12 @@ public class ReferenceEntityController {
     @Autowired
     private ReferenceEntityService referenceEntityService;
 
-    @ApiOperation(value = "All ReferenceEntities for a given identifier",
+    @ApiOperation(
+            value = "All ReferenceEntities for a given identifier",
             notes = "Retrieves a list containing all the reference entities for a given identifier.",
-            produces = "application/json")
+            produces = "application/json",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier does not match with any reference entity", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),

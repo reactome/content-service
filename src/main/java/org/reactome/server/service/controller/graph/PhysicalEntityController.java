@@ -1,10 +1,7 @@
 package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
-import org.reactome.server.graph.domain.model.Complex;
-import org.reactome.server.graph.domain.model.PhysicalEntity;
-import org.reactome.server.graph.domain.model.ReferenceMolecule;
-import org.reactome.server.graph.domain.model.ReferenceSequence;
+import org.reactome.server.graph.domain.model.*;
 import org.reactome.server.graph.domain.result.ComponentOf;
 import org.reactome.server.graph.service.AdvancedLinkageService;
 import org.reactome.server.graph.service.PhysicalEntityService;
@@ -42,9 +39,12 @@ public class PhysicalEntityController {
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(value = "All other forms of a PhysicalEntity",
+    @ApiOperation(
+            value = "All other forms of a PhysicalEntity",
             notes = "Retrieves a list containing all other forms of the given PhysicalEntity. These other forms are PhysicalEntities that share the same ReferenceEntity identifier, e.g. PTEN H93R[R-HSA-2318524] and PTEN C124R[R-HSA-2317439] are two forms of PTEN.",
-            produces = "application/json")
+            produces = "application/json",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier does not match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
@@ -76,7 +76,11 @@ public class PhysicalEntityController {
         return componentOfs;
     }
 
-    @ApiOperation(value = "A list with the entities contained in a given complex", notes = "Retrieves the list of subunits that constitute any given complex. In case the complex comprises other complexes, this method recursively traverses the content returning each contained PhysicalEntity. Contained complexes and entity sets can be excluded setting the 'excludeStructures' optional parameter to 'true'")
+    @ApiOperation(
+            value = "A list with the entities contained in a given complex",
+            notes = "Retrieves the list of subunits that constitute any given complex. In case the complex comprises other complexes, this method recursively traverses the content returning each contained PhysicalEntity. Contained complexes and entity sets can be excluded setting the 'excludeStructures' optional parameter to 'true'",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier does not match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
@@ -101,8 +105,11 @@ public class PhysicalEntityController {
     }
 
 
-    @ApiOperation(value = "A list of complexes containing the pair (identifier, resource)",
-            notes = "Retrieves the list of complexes that contain a given (identifier, resource). The method deconstructs the complexes into all its participants to do so.")
+    @ApiOperation(
+            value = "A list of complexes containing the pair (identifier, resource)",
+            notes = "Retrieves the list of complexes that contain a given (identifier, resource). The method deconstructs the complexes into all its participants to do so.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Pair (identifier, resource) does not match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),

@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.Person;
 import org.reactome.server.graph.domain.model.Publication;
@@ -35,7 +36,11 @@ public class PersonController {
     private PersonService personService;
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A list of people with first or last name exactly matching a given string", notes = "Retrieves a list of people in Reactome with either their first or last name matching exactly the given string.")
+    @ApiOperation(
+            value = "A list of people with first or last name exactly matching a given string",
+            notes = "Retrieves a list of people in Reactome with either their first or last name matching exactly the given string.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Given name does not exactly match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -50,7 +55,11 @@ public class PersonController {
     }
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
-    @ApiOperation(value = "A list of people with first or last name partly matching a given string", notes = "Retrieves a list of people in Reactome with either their first or last name partly matching the given string.")
+    @ApiOperation(
+            value = "A list of people with first or last name partly matching a given string",
+            notes = "Retrieves a list of people in Reactome with either their first or last name partly matching the given string.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Given name does not partly match with any in current data", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -96,7 +105,11 @@ public class PersonController {
         return ControllerUtils.getProperty(person, attributeName);
     }
 
-    @ApiOperation(value = "A list of publications authored by a given person", notes = "Retrieves a list of publications authored by a given person. OrcidId, DbId or Email can be used to specify the person.")
+    @ApiOperation(
+            value = "A list of publications authored by a given person",
+            notes = "Retrieves a list of publications authored by a given person. OrcidId, DbId or Email can be used to specify the person.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "OrcidId or DbId does not match with any publication", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
@@ -110,7 +123,11 @@ public class PersonController {
         return publications;
     }
 
-    @ApiOperation(value = "A list of pathways authored by a given person", notes = "Retrieves a list of pathways authored by a given person. OrcidId, DbId or Email can be used to specify the person.")
+    @ApiOperation(
+            value = "A list of pathways authored by a given person",
+            notes = "Retrieves a list of pathways authored by a given person. OrcidId, DbId or Email can be used to specify the person.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "OrcidId or DbId does not retrieve any pathway", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),

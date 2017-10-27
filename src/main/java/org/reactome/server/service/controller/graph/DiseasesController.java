@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Disease;
 import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.service.exception.ErrorInfo;
@@ -33,7 +34,10 @@ public class DiseasesController {
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(value = "The list of disease objects",  notes = "It retrieves the list of diseases annotated in Reactome")
+    @ApiOperation(
+            value = "The list of disease objects",  notes = "It retrieves the list of diseases annotated in Reactome",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class),

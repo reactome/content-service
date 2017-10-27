@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.TopLevelPathway;
@@ -42,7 +43,11 @@ public class PathwaysController {
     @Autowired
     private TopLevelPathwayService topLevelPathwayService;
 
-    @ApiOperation(value = "All the events contained in the given event", notes = "Events are the building blocks used in Reactome to represent all biological processes, and they include pathways and reactions. Typically, an event can contain other events. For example, a pathway can contain smaller pathways and reactions. This method recursively retrieves all the events contained in any given event.")
+    @ApiOperation(
+            value = "All the events contained in the given event",
+            notes = "Events are the building blocks used in Reactome to represent all biological processes, and they include pathways and reactions. Typically, an event can contain other events. For example, a pathway can contain smaller pathways and reactions. This method recursively retrieves all the events contained in any given event.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "No contained events found in the given event", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -71,7 +76,11 @@ public class PathwaysController {
         return ControllerUtils.getProperties(containedEvents, attributeName).toString();
     }
 
-    @ApiOperation(value = "All Reactome top level pathways", notes = "This method retrieves the list of top level pathways for the given species") //, response = Pathway.class, responseContainer = "List")
+    @ApiOperation(
+            value = "All Reactome top level pathways",
+            notes = "This method retrieves the list of top level pathways for the given species",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "No TopLevelPathways were found for species", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -86,7 +95,11 @@ public class PathwaysController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of lower level pathways containing a given entity or event", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that contain the given PhysicalEntity or Event.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @ApiOperation(
+            value = "A list of lower level pathways containing a given entity or event",
+            notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that contain the given PhysicalEntity or Event.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier is not present in any pathways", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -101,7 +114,11 @@ public class PathwaysController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of lower level pathways containing any form of a given entity", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @ApiOperation(
+            value = "A list of lower level pathways containing any form of a given entity",
+            notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier (in any of its forms) is not present in any pathways", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -116,7 +133,11 @@ public class PathwaysController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of lower level pathways with diagram containing a given entity or event", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity or Event.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @ApiOperation(
+            value = "A list of lower level pathways with diagram containing a given entity or event",
+            notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity or Event.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier is not present in any pathways with diagram", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -131,7 +152,11 @@ public class PathwaysController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of lower level pathways with diagram containing any form of a given entity", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @ApiOperation(
+            value = "A list of lower level pathways with diagram containing any form of a given entity",
+            notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier (in any of its forms) is not present in any pathways with diagram", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
@@ -146,7 +171,11 @@ public class PathwaysController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of lower level pathways with diagram containing any form of a given identifier", notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.") //, response = SimpleDatabaseObject.class, responseContainer = "List")
+    @ApiOperation(
+            value = "A list of lower level pathways with diagram containing any form of a given identifier",
+            notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.",
+            response = DatabaseObject.class, responseContainer = "List"
+    )
     @RequestMapping(value = "/pathways/low/diagram/identifier/{identifier}/allForms", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Pathway> getLowerLevelPathwaysForIdentifier(@ApiParam(value = "The entity (in any of its forms) that has to be present in the pathways", defaultValue = "PTEN", required = true) @PathVariable String identifier,
