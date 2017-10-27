@@ -52,7 +52,6 @@ public class DiagramExportManager {
         String ancestorStId = getAncestorStId(stId);
 
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
-        if (!diagramJsonFolder.endsWith("/")) diagramJsonFolder += "/";
 
         File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/pptx/" + colorProfile.toLowerCase());
         if (!outputFolder.exists()) {
