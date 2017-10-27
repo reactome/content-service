@@ -23,6 +23,7 @@ public class TuplesFileCheckerController implements LruFolderContentCheckerFileD
     private Long ttl;
 
     public TuplesFileCheckerController() {
+        Thread.currentThread().setName("TuplesFileCheckerController");
     }
 
     public void setPathDirectory(String pathDirectory) {
@@ -61,12 +62,12 @@ public class TuplesFileCheckerController implements LruFolderContentCheckerFileD
             folderContentChecker.addCheckerFileDeletedHandler(this);
             checker = new Thread(folderContentChecker);
             try{
-                checker.setName("TuplesFileCheckerController");
+                checker.setName("LruFolderContentChecker");
             }catch (SecurityException e){
-                logger.warn("TuplesFileCheckerController thread renaming failed!");
+                logger.warn("LruFolderContentChecker thread renaming failed!");
             }
             checker.start();
-            logger.info("TuplesFileCheckerController started...");
+            logger.info(pathDirectory + " is now under LRU check...");
         }
     }
 
