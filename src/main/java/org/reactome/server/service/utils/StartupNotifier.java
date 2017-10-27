@@ -47,9 +47,7 @@ public class StartupNotifier extends Thread {
 
             logger.debug("Sent!");
         } catch (Exception e) {
-            logger.warn("[MAIL_SERVER_ERROR] The email could not be sent startup notification email."
-                    + "\n\tMessage: " + e.getMessage().split("\n")[0]
-                    + "\n\tCause: " + e.getCause().getMessage().split("\n")[0]);
+            logger.warn("Startup notification failed because: " + e.getMessage().split("\n")[0]);
         }
     }
 
