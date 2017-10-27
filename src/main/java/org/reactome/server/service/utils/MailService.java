@@ -44,7 +44,7 @@ public class MailService {
             };
             mailSender.send(preparator);
         } catch (Exception e) {
-            logger.error("[MAILSRVErr] The email could not be sent [To: " + toAddress + " From: " + fromAddress + " Subject: " + subject);
+            logger.error("[MAIL_SERVER_ERROR] The email could not be sent [To: " + toAddress + " From: " + fromAddress + " Subject: " + subject, e);
         }
     }
 }
