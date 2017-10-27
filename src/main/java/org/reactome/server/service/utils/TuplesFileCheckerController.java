@@ -23,7 +23,7 @@ public class TuplesFileCheckerController implements LruFolderContentCheckerFileD
     private Long ttl;
 
     public TuplesFileCheckerController() {
-        Thread.currentThread().setName("TuplesFileCheckerController");
+        Thread.currentThread().setName("CS-TupleFilesChecker");
     }
 
     public void setPathDirectory(String pathDirectory) {
