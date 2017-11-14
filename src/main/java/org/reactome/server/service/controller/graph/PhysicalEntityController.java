@@ -94,9 +94,9 @@ public class PhysicalEntityController {
                                                          @RequestParam(defaultValue = "false") boolean excludeStructures) {
         Collection<PhysicalEntity> componentOfs;
         if (excludeStructures) {
-            componentOfs = physicalEntityService.getComplexSubunitsNoStructures(id);
+            componentOfs = physicalEntityService.getPhysicalEntitySubunitsNoStructures(id);
         } else {
-            componentOfs = physicalEntityService.getComplexSubunits(id);
+            componentOfs = physicalEntityService.getPhysicalEntitySubunits(id);
         }
         if (componentOfs == null || componentOfs.isEmpty())
             throw new NotFoundException("Id: " + id + " has not been found in the System");
