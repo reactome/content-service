@@ -241,12 +241,12 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DiagramProfileException.class)
     @ResponseBody
     ResponseEntity<String> handleDiagramProfileException(HttpServletRequest request, DiagramProfileException e) {
         logger.warn("DiagramProfileException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
     //================================================================================
@@ -331,6 +331,14 @@ class GlobalExceptionHandler {
     ResponseEntity<String> handleClientAbortException(HttpServletRequest request, ClientAbortException e) {
         // Wrap an IOException identifying it as being caused by an abort of a request by a remote client.
         logger.warn("ClientAbortException was caught, we can ignore it");
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(RasterException.class)
+    @ResponseBody
+    ResponseEntity<String> handleRasterException(HttpServletRequest request, RasterException e) {
+        logger.warn("RasterException was caught for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
