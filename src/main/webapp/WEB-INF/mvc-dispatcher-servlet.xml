@@ -55,27 +55,6 @@
         <property name="maxUploadSize" value="52428800"/> <!-- 10 MB  // 52428800 = 50 MB // 209715200 = 200MB  -->
     </bean>
 
-    <!-- Configuration for the Interactors-Core components -->
-    <bean id="interactorsDB" class="org.reactome.server.interactors.database.InteractorsDatabase" destroy-method="closeConnection">
-        <constructor-arg name="fileName" value="${interactors.static.db}"/>
-    </bean>
-
-    <bean id="interactionParserService" class="org.reactome.server.interactors.service.InteractionParserService">
-        <constructor-arg name="database" ref="interactorsDB"/>
-    </bean>
-    <bean id="interactionResourceService" class="org.reactome.server.interactors.service.InteractionResourceService">
-        <constructor-arg name="database" ref="interactorsDB"/>
-    </bean>
-    <bean id="interactionService" class="org.reactome.server.interactors.service.InteractionService">
-        <constructor-arg name="database" ref="interactorsDB"/>
-    </bean>
-    <bean id="interactorResourceService" class="org.reactome.server.interactors.service.InteractorResourceService">
-        <constructor-arg name="database" ref="interactorsDB"/>
-    </bean>
-    <bean id="interactorService" class="org.reactome.server.interactors.service.InteractorService">
-        <constructor-arg name="database" ref="interactorsDB"/>
-    </bean>
-
     <bean id="psicquicService" class="org.reactome.server.interactors.service.PsicquicService"/>
 
     <bean id="fileCheckerController" class="org.reactome.server.service.utils.TuplesFileCheckerController" name="FileCheckerController" destroy-method="interrupt">
