@@ -2,16 +2,13 @@ package org.reactome.server.service.manager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
-import org.reactome.server.interactors.exception.InvalidInteractionResourceException;
+import org.reactome.server.graph.service.InteractionsService;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
 import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
 import org.reactome.server.interactors.model.Interaction;
 import org.reactome.server.interactors.model.InteractionDetails;
-import org.reactome.server.interactors.service.InteractionService;
 import org.reactome.server.interactors.service.PsicquicService;
 import org.reactome.server.interactors.util.Toolbox;
-import org.reactome.server.service.exception.InteractorResourceNotFound;
-import org.reactome.server.service.exception.StaticInteractionException;
 import org.reactome.server.service.model.interactors.Interactor;
 import org.reactome.server.service.model.interactors.InteractorEntity;
 import org.reactome.server.service.model.interactors.Interactors;
@@ -19,29 +16,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import psidev.psi.mi.tab.PsimiTabException;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
+ * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
+ * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @Component
 public class InteractionManager {
 
     /**
-     * Holds the services that query the DB
+     * Holds the services that query the IntAct interactions in the database
      */
     @Autowired
-    private InteractionService interactionService;
+    private InteractionsService interactionsService;
 
     @Autowired
     private PsicquicService psicquicService;
 
-    public InteractionManager() {
-    }
+    public InteractionManager() { }
 
     /**
      * Retrieve static interactions details
@@ -49,14 +45,12 @@ public class InteractionManager {
      * @return InteractionMapper
      */
     public Interactors getStaticProteinDetails(Collection<String> accs, String resource, Integer page, Integer pageSize) {
-        try {
-            Map<String, List<Interaction>> interactionMaps = interactionService.getInteractions(accs, resource, page, pageSize);
-            return getDetailInteractionResult(interactionMaps, resource);
-        } catch (InvalidInteractionResourceException s) {
-            throw new InteractorResourceNotFound(resource);
-        } catch (SQLException e) {
-            throw new StaticInteractionException(e);
+        Interactors rtn = new Interactors();
+        rtn.setResource(resource);
+        for (String acc : accs) {
+            rtn.add(acc, interactionsService.getInteractions(acc, page, pageSize));
         }
+        return rtn;
     }
 
     /**
@@ -78,7 +72,7 @@ public class InteractionManager {
      * @return InteractionMapper which will be serialized to JSON by Jackson
      */
     public Interactors getPsicquicProteinsDetails(Collection<String> accs, String resource, int numberOfThreads, boolean cache) throws PsicquicQueryException, PsicquicRegistryClientException, PsimiTabException, PsicquicResourceNotFoundException {
-        if(numberOfThreads >= 20){
+        if (numberOfThreads >= 20) {
             // no more than 20 threads.....
             numberOfThreads = 20;
         }
@@ -93,14 +87,8 @@ public class InteractionManager {
      * @return InteractionMapper
      */
     public Interactors getStaticProteinsSummary(Collection<String> accs, String resource) {
-        try {
-            Map<String, Integer> interactionCountMap = interactionService.countInteractionsByAccessions(accs, resource);
-            return getSummaryInteractionResult(interactionCountMap, resource);
-        } catch (InvalidInteractionResourceException s) {
-            throw new InteractorResourceNotFound(resource);
-        } catch (SQLException e) {
-            throw new StaticInteractionException(e);
-        }
+        Map<String, Integer> interactionCountMap = interactionsService.countInteractionsByAccessions(accs);
+        return getSummaryInteractionResult(interactionCountMap, resource);
     }
 
     /**
