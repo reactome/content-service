@@ -42,11 +42,11 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.4</graph.core>
+        <graph.core>1.1.5</graph.core>
         <search.core>1.0.1</search.core>
-        <interactors.core>1.0.10</interactors.core>
-        <diagram.exporter>1.1.0</diagram.exporter>
-        <sbml-exporter>1.0.0</sbml-exporter>
+        <interactors.core>1.0.12</interactors.core>
+        <diagram.exporter>1.2.1</diagram.exporter>
+        <sbml-exporter>1.0.1</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -58,7 +58,7 @@
         <activation.version>1.1.1</activation.version>
         <kryo.version>2.22</kryo.version>
         <tika.version>1.12</tika.version>
-        <reactome.utils.version>1.0.5</reactome.utils.version>
+        <reactome.utils.version>1.0.7</reactome.utils.version>
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>
@@ -89,6 +89,18 @@
             <groupId>org.reactome.server.interactors</groupId>
             <artifactId>interactor-core</artifactId>
             <version>${interactors.core}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xerial</groupId>
+                    <artifactId>sqlite-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- diagram exporter -->
+        <dependency>
+            <groupId>org.reactome.server.tools</groupId>
+            <artifactId>diagram-exporter</artifactId>
+            <version>${diagram.exporter}</version>
         </dependency>
         <!--Spring-->
         <dependency>
@@ -189,13 +201,6 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
             <version>${kryo.version}</version>
-        </dependency>
-
-        <!-- diagram exporter -->
-        <dependency>
-            <groupId>org.reactome.server.tools</groupId>
-            <artifactId>diagram-exporter</artifactId>
-            <version>${diagram.exporter}</version>
         </dependency>
 
     </dependencies>
