@@ -9,11 +9,11 @@ import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.DiagramExporterController;
 import org.reactome.server.service.exception.MissingSBMLException;
+import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService;
-import org.reactome.server.tools.diagram.exporter.pptx.model.Decorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
@@ -31,7 +32,7 @@ import java.util.LinkedHashMap;
  */
 
 @Component
-public class DiagramExportManager {
+public class DiagramPPTXExportManager {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
     private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
@@ -158,7 +159,7 @@ public class DiagramExportManager {
         File file = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
         if (!file.exists()) {
             try {
-                FileUtils.writeStringToFile(file, sbml);
+                FileUtils.writeStringToFile(file, sbml, Charset.defaultCharset());
             } catch (IOException e) {
                 errorLogger.error(e.getMessage());
             }
