@@ -1,7 +1,9 @@
 package org.reactome.server.service.model.interactors;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.reactome.server.graph.domain.model.Interaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +18,13 @@ public class Interactors {
     private String resource;
 
     @ApiModelProperty(value = "This is the list of entities which have been requested.")
-    private List<InteractorEntity> entities;
+    private List<InteractorEntity> entities = new ArrayList<>();
+
+    public Interactors() { }
+
+    public void add(String acc, List<Interaction> interactions){
+        entities.add(new InteractorEntity(acc, interactions));
+    }
 
     public String getResource() {
         return resource;

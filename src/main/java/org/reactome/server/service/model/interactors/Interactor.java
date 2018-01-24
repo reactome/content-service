@@ -1,6 +1,7 @@
 package org.reactome.server.service.model.interactors;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.reactome.server.graph.domain.model.*;
 
 /**
  * Maps an Interactor and the Interaction Id
@@ -30,6 +31,30 @@ public class Interactor {
 
     @ApiModelProperty(value = "This represents the URL for the given interactions identifiers.")
     private String evidencesURL;
+
+    public Interactor() {}
+
+    public Interactor(Interaction interaction) {
+        ReferenceEntity re;
+        if(interaction instanceof UndirectedInteraction){
+            re = ((UndirectedInteraction) interaction).getInteractor().get(0);
+        } else {
+            re = ((DirectedInteraction) interaction).getTarget();
+        }
+
+        this.acc = re.getIdentifier();
+        this.accURL = re.getUrl();
+
+        this.evidences = interaction.getAccession().size();
+        this.evidencesURL = interaction.getUrl();
+
+        this.score = interaction.getScore();
+
+        if(re instanceof ReferenceSequence){
+            ReferenceSequence rs = (ReferenceSequence) re;
+            if (rs.getGeneName() != null && !rs.getGeneName().isEmpty()) this.alias = rs.getGeneName().get(0);
+        }
+    }
 
     public String getAcc() {
         return acc;
