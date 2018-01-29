@@ -85,11 +85,11 @@ public class PathwaysController {
             @ApiResponse(code = 404, message = "No TopLevelPathways were found for species", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/pathways/top/{species}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/pathways/top/{species:.+}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<? extends Pathway> getTopLevelPathways( @ApiParam(value = "Specifies the species by the taxonomy identifier (eg: 9606) or species name (eg: 'Homo+sapiens')", defaultValue = "9606", required = true)
-                                                             @PathVariable Object species) throws UnsupportedEncodingException {
-        Collection<TopLevelPathway> rtn = topLevelPathwayService.getTopLevelPathways(URLDecoder.decode(species.toString(),"UTF8"));
+                                                             @PathVariable String species) throws UnsupportedEncodingException {
+        Collection<TopLevelPathway> rtn = topLevelPathwayService.getTopLevelPathways(URLDecoder.decode(species,"UTF-8"));
         if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No TopLevelPathways were found for species: " + species);
         infoLogger.info("Request for toplevelpathways with species: {}", species);
         return rtn;
