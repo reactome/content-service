@@ -25,15 +25,17 @@ public class StartupNotifier extends Thread {
     private static final String FROM = "noreply@reactome.org";
     private static final String SENDER_NAME = "Tomcat";
 
-    private final MailService sms;
-    private final String to;
+    private MailService sms;
+    private String to;
 
     @Autowired
-    public StartupNotifier(MailService sms, @Value("${mail.to}") String to) {
+    public StartupNotifier(MailService sms, @Value("${mail.to}") String to, @Value("${startup.notification}") String notify) {
         super("CS-StartupNotifier");
-        this.sms = sms;
-        this.to = to;
-        start();
+        if(Boolean.valueOf(notify) && to != null) {
+            this.sms = sms;
+            this.to = to;
+            start();
+        }
     }
 
     @Override

@@ -18,11 +18,20 @@
     <!--</context:component-scan>-->
 
     <context:component-scan base-package="org.reactome.server" />
-    <context:property-placeholder location="classpath:/service.properties" />
+    <context:property-placeholder location="classpath:/service.properties" ignore-unresolvable="true" />
 
     <!-- Standard xml based mvc config-->
     <mvc:annotation-driven>
         <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="writeAcceptCharset" value="false" />
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain; charset=UTF-8</value>
+                        <value>application/json; charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="objectMapper">
                     <bean class="com.fasterxml.jackson.databind.ObjectMapper">
