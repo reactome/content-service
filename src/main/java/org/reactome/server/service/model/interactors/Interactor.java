@@ -42,7 +42,12 @@ public class Interactor {
             re = ((DirectedInteraction) interaction).getTarget();
         }
 
-        this.acc = re.getIdentifier();
+        if (re instanceof ReferenceIsoform) {
+            String vi = ((ReferenceIsoform) re).getVariantIdentifier();
+            this.acc = (vi != null && !vi.isEmpty()) ? vi : re.getIdentifier();
+        } else {
+            this.acc =  re.getIdentifier();
+        }
         this.accURL = re.getUrl();
 
         this.evidences = interaction.getAccession().size();
