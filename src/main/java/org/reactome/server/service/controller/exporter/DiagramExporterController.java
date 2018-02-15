@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.exporter;
 
 import io.swagger.annotations.*;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.io.IOUtils;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.result.DiagramResult;
@@ -15,10 +16,12 @@ import org.reactome.server.service.manager.DiagramPPTXExportManager;
 import org.reactome.server.service.manager.DiagramRasterExportManager;
 import org.reactome.server.tools.SBMLFactory;
 import org.reactome.server.tools.diagram.exporter.common.Decorator;
+import org.reactome.server.tools.diagram.exporter.common.analysis.AnalysisException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
 import org.reactome.server.tools.diagram.exporter.raster.profiles.ColorProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +106,7 @@ public class DiagramExporterController {
                           @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
-                         HttpServletResponse response) {
+                         HttpServletResponse response) throws AnalysisException, EHLDException, TranscoderException, DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramExporterException {
 
         DiagramResult result = diagramService.getDiagramResult(identifier);
         if (result == null) throw new DiagramExporterException(String.format("'%s' is not an event", identifier));
@@ -128,9 +131,7 @@ public class DiagramExporterController {
 
             rasterManager.exportRaster(args, response);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead
-        } catch (Exception e) {
-            throw new DiagramExporterException(e.getMessage(), e.getCause()); //Treated as a 400
+            throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         } finally {
             synchronized (RASTER_SEMAPHORE) {
                 CURRENT_RASTER_SIZE -= size;

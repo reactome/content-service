@@ -2,6 +2,7 @@ package org.reactome.server.service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.neo4j.ogm.drivers.http.request.HttpRequestException;
@@ -13,9 +14,11 @@ import org.reactome.server.interactors.tuple.exception.ParserException;
 import org.reactome.server.interactors.tuple.exception.TupleParserException;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.*;
+import org.reactome.server.tools.diagram.exporter.common.analysis.AnalysisException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -246,6 +249,30 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleDiagramProfileException(HttpServletRequest request, DiagramProfileException e) {
         logger.warn("DiagramProfileException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(AnalysisException.class)
+    @ResponseBody
+    ResponseEntity<String> handleAnalysisException(HttpServletRequest request, AnalysisException e) {
+        logger.warn("AnalysisException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(EHLDException.class)
+    @ResponseBody
+    ResponseEntity<String> handleEHLDException(HttpServletRequest request, EHLDException e) {
+        logger.warn("EHLDException: " + e.getMessage() + " for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(TranscoderException.class)
+    @ResponseBody
+    ResponseEntity<String> handleTranscoderException(HttpServletRequest request, TranscoderException e) {
+        logger.warn("SVG TranscoderException: " + e.getMessage() + " for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
