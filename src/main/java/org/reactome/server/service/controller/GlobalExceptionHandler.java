@@ -335,10 +335,10 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(RasterException.class)
+    @ExceptionHandler(DiagramExporterException.class)
     @ResponseBody
-    ResponseEntity<String> handleRasterException(HttpServletRequest request, RasterException e) {
-        logger.warn("RasterException was caught for request: " + request.getRequestURL());
+    ResponseEntity<String> handleRasterException(HttpServletRequest request, DiagramExporterException e) {
+        logger.warn("DiagramExporterException was caught for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
