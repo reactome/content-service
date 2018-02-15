@@ -13,7 +13,7 @@ import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
-import org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService;
+import org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramExporterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class DiagramPPTXExportManager {
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
     private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
 
-    private DiagramService diagramService;
+    private DiagramExporterService diagramExporterService = new DiagramExporterService();
     private GeneralService generalService;
     private EventsService eventsService;
     private DatabaseObjectService databaseObjectService;
@@ -78,7 +78,7 @@ public class DiagramPPTXExportManager {
             return pptxFile;
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
-            File newFile = diagramService.exportToPPTX(stId, diagramJsonFolder, colorProfile, outputFolder.getPath(), decorator);
+            File newFile = diagramExporterService.exportToPPTX(stId, diagramJsonFolder, colorProfile, outputFolder.getPath(), decorator);
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return newFile;
@@ -166,11 +166,6 @@ public class DiagramPPTXExportManager {
         } else {
             errorLogger.error("Trying to write a file that already exists");
         }
-    }
-
-    @Autowired
-    public void setDiagramService(DiagramService diagramService) {
-        this.diagramService = diagramService;
     }
 
     @Autowired
