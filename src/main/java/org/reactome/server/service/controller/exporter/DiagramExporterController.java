@@ -3,15 +3,16 @@ package org.reactome.server.service.controller.exporter;
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.DiagramService;
 import org.reactome.server.graph.service.GeneralService;
+import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.MissingSBMLException;
 import org.reactome.server.service.exception.NotFoundException;
-import org.reactome.server.service.exception.RasterException;
 import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.service.manager.DiagramPPTXExportManager;
 import org.reactome.server.service.manager.DiagramRasterExportManager;
-import org.reactome.server.service.manager.DiagramResult;
 import org.reactome.server.tools.SBMLFactory;
 import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
@@ -58,6 +59,9 @@ public class DiagramExporterController {
     private DatabaseObjectService databaseObjectService;
 
     @Autowired
+    private DiagramService diagramService;
+
+    @Autowired
     private DiagramPPTXExportManager pptxManager;
 
     @Autowired
@@ -70,7 +74,7 @@ public class DiagramExporterController {
                     "<br/>When a subpathway is provided, the diagram for the parent is exported and the events that are part of the subpathways are selected." +
                     "<br/>When a reaction is provided, the diagram containing the reaction is exported and the reaction is selected." +
                     "<br/><br/>Find out more about this method <a href=\"/dev/content-service/diagram-exporter\" target=\"_blank\">here</a>",
-            produces = "image/png, image/jpg, image/jpeg, image/gif"
+            produces = "image/png, image/jpg, image/jpeg, image/svg+xml, image/gif"
     )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Stable Identifier does not match with any of the available diagrams."),
@@ -80,7 +84,7 @@ public class DiagramExporterController {
     @RequestMapping(value = "/diagram/{identifier}.{ext:.*}", method = RequestMethod.GET)
     public void toRaster( @ApiParam(value = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, defaultValue = "R-HSA-177929")
                          @PathVariable String identifier,
-                          @ApiParam(value = "File extension (defines the image format)", required = true, defaultValue = "png", allowableValues = "png,jpg,jpeg,gif")
+                          @ApiParam(value = "File extension (defines the image format)", required = true, defaultValue = "png", allowableValues = "png,jpg,jpeg,svg,gif")
                          @PathVariable String ext,
 
                           @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
@@ -100,36 +104,33 @@ public class DiagramExporterController {
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
                          HttpServletResponse response) {
-        int size = 0;
-        try {
-            DiagramResult result = rasterManager.argumentsValidation(identifier);
-            size = result.getSize() * (int) Math.ceil(quality * 0.3);
 
+        DiagramResult result = diagramService.getDiagramResult(identifier);
+        if (result == null) throw new DiagramExporterException(String.format("'%s' is not an event", identifier));
+
+        int size = result.getSize() * (int) Math.ceil(quality * 0.3);
+        try {
             synchronized (RASTER_SEMAPHORE) {
                 while ((CURRENT_RASTER_SIZE + size) >= MAX_RASTER_SIZE) RASTER_SEMAPHORE.wait();
                 CURRENT_RASTER_SIZE += size;
             }
 
-            if (result != null) {
-                List<String> toSelect = result.getEvents();
-                if (sel != null) toSelect.addAll(sel);
+            List<String> toSelect = result.getEvents();
+            if (sel != null) toSelect.addAll(sel);
 
-                final RasterArgs args = new RasterArgs(result.getDiagramStId(), ext);
-                args.setProfiles(new ColorProfiles(diagramProfile, analysisProfile, null));
-                args.setFlags(flg);
-                args.setSelected(toSelect);
-                args.setToken(token);
-                args.setQuality(quality);
-                args.setColumn(expColumn);
+            final RasterArgs args = new RasterArgs(result.getDiagramStId(), ext);
+            args.setProfiles(new ColorProfiles(diagramProfile, analysisProfile, null));
+            args.setFlags(flg);
+            args.setSelected(toSelect);
+            args.setToken(token);
+            args.setQuality(quality);
+            args.setColumn(expColumn);
 
-                rasterManager.exportRaster(args, response);
-            } else {
-                throw new RasterException(String.format("'%s' is not an event", identifier));
-            }
+            rasterManager.exportRaster(args, response);
         } catch (InterruptedException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead
         } catch (Exception e) {
-            throw new RasterException(e.getMessage()); //Treated as a 400
+            throw new DiagramExporterException(e.getMessage(), e.getCause()); //Treated as a 400
         } finally {
             synchronized (RASTER_SEMAPHORE) {
                 CURRENT_RASTER_SIZE -= size;
