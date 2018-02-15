@@ -83,7 +83,12 @@
         <aop:include name="actionResponseLazyLoading" />
     </aop:aspectj-autoproxy>
 
-    <bean id="diagramService" class="org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramService" />
+    <bean id="rasterExporter" class="org.reactome.server.tools.diagram.exporter.raster.RasterExporter">
+        <constructor-arg name="diagramPath" value="${diagram.json.folder}"/>
+        <constructor-arg name="ehldPath" value="${ehld.folder}"/>
+        <constructor-arg name="analysisPath" value="${analysis.token}"/>
+        <constructor-arg name="svgSummary" value="${svg.summary.file}"/>
+    </bean>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="${mail.host}" />
