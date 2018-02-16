@@ -8,7 +8,7 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
 import org.reactome.server.tools.diagram.exporter.raster.RasterOutput;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
-import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.svg.SVGDocument;
@@ -33,7 +33,7 @@ public class DiagramRasterExportManager {
         this.rasterExporter = rasterExporter;
     }
 
-    public void exportRaster(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
+    public void exportRaster(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EhldException, DiagramJsonNotFoundException {
 
         final String ext = args.getFormat();
         final Integer column = args.getColumn();
@@ -58,7 +58,7 @@ public class DiagramRasterExportManager {
         }
     }
 
-    private void gif(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
+    private void gif(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EhldException, DiagramJsonNotFoundException {
         try {
             OutputStream os = response.getOutputStream();
             rasterExporter.exportToGif(args, os);
@@ -67,7 +67,7 @@ public class DiagramRasterExportManager {
         }
     }
 
-    private void normal(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
+    private void normal(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EhldException, DiagramJsonNotFoundException {
         try {
             OutputStream os = response.getOutputStream();
             final BufferedImage image = rasterExporter.export(args);
@@ -77,7 +77,7 @@ public class DiagramRasterExportManager {
         }
     }
 
-    private void svg(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
+    private void svg(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EhldException, DiagramJsonNotFoundException {
         try {
             OutputStream os = response.getOutputStream();
             SVGDocument svg = rasterExporter.exportToSvg(args);
