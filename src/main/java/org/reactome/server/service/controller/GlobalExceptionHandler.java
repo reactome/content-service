@@ -18,7 +18,7 @@ import org.reactome.server.tools.diagram.exporter.common.analysis.AnalysisExcept
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
-import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -261,10 +261,10 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(EHLDException.class)
+    @ExceptionHandler(EhldException.class)
     @ResponseBody
-    ResponseEntity<String> handleEHLDException(HttpServletRequest request, EHLDException e) {
-        logger.warn("EHLDException: " + e.getMessage() + " for request: " + request.getRequestURL());
+    ResponseEntity<String> handleEhldException(HttpServletRequest request, EhldException e) {
+        logger.warn("EhldException: " + e.getMessage() + " for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
 
