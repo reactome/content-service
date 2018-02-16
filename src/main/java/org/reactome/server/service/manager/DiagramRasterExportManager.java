@@ -8,7 +8,7 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
 import org.reactome.server.tools.diagram.exporter.raster.RasterOutput;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
-import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,7 +83,7 @@ public class DiagramRasterExportManager {
             SVGDocument svg = rasterExporter.exportToSvg(args);
             RasterOutput.save(svg, os);
             os.close();
-        } catch (AnalysisException | EHLDException | DiagramJsonNotFoundException | DiagramJsonDeserializationException | IOException | TranscoderException e) {
+        } catch (AnalysisException | EhldException | DiagramJsonNotFoundException | DiagramJsonDeserializationException | IOException | TranscoderException e) {
             throw new DiagramExporterException(e.getMessage(), e);
         }
     }
