@@ -21,7 +21,7 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
-import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.reactome.server.tools.diagram.exporter.raster.profiles.ColorProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class DiagramExporterController {
                           @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
-                         HttpServletResponse response) throws AnalysisException, EHLDException, TranscoderException, DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramExporterException {
+                         HttpServletResponse response) throws AnalysisException, EhldException, TranscoderException, DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramExporterException {
 
         DiagramResult result = diagramService.getDiagramResult(identifier);
         if (result == null) throw new DiagramExporterException(String.format("'%s' is not an event", identifier));
