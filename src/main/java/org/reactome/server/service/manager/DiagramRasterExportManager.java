@@ -8,10 +8,8 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
 import org.reactome.server.tools.diagram.exporter.raster.RasterOutput;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
-import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
+import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EHLDException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -28,10 +26,14 @@ import java.io.OutputStream;
 @Component
 public class DiagramRasterExportManager {
 
-    @Autowired
-    private RasterExporter rasterExporter;
+    private final RasterExporter rasterExporter;
 
-    public ResponseEntity exportRaster(RasterArgs args, HttpServletResponse response) {
+    @Autowired
+    public DiagramRasterExportManager(RasterExporter rasterExporter) {
+        this.rasterExporter = rasterExporter;
+    }
+
+    public void exportRaster(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
 
         final String ext = args.getFormat();
         final Integer column = args.getColumn();
@@ -44,7 +46,7 @@ public class DiagramRasterExportManager {
         String type = args.getFormat().equalsIgnoreCase("svg") ? "svg+xml" : args.getFormat().toLowerCase();
         response.addHeader("Content-Type", "image/" + type);
         if (ext.equalsIgnoreCase("gif")) {
-            if(column == null) {
+            if (column == null) {
                 gif(args, response);
             } else {
                 normal(args, response);
@@ -54,36 +56,33 @@ public class DiagramRasterExportManager {
         } else {
             normal(args, response);
         }
-        return new ResponseEntity(HttpStatus.OK);
     }
 
-    private void gif(RasterArgs args, HttpServletResponse response) {
+    private void gif(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
         try {
-            final OutputStream os = response.getOutputStream();
+            OutputStream os = response.getOutputStream();
             rasterExporter.exportToGif(args, os);
-            os.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new DiagramExporterException(e.getMessage(), e);
         }
     }
 
-    private void normal(RasterArgs args, HttpServletResponse response) {
+    private void normal(RasterArgs args, HttpServletResponse response) throws DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
         try {
+            OutputStream os = response.getOutputStream();
             final BufferedImage image = rasterExporter.export(args);
-            final OutputStream outputStream = response.getOutputStream();
-            ImageIO.write(image, args.getFormat(), outputStream);
-        } catch (Exception e) {
+            ImageIO.write(image, args.getFormat(), os);
+        } catch (IOException e) {
             throw new DiagramExporterException(e.getMessage(), e);
         }
     }
 
-    private void svg(RasterArgs args, HttpServletResponse response){
+    private void svg(RasterArgs args, HttpServletResponse response) throws TranscoderException, DiagramJsonDeserializationException, AnalysisException, EHLDException, DiagramJsonNotFoundException {
         try {
-            final OutputStream os = response.getOutputStream();
+            OutputStream os = response.getOutputStream();
             SVGDocument svg = rasterExporter.exportToSvg(args);
             RasterOutput.save(svg, os);
-            os.close();
-        } catch (AnalysisException | EhldException | DiagramJsonNotFoundException | DiagramJsonDeserializationException | IOException | TranscoderException e) {
+        } catch (IOException e) {
             throw new DiagramExporterException(e.getMessage(), e);
         }
     }
