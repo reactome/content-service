@@ -128,6 +128,7 @@ public class DiagramExporterController {
             args.setToken(token);
             args.setQuality(quality);
             args.setColumn(expColumn);
+            args.setWriteTitle(true);
 
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
