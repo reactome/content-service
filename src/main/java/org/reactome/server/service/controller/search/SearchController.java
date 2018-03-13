@@ -1,10 +1,7 @@
 package org.reactome.server.service.controller.search;
 
 import io.swagger.annotations.*;
-import org.reactome.server.search.domain.FacetMapping;
-import org.reactome.server.search.domain.FireworksResult;
-import org.reactome.server.search.domain.GroupedResult;
-import org.reactome.server.search.domain.Query;
+import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
 import org.reactome.server.service.exception.ErrorInfo;
@@ -76,8 +73,8 @@ class SearchController {
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @ApiParam(value = "Species names", defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
-                                   @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(value = "Species names", required = false) List<String> species,
+                                   @RequestParam(value = "Types to filter", required = false) List<String> types,
                                    @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
                                    @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
@@ -93,8 +90,8 @@ class SearchController {
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @ApiParam(value = "Species names", defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
-                                   @ApiParam(value = "Types to filter", defaultValue = "Reaction, Pathway") @RequestParam(required = false) List<String> types,
+                                   @RequestParam(value = "Species to filter", required = false) List<String> species,
+                                   @RequestParam(value = "Types to filter", required = false) List<String> types,
                                    @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
                                    @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords,
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
@@ -122,5 +119,35 @@ class SearchController {
         infoLogger.info("Fireworks request for query: {}", query);
         Query queryObject = new Query(query, species, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
+    }
+
+    @ApiIgnore
+    @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
+    @RequestMapping(value = "/diagrams", method = RequestMethod.GET)
+    @ResponseBody
+    public DiagramResult getDiagrams(@ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
+                                     @ApiParam(defaultValue = "R-HSA-9006927", required = true) @RequestParam String filter,
+                                     @RequestParam(required = false) List<String> species,
+                                     @RequestParam(required = false) List<String> types,
+                                     @RequestParam(required = false) Integer start,
+                                     @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        // query is the term
+        // filter is the diagram
+        Query queryObject = new Query(query, filter, species, types, null, null, start, rows);
+        return searchService.getDiagrams(queryObject);
+    }
+
+    @ApiIgnore
+    @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
+    @RequestMapping(value = "/diagramOccurrences", method = RequestMethod.GET)
+    @ResponseBody
+    public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-141433", required = true) @RequestParam String query,
+                                                          @ApiParam(defaultValue = "R-HSA-68886", required = true) @RequestParam String filter,
+                                                          @RequestParam(required = false) List<String> species,
+                                                          @RequestParam(required = false) List<String> types,
+                                                          @RequestParam(required = false) Integer start,
+                                                          @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        Query queryObject = new Query(query, filter, species, types, null, null, start, rows);
+        return searchService.getDiagramOccurrencesResult(queryObject);
     }
 }
