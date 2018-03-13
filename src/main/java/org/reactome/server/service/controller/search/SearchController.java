@@ -35,7 +35,7 @@ class SearchController {
     })
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> spellcheckSuggestions(@ApiParam(value = "Search term", defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> spellcheckerSuggestions(@ApiParam(value = "Search term", defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for spellcheck suggestions for query {}", query);
         return searchService.getSpellcheckSuggestions(query);
     }
@@ -118,30 +118,28 @@ class SearchController {
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/diagrams", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET)
     @ResponseBody
-    public DiagramResult getDiagrams(@ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
-                                     @ApiParam(defaultValue = "R-HSA-9006927", required = true) @RequestParam String diagram,
-                                     @RequestParam(required = false) List<String> species,
-                                     @RequestParam(required = false) List<String> types,
-                                     @RequestParam(required = false) Integer start,
-                                     @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        // query is the term
-        // filter is the diagram
+    public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-9006927", required = true) @PathVariable String diagram,
+                                          @ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
+                                          @RequestParam(required = false) List<String> species,
+                                          @RequestParam(required = false) List<String> types,
+                                          @RequestParam(required = false) Integer start,
+                                          @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
         return searchService.getDiagrams(queryObject);
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/diagram/occurrences", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/{diagram}/occurrences/{instance}", method = RequestMethod.GET)
     @ResponseBody
-    public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-141433", required = true) @RequestParam String query,
-                                                          @ApiParam(defaultValue = "R-HSA-68886", required = true) @RequestParam String diagram,
+    public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
+                                                          @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
                                                           @RequestParam(required = false) List<String> species,
                                                           @RequestParam(required = false) List<String> types,
                                                           @RequestParam(required = false) Integer start,
                                                           @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
+        Query queryObject = new Query(instance, diagram, species, types, null, null, start, rows);
         return searchService.getDiagramOccurrencesResult(queryObject);
     }
 }
