@@ -13,13 +13,13 @@ import org.reactome.server.service.exception.MissingSBMLException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.exception.UnprocessableEntityException;
 import org.reactome.server.service.manager.DiagramPPTXExportManager;
-import org.reactome.server.service.manager.DiagramRasterExportManager;
 import org.reactome.server.tools.SBMLFactory;
 import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.analysis.AnalysisException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
+import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
 import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
 import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.reactome.server.tools.diagram.exporter.raster.profiles.ColorProfiles;
@@ -68,7 +68,7 @@ public class DiagramExporterController {
     private DiagramPPTXExportManager pptxManager;
 
     @Autowired
-    private DiagramRasterExportManager rasterManager;
+    private RasterExporter rasterExporter;
 
     @ApiOperation(
             value = "Export a given pathway diagram to raster file",
@@ -128,9 +128,12 @@ public class DiagramExporterController {
             args.setToken(token);
             args.setQuality(quality);
             args.setColumn(expColumn);
+            args.setWriteTitle(true);
 
-            rasterManager.exportRaster(args, response);
-        } catch (InterruptedException e) {
+            String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
+            response.addHeader("Content-Type", "image/" + type);
+            rasterExporter.export(args, response.getOutputStream());
+        } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         } finally {
             synchronized (RASTER_SEMAPHORE) {
