@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -105,9 +104,6 @@ class SearchController {
         return result;
     }
 
-    // ##################### API Ignored but still available for internal purposes #####################//
-
-    @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
@@ -121,33 +117,31 @@ class SearchController {
         return searchService.getFireworks(queryObject);
     }
 
-    @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/diagrams", method = RequestMethod.GET)
     @ResponseBody
     public DiagramResult getDiagrams(@ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
-                                     @ApiParam(defaultValue = "R-HSA-9006927", required = true) @RequestParam String filter,
+                                     @ApiParam(defaultValue = "R-HSA-9006927", required = true) @RequestParam String diagram,
                                      @RequestParam(required = false) List<String> species,
                                      @RequestParam(required = false) List<String> types,
                                      @RequestParam(required = false) Integer start,
                                      @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         // query is the term
         // filter is the diagram
-        Query queryObject = new Query(query, filter, species, types, null, null, start, rows);
+        Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
         return searchService.getDiagrams(queryObject);
     }
 
-    @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/diagram/occurrences", method = RequestMethod.GET)
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-141433", required = true) @RequestParam String query,
-                                                          @ApiParam(defaultValue = "R-HSA-68886", required = true) @RequestParam String filter,
+                                                          @ApiParam(defaultValue = "R-HSA-68886", required = true) @RequestParam String diagram,
                                                           @RequestParam(required = false) List<String> species,
                                                           @RequestParam(required = false) List<String> types,
                                                           @RequestParam(required = false) Integer start,
                                                           @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, filter, species, types, null, null, start, rows);
+        Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
         return searchService.getDiagramOccurrencesResult(queryObject);
     }
 }
