@@ -139,7 +139,7 @@ class SearchController {
 
     @ApiIgnore
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/diagramOccurrences", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/occurrences", method = RequestMethod.GET)
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-141433", required = true) @RequestParam String query,
                                                           @ApiParam(defaultValue = "R-HSA-68886", required = true) @RequestParam String filter,
