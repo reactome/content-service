@@ -160,8 +160,8 @@ class SearchController {
             String stId = entry.getStId();
             queryObject = new Query(stId, pathwayId, null, null, null, null);
             DiagramOccurrencesResult diagramOccurrencesResult = searchService.getDiagramOccurrencesResult(queryObject);
-            rtn.addAll(diagramOccurrencesResult.getOccurrences());
-            if(diagramOccurrencesResult.getInDiagram()) rtn.add(pathwayId);
+            if (diagramOccurrencesResult.getOccurrences() != null) rtn.addAll(diagramOccurrencesResult.getOccurrences());
+            if (diagramOccurrencesResult.getInDiagram()) rtn.add(stId);
         }
 
         if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
