@@ -110,13 +110,24 @@ class SearchController {
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
-                                              @ApiParam(defaultValue = "Homo sapiens") @RequestParam(required = false) List<String> species,
-                                              @ApiParam(defaultValue = "Protein") @RequestParam(required = false) List<String> types,
+                                              @RequestParam(required = false, defaultValue = "Homo sapiens") List<String> species,
+                                              @RequestParam(required = false) List<String> types,
                                               @RequestParam(required = false) Integer start,
                                               @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         Query queryObject = new Query(query, species, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
+    }
+
+    @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
+    @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
+    @ResponseBody
+    public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
+                                                @RequestParam(required = false) List<String> species,
+                                                @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        infoLogger.info("Fireworks Flagging request for query: {}", query);
+        Query queryObject = new Query(query, species, null, null, null, 0, rows);
+        return searchService.fireworksFlagging(queryObject);
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
@@ -149,9 +160,9 @@ class SearchController {
     @RequestMapping(value = "/diagram/{pathwayId}/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<String> getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
-                                                                              @PathVariable String pathwayId,
-                                                                              @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
-                                                                              @RequestParam String query) throws SolrSearcherException {
+                                                                @PathVariable String pathwayId,
+                                                                @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
+                                                                @RequestParam String query) throws SolrSearcherException {
         Collection<String> rtn = new HashSet<>();
         Query queryObject = new Query(query, pathwayId, null, null, null, null);
         DiagramResult searchInDiagram = searchService.getDiagrams(queryObject);
