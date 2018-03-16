@@ -110,7 +110,7 @@ class SearchController {
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
-                                              @RequestParam(required = false, defaultValue = "Homo sapiens") List<String> species,
+                                              @RequestParam(required = false) List<String> species,
                                               @RequestParam(required = false) List<String> types,
                                               @RequestParam(required = false) Integer start,
                                               @RequestParam(required = false) Integer rows) throws SolrSearcherException {
