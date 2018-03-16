@@ -123,10 +123,9 @@ class SearchController {
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
     @ResponseBody
     public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
-                                                @RequestParam(required = false) List<String> species,
-                                                @RequestParam(required = false, defaultValue = "100") Integer rows) throws SolrSearcherException {
+                                                @RequestParam(required = false) List<String> species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
-        Query queryObject = new Query(query, species, null, null, null, 0, rows);
+        Query queryObject = new Query(query, species, null, null, null);
         return searchService.fireworksFlagging(queryObject);
     }
 
