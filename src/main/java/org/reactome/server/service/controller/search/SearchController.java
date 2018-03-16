@@ -37,7 +37,7 @@ class SearchController {
     })
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> spellcheckerSuggestions(@ApiParam(value = "Search term", defaultValue = "appoptosis", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> spellcheckerSuggestions(@ApiParam(value = "Search term", defaultValue = "repoduction", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for spellcheck suggestions for query {}", query);
         return searchService.getSpellcheckSuggestions(query);
     }
@@ -49,7 +49,7 @@ class SearchController {
     })
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "apoptos", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "platele", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for autocomplete suggestions for query {}", query);
         return searchService.getAutocompleteSuggestions(query);
     }
@@ -73,7 +73,7 @@ class SearchController {
     })
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
-    public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
+    public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "TP53", required = true) @RequestParam String query,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                    @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                    @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
@@ -90,7 +90,7 @@ class SearchController {
     })
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
-    public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
+    public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                    @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                    @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
@@ -110,7 +110,7 @@ class SearchController {
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
-    public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
+    public FireworksResult getFireworksResult(@ApiParam(defaultValue = "BRAF", required = true) @RequestParam String query,
                                               @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                               @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                               @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
@@ -123,7 +123,7 @@ class SearchController {
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
     @ResponseBody
-    public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
+    public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
                                                 @RequestParam(required = false) List<String> species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
         Query queryObject = new Query(query, species, null, null, null);
@@ -133,8 +133,8 @@ class SearchController {
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET)
     @ResponseBody
-    public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-9006927", required = true) @PathVariable String diagram,
-                                          @ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
+    public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-8848021", required = true) @PathVariable String diagram,
+                                          @ApiParam(defaultValue = "MAD", required = true) @RequestParam String query,
                                           @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                           @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
