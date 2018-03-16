@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -111,12 +112,13 @@ class SearchController {
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "BRAF", required = true) @RequestParam String query,
-                                              @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                              @ApiParam(value = "Species name", defaultValue = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
                                               @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                               @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                               @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
-        Query queryObject = new Query(query, species, types, null, null, start, rows);
+        List<String> speciess = new ArrayList<>(); speciess.add(species);
+        Query queryObject = new Query(query, speciess, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
     }
 
@@ -124,9 +126,10 @@ class SearchController {
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
     @ResponseBody
     public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
-                                                @RequestParam(required = false) List<String> species) throws SolrSearcherException {
+                                                @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
-        Query queryObject = new Query(query, species, null, null, null);
+        List<String> speciess = new ArrayList<>(); speciess.add(species);
+        Query queryObject = new Query(query, speciess, null, null, null);
         return searchService.fireworksFlagging(queryObject);
     }
 
@@ -135,11 +138,10 @@ class SearchController {
     @ResponseBody
     public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-8848021", required = true) @PathVariable String diagram,
                                           @ApiParam(defaultValue = "MAD", required = true) @RequestParam String query,
-                                          @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                           @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                           @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
+        Query queryObject = new Query(query, diagram, null, types, null, null, start, rows);
         return searchService.getDiagrams(queryObject);
     }
 
@@ -148,11 +150,10 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species,
                                                           @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types,
                                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                                           @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(instance, diagram, species, types, null, null, start, rows);
+        Query queryObject = new Query(instance, diagram, null, types, null, null, start, rows);
         return searchService.getDiagramOccurrencesResult(queryObject);
     }
 
