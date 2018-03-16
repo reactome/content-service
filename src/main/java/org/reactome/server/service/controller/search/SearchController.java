@@ -74,10 +74,10 @@ class SearchController {
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
     @ResponseBody
     public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @RequestParam(value = "Species names", required = false) List<String> species,
-                                   @RequestParam(value = "Types to filter", required = false) List<String> types,
-                                   @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
-                                   @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords) throws SolrSearcherException {
+                                   @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                   @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
+                                   @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                   @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
         Query queryObject = new Query(query, species, types, compartments, keywords);
         return searchService.getFacetingInformation(queryObject);
@@ -91,13 +91,14 @@ class SearchController {
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "apoptosis", required = true) @RequestParam String query,
-                                   @RequestParam(value = "Species to filter", required = false) List<String> species,
-                                   @RequestParam(value = "Types to filter", required = false) List<String> types,
-                                   @RequestParam(value = "Compartments to filter", required = false) List<String> compartments,
-                                   @RequestParam(value = "Reaction types to filter", required = false) List<String> keywords,
+                                   @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                   @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
+                                   @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                   @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                   @RequestParam(value = "Start row", required = false) Integer start,
-                                   @RequestParam(value = "Number of rows to include", required = false) Integer rows) throws SolrSearcherException {
+                                   @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
+                                   @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows)
+            throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
         GroupedResult result = searchService.getEntries(queryObject, cluster);
@@ -110,10 +111,10 @@ class SearchController {
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
     @ResponseBody
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "PTEN", required = true) @RequestParam String query,
-                                              @RequestParam(required = false) List<String> species,
-                                              @RequestParam(required = false) List<String> types,
-                                              @RequestParam(required = false) Integer start,
-                                              @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+                                              @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                              @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
+                                              @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
+                                              @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         Query queryObject = new Query(query, species, types, null, null, start, rows);
         return searchService.getFireworks(queryObject);
@@ -134,10 +135,10 @@ class SearchController {
     @ResponseBody
     public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-9006927", required = true) @PathVariable String diagram,
                                           @ApiParam(defaultValue = "MAD1L1", required = true) @RequestParam String query,
-                                          @RequestParam(required = false) List<String> species,
-                                          @RequestParam(required = false) List<String> types,
-                                          @RequestParam(required = false) Integer start,
-                                          @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+                                          @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                          @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
+                                          @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
+                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(query, diagram, species, types, null, null, start, rows);
         return searchService.getDiagrams(queryObject);
     }
@@ -147,10 +148,10 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @RequestParam(required = false) List<String> species,
-                                                          @RequestParam(required = false) List<String> types,
-                                                          @RequestParam(required = false) Integer start,
-                                                          @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+                                                          @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species,
+                                                          @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types,
+                                                          @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
+                                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         Query queryObject = new Query(instance, diagram, species, types, null, null, start, rows);
         return searchService.getDiagramOccurrencesResult(queryObject);
     }
