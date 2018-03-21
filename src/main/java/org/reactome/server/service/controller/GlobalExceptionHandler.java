@@ -393,6 +393,16 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Something unexpected happened and the error has been reported.");
     }
 
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseBody
+    ResponseEntity<String> handleBadRequestException(HttpServletRequest request, BadRequestException e) {
+        logger.warn("BadRequestException was caught for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
+    }
+
+
     /*
      * Adding a JSON String manually to the response.
      *
