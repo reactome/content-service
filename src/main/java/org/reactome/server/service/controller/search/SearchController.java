@@ -1,9 +1,12 @@
 package org.reactome.server.service.controller.search;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.Species;
+import org.reactome.server.graph.service.SpeciesService;
 import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
+import org.reactome.server.service.exception.BadRequestException;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -30,6 +34,9 @@ class SearchController {
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private SpeciesService speciesService;
 
     @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
     @ApiResponses({
@@ -128,9 +135,18 @@ class SearchController {
     public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
                                                 @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
+        Species sp = speciesService.getSpeciesByName(species);
+        if (sp == null) throw new BadRequestException("No species found for '" + species + "'");
+
         List<String> speciess = new ArrayList<>(); speciess.add(species);
         Query queryObject = new Query(query, speciess, null, null, null);
-        return searchService.fireworksFlagging(queryObject);
+        //Filter the result by species. This is necessary when the query term is a chemical
+        String prefix = "R-" + sp.getAbbreviation();
+        Collection<String> rtn = searchService.fireworksFlagging(queryObject).stream()
+                .filter(s -> s.startsWith(prefix))
+                .collect(Collectors.toList());
+        if (rtn.isEmpty()) throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
+        return rtn;
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
