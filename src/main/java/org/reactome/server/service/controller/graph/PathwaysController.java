@@ -171,6 +171,9 @@ public class PathwaysController {
         return rtn;
     }
 
+    //##################### API Ignored but still available for internal purposes #####################//
+
+    @ApiIgnore
     @ApiOperation(
             value = "A list of lower level pathways with diagram containing any form of a given identifier",
             notes = "This method traverses the event hierarchy and retrieves the list of all lower level pathways that have a diagram and contain the given PhysicalEntity in any of its variant forms. These variant forms include for example different post-translationally modified versions of a single protein, or the same chemical in different compartments.",
@@ -185,8 +188,6 @@ public class PathwaysController {
         infoLogger.info("Request for all lower level pathways (containing diagrams) of entry with identifier: {}", identifier);
         return rtn;
     }
-
-    //##################### API Ignored but still available for internal purposes #####################//
 
     @ApiIgnore
     @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
