@@ -175,7 +175,7 @@ public class QueryObjectController {
                 String query = "MATCH (n:DatabaseObject{dbId:{id}}) " +
                                "RETURN NOT ((n:Species) OR (n:Summation) OR (n:Person) OR (n:Compartment))";
                 parameters.put("id", Long.valueOf(id));
-                rtn =  advancedDatabaseObjectService.customBooleanQueryResult(query, parameters);
+                rtn =  advancedDatabaseObjectService.getCustomQueryResult(Boolean.class, query, parameters);
             }
         } catch (CustomQueryException | NullPointerException | NumberFormatException e) { /* Nothing here */ }
         return rtn;
