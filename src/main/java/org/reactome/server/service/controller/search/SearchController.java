@@ -266,8 +266,9 @@ class SearchController {
         result.put("user-agent", request.getHeader("User-Agent"));
         String remoteAddr = request.getHeader("X-FORWARDED-FOR"); // Client IP
         if (remoteAddr == null || "".equals(remoteAddr)) {
-            result.put("ip-address", request.getRemoteAddr());
+            remoteAddr = request.getRemoteAddr();
         }
+        result.put("ip-address", remoteAddr);
         result.put("release-version", releaseNumber.toString());
 
         return result;
