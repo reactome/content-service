@@ -1,8 +1,13 @@
 package org.reactome.server.service.controller.search;
 
 import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
+import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.Species;
+import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.SpeciesService;
+import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
@@ -14,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +39,9 @@ class SearchController {
 
     @Autowired
     private SpeciesService speciesService;
+
+    @Autowired
+    private DatabaseObjectService dos;
 
     @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
     @ApiResponses({
@@ -157,8 +162,11 @@ class SearchController {
                                           @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                           @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+        checkDiagramIdentifier(diagram);
         Query queryObject = new Query(query, diagram, null, types, null, null, start, rows);
-        return searchService.getDiagrams(queryObject);
+        DiagramResult rtn = searchService.getDiagrams(queryObject);
+        if (rtn == null) throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
+        return rtn;
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
@@ -166,11 +174,12 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types,
-                                                          @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
-                                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(instance, diagram, null, types, null, null, start, rows);
-        return searchService.getDiagramOccurrencesResult(queryObject);
+                                                          @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types) throws SolrSearcherException {
+        checkIdentifiers(diagram, instance);
+        Query queryObject = new Query(instance, diagram, null, types, null, null);
+        DiagramOccurrencesResult rtn = searchService.getDiagramOccurrencesResult(queryObject);
+        if (rtn == null) throw new NotFoundException(String.format("No occurrences of '%s' found in '%s'", instance, diagram));
+        return rtn;
     }
 
     @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
@@ -180,6 +189,7 @@ class SearchController {
                                                                 @PathVariable String pathwayId,
                                                                 @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
                                                                 @RequestParam String query) throws SolrSearcherException {
+        checkDiagramIdentifier(pathwayId);
         Collection<String> rtn = new HashSet<>();
         Query queryObject = new Query(query, pathwayId, null, null, null, null);
         DiagramResult searchInDiagram = searchService.getDiagrams(queryObject);
@@ -195,5 +205,43 @@ class SearchController {
         if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
         infoLogger.info("Request for all entities in diagram with identifier: {}", query);
         return rtn;
+    }
+
+    private void checkDiagramIdentifier(String diagram) {
+        checkIdentifiers(diagram, null);
+    }
+
+    /**
+     * A simple mechanism to check whether the identifiers submitted by the users are valid. This is meant to offer
+     * better HttpStatus codes depending on the paramenters (more accurate error messages)
+     *
+     * @param diagram a valid identifier to a diagrammed pathway (does not accept null)
+     * @param object a valid identifier to any object in Reactome (accepts null)
+     */
+    private void checkIdentifiers(String diagram, String object) {
+        SortedSet<String> report = new TreeSet<>();
+
+        if (diagram == null || DatabaseObjectUtils.getIdentifier(diagram) == null) {
+            report.add(String.format("'%s' is not a valid identifier", diagram));
+        } else {
+            DatabaseObject d = dos.findByIdNoRelations(diagram);
+            if (d == null){
+                report.add(String.format("'%s' cannot be found", diagram));
+            } else if(!(d instanceof Pathway)) {
+                report.add(String.format("'%s' does not belong to a pathway", diagram));
+            } else {
+                Pathway p = (Pathway) d;
+                if (!p.getHasDiagram()) report.add(String.format("'%s' the pathway does not have diagram", diagram));
+            }
+        }
+
+        if (object == null || DatabaseObjectUtils.getIdentifier(object) == null) {
+            report.add(String.format("'%s' is not a valid identifier", object));
+        } else {
+            DatabaseObject o = dos.findByIdNoRelations(object);
+            if (o == null) report.add(String.format("'%s' cannot be found", object));
+        }
+
+        if (!report.isEmpty()) throw new BadRequestException(StringUtils.join(report, " and "));
     }
 }
