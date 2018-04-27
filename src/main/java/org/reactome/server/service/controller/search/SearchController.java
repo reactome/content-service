@@ -235,11 +235,13 @@ class SearchController {
             }
         }
 
-        if (object == null || DatabaseObjectUtils.getIdentifier(object) == null) {
-            report.add(String.format("'%s' is not a valid identifier", object));
-        } else {
-            DatabaseObject o = dos.findByIdNoRelations(object);
-            if (o == null) report.add(String.format("'%s' cannot be found", object));
+        if (object != null) {
+            if (DatabaseObjectUtils.getIdentifier(object) == null) {
+                report.add(String.format("'%s' is not a valid identifier", object));
+            } else {
+                DatabaseObject o = dos.findByIdNoRelations(object);
+                if (o == null) report.add(String.format("'%s' cannot be found", object));
+            }
         }
 
         if (!report.isEmpty()) throw new BadRequestException(StringUtils.join(report, " and "));
