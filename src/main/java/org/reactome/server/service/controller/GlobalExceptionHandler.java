@@ -76,6 +76,19 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.NOT_FOUND, request, e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoResultsFoundException.class)
+    @ResponseBody
+    ResponseEntity<String> handleNoResultsFoundException(HttpServletRequest request, NoResultsFoundException e) {
+        //no logging here!
+        StringBuffer requestURL = (request == null) ? new StringBuffer("") : request.getRequestURL();
+        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.NOT_FOUND, requestURL, e.getTargets(), e.getMessage());
+
+        // TODO targets : "[ { term:"aaa", target:"yes" } ... ]
+
+        return toJsonResponse(HttpStatus.NOT_FOUND, request, errorInfo);
+    }
+
     //================================================================================
     // SOLR
     //================================================================================
@@ -304,12 +317,12 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Specified class was not found");
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
     ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
         logger.warn("HttpRequestMethodNotSupportedException: " + e.getMessage() + " for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+        return toJsonResponse(HttpStatus.METHOD_NOT_ALLOWED, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
@@ -393,7 +406,6 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Something unexpected happened and the error has been reported.");
     }
 
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
@@ -401,7 +413,6 @@ class GlobalExceptionHandler {
         logger.warn("BadRequestException was caught for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
-
 
     /*
      * Adding a JSON String manually to the response.
@@ -420,8 +431,21 @@ class GlobalExceptionHandler {
                     .body(mapper.writeValueAsString(new ErrorInfo(status, requestURL, exceptionMessage)));
         } catch (JsonProcessingException e1) {
             logger.error("Could not process to JSON the given ErrorInfo instance", e1);
+            return ResponseEntity.status(status).headers(responseHeaders).body("");
+        }
+    }
+
+    private ResponseEntity<String> toJsonResponse(HttpStatus status, HttpServletRequest request, ErrorInfo errorInfo) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type", "application/json");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
             return ResponseEntity.status(status)
-                    .headers(responseHeaders).body("");
+                    .headers(responseHeaders)
+                    .body(mapper.writeValueAsString(errorInfo));
+        } catch (JsonProcessingException e1) {
+            logger.error("Could not process to JSON the given ErrorInfo instance", e1);
+            return ResponseEntity.status(status).headers(responseHeaders).body("");
         }
     }
 }
