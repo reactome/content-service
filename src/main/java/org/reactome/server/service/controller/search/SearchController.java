@@ -40,11 +40,8 @@ class SearchController {
 
     private final Integer releaseNumber;
 
-    private GeneralService generalService;
     private SearchService searchService;
     private SpeciesService speciesService;
-
-    @Autowired
     private DatabaseObjectService dos;
 
     @Autowired
@@ -245,11 +242,6 @@ class SearchController {
     }
 
     @Autowired
-    public void setGeneralService(GeneralService generalService) {
-        this.generalService = generalService;
-    }
-
-    @Autowired
     public void setSearchService(SearchService searchService) {
         this.searchService = searchService;
     }
@@ -257,6 +249,11 @@ class SearchController {
     @Autowired
     public void setSpeciesService(SpeciesService speciesService) {
         this.speciesService = speciesService;
+    }
+
+    @Autowired
+    public void setDos(DatabaseObjectService dos) {
+        this.dos = dos;
     }
 
     /**
