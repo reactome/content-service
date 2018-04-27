@@ -2,22 +2,23 @@ package org.reactome.server.service.controller.search;
 
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.Species;
+import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.graph.service.SpeciesService;
 import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
 import org.reactome.server.service.exception.BadRequestException;
 import org.reactome.server.service.exception.ErrorInfo;
+import org.reactome.server.service.exception.NoResultsFoundException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -32,11 +33,16 @@ class SearchController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
-    @Autowired
+    private final Integer releaseNumber;
+
+    private GeneralService generalService;
     private SearchService searchService;
+    private SpeciesService speciesService;
 
     @Autowired
-    private SpeciesService speciesService;
+    public SearchController(GeneralService generalService) {
+        releaseNumber = generalService.getDBVersion();
+    }
 
     @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
     @ApiResponses({
@@ -93,6 +99,7 @@ class SearchController {
 
     @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.", response = GroupedResult.class, produces = "application/json")
     @ApiResponses({
+            @ApiResponse(code = 404, message = "Entry not found. Targets inform if the term is our scope of annotation", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
@@ -105,13 +112,18 @@ class SearchController {
                                    @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
                                    @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
-                                   @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows)
-            throws SolrSearcherException {
+                                   @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+                                   HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query(query, species, types, compartments, keywords, start, rows);
+        Query queryObject = new Query(query, "", species, types, compartments, keywords, start, rows, getReportInformation(request));
         GroupedResult result = searchService.getEntries(queryObject, cluster);
-        if (result == null || result.getResults() == null || result.getResults().isEmpty())
-            throw new NotFoundException("No entries found for query: " + query);
+        if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
+            Set<TargetResult> targets = null;
+            if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
+                targets = result.getTargetResults();
+            }
+            throw new NoResultsFoundException("No entries found for query: " + query, targets);
+        }
         return result;
     }
 
@@ -122,10 +134,11 @@ class SearchController {
                                               @ApiParam(value = "Species name", defaultValue = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
                                               @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                               @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
-                                              @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+                                              @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+                                              HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>(); speciess.add(species);
-        Query queryObject = new Query(query, speciess, types, null, null, start, rows);
+        Query queryObject = new Query(query, "", speciess, types, null, null, start, rows, getReportInformation(request));
         return searchService.getFireworks(queryObject);
     }
 
@@ -166,10 +179,8 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types,
-                                                          @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
-                                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
-        Query queryObject = new Query(instance, diagram, null, types, null, null, start, rows);
+                                                          @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types) throws SolrSearcherException {
+        Query queryObject = new Query(instance, diagram, null, types, null, null);
         return searchService.getDiagramOccurrencesResult(queryObject);
     }
 
@@ -195,5 +206,58 @@ class SearchController {
         if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
         infoLogger.info("Request for all entities in diagram with identifier: {}", query);
         return rtn;
+    }
+
+    @ApiIgnore
+    @ApiOperation(value = "", response = DiagramSearchSummary.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
+    @RequestMapping(value = "/diagram/summary", method = RequestMethod.GET)
+    @ResponseBody
+    public DiagramSearchSummary diagramSearchSummary(@ApiParam(value = "Search term", defaultValue = "KIF", required = true)
+                                                     @RequestParam String query,
+                                                     @ApiParam(value = "Species name", defaultValue = "Homo sapiens", required = true)
+                                                     @RequestParam(required = false, defaultValue = "Homo sapiens") String species,
+                                                     @ApiParam(value = "Diagram", defaultValue = "R-HSA-8848021", required = true)
+                                                     @RequestParam String diagram) throws SolrSearcherException {
+        infoLogger.info("Requested diagram summary for query {}", query);
+        List<String> speciess = new ArrayList<>();
+        speciess.add(species);
+        Query queryObject = new Query(query, diagram, speciess, null, null, null);
+        return searchService.getDiagramSearchSummary(queryObject);
+    }
+
+    @Autowired
+    public void setGeneralService(GeneralService generalService) {
+        this.generalService = generalService;
+    }
+
+    @Autowired
+    public void setSearchService(SearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setSpeciesService(SpeciesService speciesService) {
+        this.speciesService = speciesService;
+    }
+
+    /**
+     * Extra information to be sent to report service in order to store potential target
+     */
+    private Map<String, String> getReportInformation(HttpServletRequest request) {
+        if (request == null) return null;
+
+        Map<String, String> result = new HashMap<>();
+        result.put("user-agent", request.getHeader("User-Agent"));
+        String remoteAddr = request.getHeader("X-FORWARDED-FOR"); // Client IP
+        if (remoteAddr == null || "".equals(remoteAddr)) {
+            result.put("ip-address", request.getRemoteAddr());
+        }
+        result.put("release-version", releaseNumber.toString());
+
+        return result;
     }
 }
