@@ -144,7 +144,15 @@ class SearchController {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>(); speciess.add(species);
         Query queryObject = new Query(query, "", speciess, types, null, null, start, rows, getReportInformation(request));
-        return searchService.getFireworks(queryObject);
+        FireworksResult fireworksResult = searchService.getFireworks(queryObject);
+        if (fireworksResult == null || fireworksResult.getFound() == 0) {
+            Set<TargetResult> targets = null;
+            if (fireworksResult != null && fireworksResult.getTargetResults() != null && !fireworksResult.getTargetResults().isEmpty()) {
+                targets = fireworksResult.getTargetResults();
+            }
+            throw new NoResultsFoundException("No entries found for query: " + query, targets);
+        }
+        return fireworksResult;
     }
 
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
