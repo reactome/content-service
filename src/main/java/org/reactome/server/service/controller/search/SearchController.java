@@ -186,7 +186,7 @@ class SearchController {
         checkDiagramIdentifier(diagram);
         Query queryObject = new Query(query, diagram, null, types, null, null, start, rows);
         DiagramResult rtn = searchService.getDiagrams(queryObject);
-        if (rtn == null) throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
+        if (rtn == null || rtn.getFound() == 0) throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
         return rtn;
     }
 
