@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import psidev.psi.mi.tab.PsimiTabException;
 
@@ -339,6 +340,14 @@ class GlobalExceptionHandler {
     ResponseEntity<String> handleHttpMediaTypeNotAcceptableException(HttpServletRequest request, HttpMediaTypeNotAcceptableException e) {
         logger.warn("HttpMediaTypeNotSupportedException: " + request.getRequestURL(), e.getMessage());
         return toJsonResponse(HttpStatus.NOT_ACCEPTABLE, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseBody
+    ResponseEntity<String> handleMethodArgumentTypeMismatchException(HttpServletRequest request, MethodArgumentTypeMismatchException e) {
+        logger.warn("MethodArgumentTypeMismatchException: " + request.getRequestURL(), e.getMessage());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
