@@ -133,6 +133,8 @@ public class DiagramExporterController {
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
             rasterExporter.export(args, response.getOutputStream());
+        } catch (IndexOutOfBoundsException e) { //When the output stream is closed, it throws this exception
+            //Nothing here
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         } finally {
