@@ -1,6 +1,7 @@
 package org.reactome.server.service.controller.interactors;
 
 import io.swagger.annotations.*;
+import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
@@ -97,5 +98,22 @@ public class StaticInteractionsController {
         }
 
         return interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
+    }
+
+    @ApiOperation(value = "Retrieve a list of lower level pathways where the interacting molecules can be found", response = Interactors.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Could not find the Interactor Resource", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+    })
+    @RequestMapping(value = "/molecule/{acc}/pathways", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<Pathway> getLowerLevelPathways( @ApiParam(value = "Accession", required = true, defaultValue = "Q9BXM7-1")
+                                                     @PathVariable String acc,
+                                                      @ApiParam(value = "The species name for which the pathways are requested  (e.g. 'Homo sapiens')", defaultValue = "Homo sapiens")
+                                                     @RequestParam(required = false) String species,
+                                                      @ApiParam(value = "Specifies whether the pathways has to have an associated diagram or not", defaultValue = "false")
+                                                     @RequestParam(required = false, defaultValue = "false") Boolean onlyDiagrammed){
+        return interactions.getLowerLevelPathways(acc, species, onlyDiagrammed);
     }
 }

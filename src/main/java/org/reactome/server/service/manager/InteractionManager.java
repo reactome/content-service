@@ -2,6 +2,7 @@ package org.reactome.server.service.manager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
+import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.service.InteractionsService;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
 import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
@@ -117,6 +118,14 @@ public class InteractionManager {
 
     public Interactors getCustomInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {
         return getInteractionResult(interactionMaps, resource, token);
+    }
+
+    public Collection<Pathway> getLowerLevelPathways(String acc, String speciesName, Boolean hasDiagram) {
+        if (hasDiagram) {
+            return interactionsService.getDiagrammedLowerLevelPathways(acc, speciesName);
+        } else {
+            return interactionsService.getLowerLevelPathways(acc, speciesName);
+        }
     }
 
     private Interactors getInteractionResult(Map<String, List<Interaction>> interactionMaps, String resource, String token) {

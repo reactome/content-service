@@ -29,7 +29,8 @@ public class AspectLazyLoadingPrevention {
 //        }
 //    }
 
-    @Pointcut(value = "execution(public * org.reactome.server.service.controller.graph.*.*(..))")
+    @Pointcut(value = "execution(public * org.reactome.server.service.controller.graph.*.*(..)) " +
+            "|| execution(public * org.reactome.server.service.controller.interactors.*.*(..))")
     public void controllerMethod() {}
 
     private static void preventLazyLoading(Object obj, boolean prevent) {
