@@ -206,12 +206,12 @@ class SearchController {
     @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
     @RequestMapping(value = "/diagram/{pathwayId}/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<String> getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
+    public Collection<DiagramOccurrencesResult> getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
                                                                 @PathVariable String pathwayId,
                                                                 @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
                                                                 @RequestParam String query) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
-        Collection<String> rtn = new HashSet<>();
+        Collection<DiagramOccurrencesResult> rtn = new HashSet<>();
         Query queryObject = new Query(query, pathwayId, null, null, null, null);
         DiagramResult searchInDiagram = searchService.getDiagrams(queryObject);
         List<Entry> entries = searchInDiagram.getEntries();
@@ -219,8 +219,7 @@ class SearchController {
             String stId = entry.getStId();
             queryObject = new Query(stId, pathwayId, null, null, null, null);
             DiagramOccurrencesResult diagramOccurrencesResult = searchService.getDiagramOccurrencesResult(queryObject);
-            if (diagramOccurrencesResult.getOccurrences() != null) rtn.addAll(diagramOccurrencesResult.getOccurrences());
-            if (diagramOccurrencesResult.getInDiagram()) rtn.add(stId);
+            if (diagramOccurrencesResult != null) rtn.add(diagramOccurrencesResult);
         }
 
         if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
