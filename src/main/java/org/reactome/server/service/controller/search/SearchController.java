@@ -206,19 +206,19 @@ class SearchController {
     @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
     @RequestMapping(value = "/diagram/{pathwayId}/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DiagramFlagOccurrences getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
-                                                                @PathVariable String pathwayId,
-                                                                @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
-                                                                @RequestParam String query) throws SolrSearcherException {
+    public DiagramOccurrencesResult getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
+                                                                    @PathVariable String pathwayId,
+                                                                    @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
+                                                                    @RequestParam String query) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
-        DiagramFlagOccurrences rtn = new DiagramFlagOccurrences();
+        DiagramOccurrencesResult rtn = new DiagramOccurrencesResult();
         Query queryObject = new Query(query, pathwayId, null, null, null, null);
         List<DiagramOccurrencesResult> diagramOccurrencesList = searchService.getDiagramFlagging(queryObject);
         for (DiagramOccurrencesResult diagramOccurrencesResult : diagramOccurrencesList) {
-            if(diagramOccurrencesResult.isInDiagram()){
-                rtn.addOccurrence(Collections.singletonList(diagramOccurrencesResult.getInDiagram()));
+            if(diagramOccurrencesResult.getInDiagram()){
+                rtn.addOccurrences(Collections.singletonList(diagramOccurrencesResult.getDiagramEntity()));
             }
-            rtn.addOccurrence(diagramOccurrencesResult.getOccurrences());
+            rtn.addOccurrences(diagramOccurrencesResult.getOccurrences());
             rtn.addInteractsWith(diagramOccurrencesResult.getInteractsWith());
         }
 
