@@ -18,7 +18,7 @@ public class Interactor {
     private String alias;
 
     @ApiModelProperty(value = "This is an auto increment counter which represents an unique number for the interaction.")
-    private Integer id = null;
+    private Long id = null;
 
     @ApiModelProperty(value = "This is the Interactions evidences.")
     private Integer evidences = null;
@@ -35,6 +35,8 @@ public class Interactor {
     public Interactor() {}
 
     public Interactor(Interaction interaction) {
+        this.id = interaction.getDbId();
+
         ReferenceEntity re;
         if(interaction instanceof UndirectedInteraction){
             re = ((UndirectedInteraction) interaction).getInteractor().get(0);
@@ -77,11 +79,11 @@ public class Interactor {
         this.alias = alias;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

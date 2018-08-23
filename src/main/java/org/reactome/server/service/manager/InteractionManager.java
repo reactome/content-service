@@ -134,7 +134,7 @@ public class InteractionManager {
         // Entities are a JSON Object
         List<InteractorEntity> entities = new ArrayList<>();
 
-        int count = 1;
+        long count = 1;
         for (String accKey : interactionMaps.keySet()) {
             List<Interaction> interactions = interactionMaps.get(accKey);
 
