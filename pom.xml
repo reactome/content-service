@@ -42,10 +42,10 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.11-SNAPSHOT</graph.core>
+        <graph.core>1.1.12</graph.core>
         <search.core>1.2.0-SNAPSHOT</search.core>
         <interactors.core>1.0.14</interactors.core>
-        <diagram.exporter>1.3.6</diagram.exporter>
+        <diagram.exporter>1.3.8</diagram.exporter>
         <sbml-exporter>1.0.1</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
