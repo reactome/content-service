@@ -96,6 +96,10 @@ public class DiagramExporterController {
                          @RequestParam(value = "flg", required = false) List<String> flg,
                           @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                          @RequestParam(value = "sel", required = false) List<String> sel,
+                          @ApiParam(value = "Defines the image margin between [0 - 20] (Default 15)", defaultValue = "15")
+                         @RequestParam(value = "margin", defaultValue = "15", required = false) Integer margin,
+                          @ApiParam(value = "Defines whether textbook-like illustration are taken into account", defaultValue = "true")
+                         @RequestParam(value = "ehld", defaultValue = "true", required = false) Boolean ehld,
                           @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
                          @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
 
@@ -128,6 +132,8 @@ public class DiagramExporterController {
             args.setToken(token);
             args.setQuality(quality);
             args.setColumn(expColumn);
+            args.setMargin(margin);
+            args.setEhld(ehld);
             args.setWriteTitle(true);
 
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
