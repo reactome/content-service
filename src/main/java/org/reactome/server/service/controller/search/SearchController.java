@@ -46,7 +46,7 @@ class SearchController {
 
     @Autowired
     public SearchController(GeneralService generalService) {
-        releaseNumber = generalService.getDBVersion();
+        releaseNumber = generalService.getDBInfo().getVersion();
     }
 
     @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")

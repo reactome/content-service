@@ -219,7 +219,7 @@ public class DiagramExporterController {
             sbml = new FileInputStream(file);
             infoLogger.info("Exporting the pathway {} to SBML retrieved from previously generated file", p.getStId());
         } catch (MissingSBMLException | IOException e) {
-            String content = SBMLFactory.getSBML(p, generalService.getDBVersion());
+            String content = SBMLFactory.getSBML(p, generalService.getDBInfo().getVersion());
             pptxManager.saveSBML(content, sbmlFileName);
             sbml = IOUtils.toInputStream(content, Charset.defaultCharset());
             infoLogger.info("Exporting the pathway {} to SBML", p.getStId());

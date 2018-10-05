@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.reactome.server.graph.domain.model.DBInfo;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -38,7 +40,7 @@ public class GeneralController {
     @ResponseBody
     public String getDBName()  {
         infoLogger.info("Request for DatabaseName");
-        return generalService.getDBName();
+        return generalService.getDBInfo().getName();
     }
 
     @ApiOperation(value = "The version number of current database")
@@ -50,6 +52,14 @@ public class GeneralController {
     @ResponseBody
     public String getDBVersion()  {
         infoLogger.info("Request for DatabaseVersion");
-        return "" + generalService.getDBVersion();
+        return "" + generalService.getDBInfo().getVersion();
+    }
+
+    @ApiIgnore
+    @RequestMapping(value = "/database/info", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public DBInfo getChecksum() {
+        infoLogger.info("Request for DatabaseInfo");
+        return generalService.getDBInfo();
     }
 }

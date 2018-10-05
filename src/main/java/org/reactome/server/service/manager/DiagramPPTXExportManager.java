@@ -54,7 +54,7 @@ public class DiagramPPTXExportManager {
 
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
 
-        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/pptx/" + colorProfile.toLowerCase());
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/pptx/" + colorProfile.toLowerCase());
         if (!outputFolder.exists()) {
             infoLogger.debug("Creating the directory tree for storing pptx files");
             if (!outputFolder.mkdirs())
@@ -139,7 +139,7 @@ public class DiagramPPTXExportManager {
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
 
         // This folder will be created during release phase, double checking just in case
-        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/sbml");
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/sbml");
         if (outputFolder.exists()) {
             File sbml = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
             if (sbml.exists()) return sbml;
@@ -149,7 +149,7 @@ public class DiagramPPTXExportManager {
     }
 
     public void saveSBML(String sbml, String sbmlFileName) {
-        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBVersion() + "/sbml");
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/sbml");
         if (!outputFolder.exists()) {
             infoLogger.debug("Creating the directory tree for storing SBML files");
             if (!outputFolder.mkdirs())
