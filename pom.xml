@@ -42,11 +42,11 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.13-SNAPSHOT</graph.core>
+        <graph.core>1.1.14-SNAPSHOT</graph.core>
         <search.core>1.2.0-SNAPSHOT</search.core>
         <interactors.core>1.0.14</interactors.core>
-        <diagram.exporter>1.3.9</diagram.exporter>
-        <sbml-exporter>1.0.1</sbml-exporter>
+        <diagram.exporter>1.3.10-SNAPSHOT</diagram.exporter>
+        <sbml-exporter>2.0.0-SNAPSHOT</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -159,6 +159,11 @@
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>sbml-exporter</artifactId>
             <version>${sbml-exporter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reactome.server.tools</groupId>
+            <artifactId>reaction-exporter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <!--Util-->
