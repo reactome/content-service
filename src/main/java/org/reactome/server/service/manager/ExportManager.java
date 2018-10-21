@@ -3,11 +3,12 @@ package org.reactome.server.service.manager;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
-import org.reactome.server.service.controller.exporter.DiagramExporterController;
+import org.reactome.server.service.controller.exporter.ExporterController;
 import org.reactome.server.service.exception.MissingSBMLException;
 import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
@@ -28,11 +29,11 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 /**
- * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
+ * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
+ * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
-
 @Component
-public class DiagramPPTXExportManager {
+public class ExportManager {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
     private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
@@ -48,7 +49,7 @@ public class DiagramPPTXExportManager {
     @Value("${diagram.exporter.temp.folder}")
     private String diagramExporterTempFolder;
 
-    public File getPPTX(String stId, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, IOException {
+    public File getPPTX(String stId, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException {
         String pptxFileName = getPPTXFileName(stId);
         String ancestorStId = getAncestorStId(stId);
 
@@ -61,9 +62,9 @@ public class DiagramPPTXExportManager {
                 infoLogger.error("Could not create the folder for the given DBVersion and profile");
         }
 
-        File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + stId + DiagramExporterController.PPT_FILE_EXTENSION);
+        File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + stId + ExporterController.PPT_FILE_EXTENSION);
         if (ancestorStId != null) {
-            pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + DiagramExporterController.PPT_FILE_EXTENSION);
+            pptxFile = new File(outputFolder.getAbsolutePath() + "/" + ancestorStId + ExporterController.PPT_FILE_EXTENSION);
         }
 
         // We don't want to cache neither read from cache if the diagram has selection and flags.
@@ -135,7 +136,7 @@ public class DiagramPPTXExportManager {
     /* ---------------------- SBML EXPORTER ---------------------- */
     /* =========================================================== */
 
-    public File getSBML(Pathway pathway, String sbmlFileName) throws MissingSBMLException {
+    public File getSBML(Event event, String sbmlFileName) throws MissingSBMLException {
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
 
         // This folder will be created during release phase, double checking just in case
@@ -145,7 +146,7 @@ public class DiagramPPTXExportManager {
             if (sbml.exists()) return sbml;
         }
 
-        throw new MissingSBMLException("SBML hasn't been previously generated for " + pathway.getStId());
+        throw new MissingSBMLException("SBML hasn't been previously generated for " + event.getStId());
     }
 
     public void saveSBML(String sbml, String sbmlFileName) {
