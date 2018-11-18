@@ -14,7 +14,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.Collections;
 
 /**
- * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
+ * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
+ * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @EnableSwagger2
 public class SwaggerConfig {
@@ -37,16 +38,16 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-
         return new ApiInfo(
                 "Content Service",
                 "RESTFul service for Reactome content",
-                "1.0",
+                "1.1",
                 "about/license-agreement",
-                new Contact("Reactome","https://reactome.org","help@reactome.org"),
+                new Contact("Reactome", "https://reactome.org", "help@reactome.org"),
                 "Creative Commons Attribution 3.0 Unported License",
                 "http://creativecommons.org/licenses/by/3.0/legalcode",
-                Collections.emptyList());
+                Collections.emptyList()
+        );
     }
 
 }
