@@ -46,7 +46,8 @@
         <search.core>1.2.0</search.core>
         <interactors.core>1.0.14</interactors.core>
         <diagram.exporter>1.3.10-SNAPSHOT</diagram.exporter>
-        <sbml-exporter>2.0.0-SNAPSHOT</sbml-exporter>
+        <reaction.exporter>1.0.0-SNAPSHOT</reaction.exporter>
+        <sbml.exporter>2.0.0-SNAPSHOT</sbml.exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
@@ -105,12 +106,12 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>reaction-exporter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${reaction.exporter}</version>
         </dependency>
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>sbml-exporter</artifactId>
-            <version>${sbml-exporter}</version>
+            <version>${sbml.exporter}</version>
         </dependency>
 
         <!--Spring-->
