@@ -208,7 +208,7 @@ public class ExporterController {
         }
     }
 
-    //@ApiIgnore
+    @ApiIgnore
     @ApiOperation(
             value = "Exports a given reaction to the specified image format (png, jpg, jpeg, svg, gif)",
             notes = "This method accepts identifiers for <a href=\"/content/schema/ReactionLikeEvent\" target=\"_blank\">ReactionLikeEvent class</a> instances.",
@@ -276,7 +276,7 @@ public class ExporterController {
     }
 
 
-    //@ApiIgnore
+    @ApiIgnore
     @ApiOperation(value = "Exports a given reaction to PowerPoint")
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier not found"),

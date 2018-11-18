@@ -20,8 +20,7 @@ import org.reactome.server.tools.diagram.exporter.common.profiles.factory.Diagra
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramProfileException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.service.DiagramExporterService;
-import org.reactome.server.tools.reaction.exporter.diagram.ReactionDiagramFactory;
-import org.reactome.server.tools.reaction.exporter.layout.LayoutFactory;
+import org.reactome.server.tools.reaction.exporter.ReactionExporter;
 import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Sbgn;
 import org.slf4j.Logger;
@@ -51,7 +50,6 @@ public class ExportManager {
     private GeneralService generalService;
     private EventsService eventsService;
     private DatabaseObjectService databaseObjectService;
-    private LayoutFactory layoutFactory;
     private ExportManager exportManager;
 
     @Value("${diagram.json.folder}")
@@ -59,6 +57,8 @@ public class ExportManager {
 
     @Value("${diagram.exporter.temp.folder}")
     private String diagramExporterTempFolder;
+
+    private ReactionExporter reactionExporter;
 
     //The reaction will be layed out from the graph database only when object is an instance of 'ReactionLikeEvent'.
     //In any other case, an existing diagram json will be retrieved and converted to PPTX with the original requirements.
@@ -230,7 +230,8 @@ public class ExportManager {
                 return null;
             }
         } else {
-            return ReactionDiagramFactory.get(layoutFactory.getReactionLikeEventLayout((ReactionLikeEvent) event));
+            ReactionLikeEvent rle = (ReactionLikeEvent) event;
+            return reactionExporter.getReactionDiagram(reactionExporter.getReactionLayout(rle));
         }
     }
 
@@ -250,12 +251,12 @@ public class ExportManager {
     }
 
     @Autowired
-    public void setLayoutFactory(LayoutFactory reactionLayoutFactory) {
-        this.layoutFactory = reactionLayoutFactory;
+    public void setExportManager(ExportManager exportManager) {
+        this.exportManager = exportManager;
     }
 
     @Autowired
-    public void setExportManager(ExportManager exportManager) {
-        this.exportManager = exportManager;
+    public void setReactionExporter(ReactionExporter reactionExporter) {
+        this.reactionExporter = reactionExporter;
     }
 }
