@@ -10,7 +10,7 @@ import org.reactome.server.graph.domain.model.ReactionLikeEvent;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.GeneralService;
-import org.reactome.server.service.controller.exporter.ExporterController;
+import org.reactome.server.service.controller.exporter.PptxExporterController;
 import org.reactome.server.service.exception.MissingSBMLException;
 import org.reactome.server.tools.diagram.data.DiagramFactory;
 import org.reactome.server.tools.diagram.data.exception.DeserializationException;
@@ -81,7 +81,7 @@ public class ExportManager {
                 infoLogger.error("Could not create the folder for the given DBVersion and profile");
         }
 
-        String fileName = (ancestorStId != null ? ancestorStId : stId) + ExporterController.PPT_FILE_EXTENSION;
+        String fileName = (ancestorStId != null ? ancestorStId : stId) + PptxExporterController.PPT_FILE_EXTENSION;
         File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + fileName);
 
         // We don't want to cache neither read from cache if the diagram has selection and flags.
