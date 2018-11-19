@@ -125,7 +125,7 @@ public class SbxxExporterController {
         try {
             event = databaseObjectService.findById(id);
         } catch (ClassCastException ex) {
-            throw new DiagramExporterException(String.format("The identifier '%s' does not correspond to a 'Event'", id));
+            throw new DiagramExporterException(String.format("The identifier '%s' does not correspond to a pathway or reaction", id));
         }
         if (event == null) throw new NotFoundException(String.format("Identifier '%s' not found", id));
         return event;
