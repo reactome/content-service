@@ -3,6 +3,7 @@ package org.reactome.server.service.controller.exporter;
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.reactome.server.graph.domain.model.Event;
+import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
@@ -42,17 +43,17 @@ public class SbxxExporterController {
     private AdvancedDatabaseObjectService advancedDatabaseObjectService;
     private ExportManager exportManager;
 
-    @ApiOperation(value = "Exports a given pathway or reaction to SBGN")
+    @ApiOperation(value = "Exports a given pathway to SBGN")
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier not found"),
-            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway or reaction"),
+            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     @RequestMapping(value = "/event/{identifier}.sbgn", method = RequestMethod.GET)
-    public synchronized void eventSBGN(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-5205682")
+    public synchronized void eventSBGN(@ApiParam(value = "DbId or StId of the requested pathway", required = true, defaultValue = "R-HSA-5205682")
                                       @PathVariable String identifier,
                                       HttpServletResponse response) throws Exception {
-        Event event = getEvent(identifier);
+        Event event = getPathway(identifier);
         String fileName = event.getStId() + SBGN_FILE_EXTENSION;
         response.setContentType("application/sbgn+xml");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
@@ -83,17 +84,17 @@ public class SbxxExporterController {
         eventSBML(identifier, response);
     }
 
-    @ApiOperation(value = "Exports a given pathway or reaction to SBML")
+    @ApiOperation(value = "Exports a given pathway to SBML")
     @ApiResponses({
             @ApiResponse(code = 404, message = "Identifier not found"),
-            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway or reaction"),
+            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     @RequestMapping(value = "/event/{identifier}.sbml", method = RequestMethod.GET)
-    public synchronized void eventSBML(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-68616")
+    public synchronized void eventSBML(@ApiParam(value = "DbId or StId of the requested pathway", required = true, defaultValue = "R-HSA-68616")
                                       @PathVariable String identifier,
                                       HttpServletResponse response) throws Exception {
-        Event event = getEvent(identifier);
+        Event event = getPathway(identifier);
         String fileName = event.getStId() + SBML_FILE_EXTENSION;
         response.setContentType("application/sbml+xml");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
@@ -120,15 +121,15 @@ public class SbxxExporterController {
         return sbml;
     }
 
-    private Event getEvent(String id){
-        Event event;
+    private Pathway getPathway(String id){
+        Pathway pathway;
         try {
-            event = databaseObjectService.findById(id);
+            pathway = databaseObjectService.findById(id);
         } catch (ClassCastException ex) {
-            throw new DiagramExporterException(String.format("The identifier '%s' does not correspond to a 'Event'", id));
+            throw new DiagramExporterException(String.format("The identifier '%s' does not correspond to a 'Pathway'", id));
         }
-        if (event == null) throw new NotFoundException(String.format("Identifier '%s' not found", id));
-        return event;
+        if (pathway == null) throw new NotFoundException(String.format("Identifier '%s' not found", id));
+        return pathway;
     }
 
     @Autowired
