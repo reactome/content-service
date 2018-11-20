@@ -2,12 +2,18 @@ package org.reactome.server.service.controller.exporter;
 
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
-import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.ReactionLikeEvent;
+import org.reactome.server.graph.domain.result.DiagramResult;
+import org.reactome.server.graph.exception.CustomQueryException;
+import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.DiagramService;
+import org.reactome.server.search.domain.DiagramOccurrencesResult;
+import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.ExportManager;
+import org.reactome.server.service.manager.SearchManager;
 import org.reactome.server.tools.diagram.exporter.common.Decorator;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonDeserializationException;
 import org.reactome.server.tools.diagram.exporter.common.profiles.factory.DiagramJsonNotFoundException;
@@ -23,7 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
@@ -39,11 +45,11 @@ public class PptxExporterController {
 
     public static final String PPT_FILE_EXTENSION = ".pptx";
 
-    @Autowired
     private DatabaseObjectService databaseObjectService;
-
-    @Autowired
+    private AdvancedDatabaseObjectService ados;
+    private DiagramService diagramService;
     private ExportManager exportManager;
+    private SearchManager searchManager;
 
     @ApiIgnore
     @ApiOperation(value = "Exports a given pathway diagram to PowerPoint")
@@ -58,18 +64,33 @@ public class PptxExporterController {
                                          @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
                                         @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
                                          @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
-                                        @RequestParam(value = "flg", required = false) List<Long> flg,
+                                        @RequestParam(value = "flg", required = false) String flg,
                                          @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
-                                        @RequestParam(value = "sel", required = false) List<Long> sel,
+                                        @RequestParam(value = "sel", required = false) Long sel,
                                         HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, IOException {
 
-        Event event = getEvent(identifier);
+        DiagramResult result = diagramService.getDiagramResult(identifier);
         // IMPORTANT: Downloading the file on Swagger does not work - https://github.com/swagger-api/swagger-ui/issues/2132
         // for this reason we are keeping this method as APIIgnore
-        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", event.getStId(), colorProfile);
+        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", result.getDiagramStId(), colorProfile);
 
-        Decorator decorator = new Decorator(flg, sel);
-        File pptx = exportManager.getPPTX(event.getStId(), colorProfile, decorator, response);
+        Decorator decorator = new Decorator();
+
+        List<Long> toSelect = new ArrayList<>();
+        if (sel != null) toSelect.add(sel);
+        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
+        decorator.setSelected(toSelect);
+
+        if (flg != null && !flg.isEmpty()) {
+            try {
+                DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
+                decorator.setFlags(getDatabaseIdentifiers(occ.getOccurrences()));
+            } catch (SolrSearcherException e) {
+                //Nothing to be flagged
+            }
+        }
+
+        File pptx = exportManager.getDiagramPPTX(result.getDiagramStId(), colorProfile, decorator, response);
 
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
@@ -100,17 +121,33 @@ public class PptxExporterController {
                                           @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
                                          @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
                                           @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
-                                         @RequestParam(value = "flg", required = false) List<Long> flg,
+                                         @RequestParam(value = "flg", required = false) String flg,
                                           @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
-                                         @RequestParam(value = "sel", required = false) List<Long> sel,
+                                         @RequestParam(value = "sel", required = false) Long sel,
                                          HttpServletResponse response) throws Exception {
         // IMPORTANT: Downloading the file on Swagger does not work - https://github.com/swagger-api/swagger-ui/issues/2132
         // for this reason we are keeping this method as APIIgnore
         infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", identifier, colorProfile);
 
+        Decorator decorator = new Decorator();
+
+        DiagramResult result = diagramService.getDiagramResult(identifier);
+        List<Long> toSelect = new ArrayList<>();
+        if (sel != null) toSelect.add(sel);
+        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
+        decorator.setSelected(toSelect);
+
+        if (flg != null && !flg.isEmpty()) {
+            try {
+                DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
+                decorator.setFlags(getDatabaseIdentifiers(occ.getOccurrences()));
+            } catch (SolrSearcherException e) {
+                //Nothing to be flagged
+            }
+        }
+
         ReactionLikeEvent rle = getReactionLikeEvent(identifier);
-        Decorator decorator = new Decorator(flg, sel);
-        File pptx = exportManager.getPPTX(rle, colorProfile, decorator, response);
+        File pptx = exportManager.getReactionPPTX(rle, colorProfile, decorator, response);
 
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
@@ -128,17 +165,6 @@ public class PptxExporterController {
         }
     }
 
-    private Event getEvent(String id){
-        Event event;
-        try {
-            event = databaseObjectService.findById(id);
-        } catch (ClassCastException ex) {
-            throw new DiagramExporterException(String.format("The identifier '%s' does not correspond to a 'Event'", id));
-        }
-        if (event == null) throw new NotFoundException(String.format("Identifier '%s' not found", id));
-        return event;
-    }
-
     private ReactionLikeEvent getReactionLikeEvent(String id){
         ReactionLikeEvent rle;
         try {
@@ -150,4 +176,42 @@ public class PptxExporterController {
         return rle;
     }
 
+    private List<Long> getDatabaseIdentifiers(Collection<String> stableIdentifiers){
+        String query = "" +
+                "MATCH (d:DatabaseObject) " +
+                "WHERE d.stId IN {stableIdentifiers} " +
+                "RETURN d.dbId ";
+        Map<String, Object> params = new HashMap<>();
+        params.put("stableIdentifiers", stableIdentifiers);
+        try {
+            return new ArrayList<>(ados.getCustomQueryResults(Long.class, query, params));
+        } catch (CustomQueryException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Autowired
+    public void setDatabaseObjectService(DatabaseObjectService databaseObjectService) {
+        this.databaseObjectService = databaseObjectService;
+    }
+
+    @Autowired
+    public void setAdos(AdvancedDatabaseObjectService ados) {
+        this.ados = ados;
+    }
+
+    @Autowired
+    public void setDiagramService(DiagramService diagramService) {
+        this.diagramService = diagramService;
+    }
+
+    @Autowired
+    public void setExportManager(ExportManager exportManager) {
+        this.exportManager = exportManager;
+    }
+
+    @Autowired
+    public void setSearchManager(SearchManager searchManager) {
+        this.searchManager = searchManager;
+    }
 }

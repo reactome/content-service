@@ -7,8 +7,9 @@ import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.ReactionLikeEvent;
+import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
-import org.reactome.server.graph.service.EventsService;
+import org.reactome.server.graph.service.DiagramService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.PptxExporterController;
 import org.reactome.server.service.exception.MissingSBMLException;
@@ -33,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 
 /**
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
@@ -46,33 +45,22 @@ public class ExportManager {
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
     private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
 
-    private DiagramExporterService diagramExporterService = new DiagramExporterService();
-    private GeneralService generalService;
-    private EventsService eventsService;
-    private DatabaseObjectService databaseObjectService;
-    private ExportManager exportManager;
-
     @Value("${diagram.json.folder}")
     private String diagramJsonFolder;
 
     @Value("${diagram.exporter.temp.folder}")
     private String diagramExporterTempFolder;
 
+    private DiagramExporterService diagramExporterService = new DiagramExporterService();
+    private GeneralService generalService;
+    private DatabaseObjectService databaseObjectService;
+    private DiagramService diagramService;
     private ReactionExporter reactionExporter;
 
     //The reaction will be layed out from the graph database only when object is an instance of 'ReactionLikeEvent'.
     //In any other case, an existing diagram json will be retrieved and converted to PPTX with the original requirements.
-    public File getPPTX(Object obj, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException {
+    public File getDiagramPPTX(String stId, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException {
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
-
-        String stId;
-        String ancestorStId = null;
-        if (obj instanceof ReactionLikeEvent) {
-            stId = ((ReactionLikeEvent) obj).getStId();
-        } else if (obj instanceof String) {
-            stId = (String) obj;
-            ancestorStId = getAncestorStId(stId);
-        } else throw new RuntimeException();
 
         File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/pptx/" + colorProfile.toLowerCase());
         if (!outputFolder.exists()) {
@@ -81,11 +69,8 @@ public class ExportManager {
                 infoLogger.error("Could not create the folder for the given DBVersion and profile");
         }
 
-        String fileName = (ancestorStId != null ? ancestorStId : stId) + PptxExporterController.PPT_FILE_EXTENSION;
+        String fileName = stId + PptxExporterController.PPT_FILE_EXTENSION;
         File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + fileName);
-
-        // We don't want to cache neither read from cache if the diagram has selection and flags.
-        //boolean isDecorated = ((flags != null && !flags.isEmpty()) || (selected != null && !selected.isEmpty()));
 
         // The pptx is save in the temp folder using only the StId, then when we write in the response header
         // we rename it using the [stId] displayName
@@ -97,46 +82,41 @@ public class ExportManager {
             return pptxFile;
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
-            File newFile;
-            if(obj instanceof ReactionLikeEvent) { //We do not do it above to avoid creating the diagram object when no necessary
-                Diagram diagram = exportManager.getDiagram((ReactionLikeEvent) obj);
-                newFile = diagramExporterService.exportToPPTX(diagram, colorProfile, outputFolder.getPath(), decorator);
-            } else {
-                newFile = diagramExporterService.exportToPPTX(stId, diagramJsonFolder, colorProfile, outputFolder.getPath(), decorator);
-            }
+            File newFile = diagramExporterService.exportToPPTX(stId, diagramJsonFolder, colorProfile, outputFolder.getPath(), decorator);
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return newFile;
         }
     }
 
-    /**
-     * Sometimes a pathway does not have diagram, then we check the first ancestor that has diagram.
-     * We generate the powerpoint based on this ancestorStId, but final pptx filename has the stId received in the URL
-     */
-    private String getAncestorStId(String stId) {
-        String ancestorStId = null;
-
-        Collection<Collection<Pathway>> ancestors = eventsService.getEventAncestors(stId);
-        if (ancestors != null && !ancestors.isEmpty()) {
-            // This is not a Collection of Collection<Pathway> it is a Collection<Collection<LinkedHashMap<String, Object>>
-            // SDN neither map to Pathway nor throw an error
-            for (Collection<Pathway> ancestorsList : ancestors) {
-                for (Object pathwayMap : ancestorsList) {
-                    //noinspection unchecked
-                    LinkedHashMap<String, Object> pathway = (LinkedHashMap<String, Object>) pathwayMap;
-                    if (pathway != null && !pathway.isEmpty() && pathway.containsKey("hasDiagram")) {
-                        Boolean hasDiagram = (Boolean) pathway.get("hasDiagram");
-                        if (hasDiagram) {
-                            ancestorStId = (String) pathway.get("stId");
-                            break;
-                        }
-                    }
-                }
-            }
+    public File getReactionPPTX(ReactionLikeEvent rle, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonDeserializationException, DiagramProfileException {
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/pptx/" + colorProfile.toLowerCase());
+        if (!outputFolder.exists()) {
+            infoLogger.debug("Creating the directory tree for storing pptx files");
+            if (!outputFolder.mkdirs())
+                infoLogger.error("Could not create the folder for the given DBVersion and profile");
         }
 
-        return ancestorStId;
+        String stId = rle.getStId();
+        String fileName = stId + PptxExporterController.PPT_FILE_EXTENSION;
+        File pptxFile = new File(outputFolder.getAbsolutePath() + "/" + fileName);
+
+        // The pptx is save in the temp folder using only the StId, then when we write in the response header
+        // we rename it using the [stId] displayName
+        String pptxFileName = getPPTXFileName(stId);
+        if (pptxFile.exists() && !decorator.isDecorated()) { // just return the file previously generated.
+            infoLogger.debug("Diagram {} has been generated previously.", pptxFile.getName());
+            response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
+            return pptxFile;
+        } else {
+            infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
+            Diagram diagram = reactionExporter.getReactionDiagram(reactionExporter.getReactionLayout(rle));
+            File newFile = diagramExporterService.exportToPPTX(diagram, colorProfile, outputFolder.getPath(), decorator);
+            response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
+            return newFile;
+        }
     }
 
     /**
@@ -219,8 +199,8 @@ public class ExportManager {
 
     public Diagram getDiagram(Event event) {
         if (event instanceof Pathway) {
-            Pathway pathway = (Pathway) event;
-            String diagram = pathway.getHasDiagram() ? pathway.getStId() : getAncestorStId(pathway.getStId());
+            DiagramResult result = diagramService.getDiagramResult(event.getStId());
+            String diagram = result.getDiagramStId();
             try {
                 File aux = new File(diagramJsonFolder + "/" + diagram + ".json");
                 String json = IOUtils.toString(new FileInputStream(aux), Charset.defaultCharset());
@@ -241,18 +221,13 @@ public class ExportManager {
     }
 
     @Autowired
-    public void setEventsService(EventsService eventsService) {
-        this.eventsService = eventsService;
-    }
-
-    @Autowired
     public void setDatabaseObjectService(DatabaseObjectService databaseObjectService) {
         this.databaseObjectService = databaseObjectService;
     }
 
     @Autowired
-    public void setExportManager(ExportManager exportManager) {
-        this.exportManager = exportManager;
+    public void setDiagramService(DiagramService diagramService) {
+        this.diagramService = diagramService;
     }
 
     @Autowired

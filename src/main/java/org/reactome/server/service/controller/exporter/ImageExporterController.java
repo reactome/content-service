@@ -6,8 +6,11 @@ import org.reactome.server.graph.domain.model.ReactionLikeEvent;
 import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
+import org.reactome.server.search.domain.DiagramOccurrencesResult;
+import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.manager.SearchManager;
 import org.reactome.server.tools.diagram.data.graph.Graph;
 import org.reactome.server.tools.diagram.data.layout.Diagram;
 import org.reactome.server.tools.diagram.exporter.common.analysis.AnalysisException;
@@ -48,6 +51,7 @@ public class ImageExporterController {
     private DiagramService diagramService;
     private RasterExporter rasterExporter;
     private ReactionExporter reactionExporter;
+    private SearchManager searchManager;
 
     @ApiOperation(
             value = "Exports a given pathway diagram to the specified image format (png, jpg, jpeg, svg, gif)",
@@ -71,8 +75,8 @@ public class ImageExporterController {
 
                              @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
                             @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
-                             @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
-                            @RequestParam(value = "flg", required = false) List<String> flg,
+                             @ApiParam(value = "Flag element in the diagram.")
+                            @RequestParam(value = "flg", required = false) String flg,
                              @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                             @RequestParam(value = "sel", required = false) List<String> sel,
                              @ApiParam(value = "Sets whether the name of the pathway is shown below", defaultValue = "true")
@@ -104,13 +108,22 @@ public class ImageExporterController {
                 CURRENT_RASTER_SIZE += size;
             }
 
-            List<String> toSelect = result.getEvents();
-            if (sel != null) toSelect.addAll(sel);
-
             final RasterArgs args = new RasterArgs(result.getDiagramStId(), ext);
             args.setProfiles(new ColorProfiles(diagramProfile, analysisProfile, null));
-            args.setFlags(flg);
+
+            List<String> toSelect = result.getEvents();
+            if (sel != null) toSelect.addAll(sel);
             args.setSelected(toSelect);
+
+            if (flg != null && !flg.isEmpty()) {
+                try {
+                    DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
+                    args.setFlags(occ.getOccurrences());
+                } catch (SolrSearcherException e) {
+                    //Nothing to be flagged
+                }
+            }
+
             args.setToken(token);
             args.setQuality(quality);
             args.setColumn(expColumn);
@@ -153,8 +166,8 @@ public class ImageExporterController {
                               @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
                              @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
                               @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
-                             @RequestParam(value = "flg", required = false) List<String> flg,
-                              @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
+                             @RequestParam(value = "flg", required = false) String flg,
+                              @ApiParam(value = "Highlight element selection in the diagram.")
                              @RequestParam(value = "sel", required = false) List<String> sel,
                               @ApiParam(value = "Sets whether the name of the reaction is shown below", defaultValue = "true")
                              @RequestParam(value = "title", required = false, defaultValue = "true") Boolean title,
@@ -170,7 +183,7 @@ public class ImageExporterController {
                               @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                              @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
-                               HttpServletResponse response) {
+                               HttpServletResponse response) throws SolrSearcherException {
 
         ReactionLikeEvent rle = getReactionLikeEvent(identifier);
         infoLogger.info("Exporting the Reaction {} to {} for color profile {}", rle.getStId(), ext, diagramProfile);
@@ -186,7 +199,11 @@ public class ImageExporterController {
             args = new RasterArgs(ext);
         }
         args.setProfiles(new ColorProfiles(diagramProfile, analysisProfile, null));
-        args.setFlags(flg);
+
+        if (flg != null && !flg.isEmpty()) {
+            DiagramOccurrencesResult flag = searchManager.getDiagramOccurrencesResult(diagram.getStableId(), flg);
+            args.setFlags(flag.getOccurrences());
+        }
         args.setSelected(sel);
         args.setToken(token);
         args.setQuality(quality);
@@ -232,5 +249,10 @@ public class ImageExporterController {
     @Autowired
     public void setReactionExporter(ReactionExporter reactionExporter) {
         this.reactionExporter = reactionExporter;
+    }
+
+    @Autowired
+    public void setSearchManager(SearchManager searchManager) {
+        this.searchManager = searchManager;
     }
 }
