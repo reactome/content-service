@@ -70,6 +70,8 @@ public class SbxxExporterController {
             sbgn = new FileInputStream(file);
             infoLogger.info("Exporting the event {} to SBGN retrieved from previously generated file", event.getStId());
         } catch (MissingSBMLException | IOException e) {
+
+
             SbgnConverter converter = new SbgnConverter(exportManager.getDiagram(event));
             sbgn = exportManager.saveSBGN(converter.getSbgn(), fileName);
             infoLogger.info("Exporting the event {} to SBGN", event.getStId());
@@ -141,6 +143,8 @@ public class SbxxExporterController {
     public void setDatabaseObjectService(DatabaseObjectService databaseObjectService) {
         this.databaseObjectService = databaseObjectService;
     }
+
+
 
     @Autowired
     public void setAdvancedDatabaseObjectService(AdvancedDatabaseObjectService advancedDatabaseObjectService) {

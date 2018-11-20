@@ -16,6 +16,7 @@ import org.reactome.server.service.exception.BadRequestException;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NoResultsFoundException;
 import org.reactome.server.service.exception.NotFoundException;
+import org.reactome.server.service.manager.SearchManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ class SearchController {
     private final Integer releaseNumber;
 
     private SearchService searchService;
+    private SearchManager searchManager;
     private SpeciesService speciesService;
     private DatabaseObjectService dos;
 
@@ -211,19 +213,9 @@ class SearchController {
                                                                     @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
                                                                     @RequestParam String query) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
-        DiagramOccurrencesResult rtn = new DiagramOccurrencesResult();
-        Query queryObject = new Query(query, pathwayId, null, null, null, null);
-        List<DiagramOccurrencesResult> diagramOccurrencesList = searchService.getDiagramFlagging(queryObject);
-        for (DiagramOccurrencesResult diagramOccurrencesResult : diagramOccurrencesList) {
-            if(diagramOccurrencesResult.getInDiagram()){
-                rtn.addOccurrences(Collections.singletonList(diagramOccurrencesResult.getDiagramEntity()));
-            }
-            rtn.addOccurrences(diagramOccurrencesResult.getOccurrences());
-            rtn.addInteractsWith(diagramOccurrencesResult.getInteractsWith());
-        }
-
-        if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
+        DiagramOccurrencesResult rtn = searchManager.getDiagramOccurrencesResult(pathwayId, query);
         infoLogger.info("Request for all entities in diagram with identifier: {}", query);
+        if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
         return rtn;
     }
 
@@ -261,6 +253,11 @@ class SearchController {
     @Autowired
     public void setDos(DatabaseObjectService dos) {
         this.dos = dos;
+    }
+
+    @Autowired
+    public void setSearchManager(SearchManager searchManager) {
+        this.searchManager = searchManager;
     }
 
     /**
