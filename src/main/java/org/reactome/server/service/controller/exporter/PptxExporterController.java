@@ -8,6 +8,7 @@ import org.reactome.server.graph.exception.CustomQueryException;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
+import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.search.domain.DiagramOccurrencesResult;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
@@ -63,10 +64,10 @@ public class PptxExporterController {
                                         @PathVariable String identifier,
                                          @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
                                         @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
-                                         @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
+                                         @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                         @RequestParam(value = "flg", required = false) String flg,
                                          @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
-                                        @RequestParam(value = "sel", required = false) Long sel,
+                                        @RequestParam(value = "sel", required = false) List<String> sel,
                                         HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, IOException {
 
         DiagramResult result = diagramService.getDiagramResult(identifier);
@@ -77,7 +78,7 @@ public class PptxExporterController {
         Decorator decorator = new Decorator();
 
         List<Long> toSelect = new ArrayList<>();
-        if (sel != null) toSelect.add(sel);
+        if (sel != null) toSelect.addAll(getDatabaseIdentifiers(sel));
         toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
         decorator.setSelected(toSelect);
 
@@ -120,10 +121,10 @@ public class PptxExporterController {
                                          @PathVariable String identifier,
                                           @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
                                          @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
-                                          @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
+                                          @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                          @RequestParam(value = "flg", required = false) String flg,
                                           @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
-                                         @RequestParam(value = "sel", required = false) Long sel,
+                                         @RequestParam(value = "sel", required = false) List<String> sel,
                                          HttpServletResponse response) throws Exception {
         // IMPORTANT: Downloading the file on Swagger does not work - https://github.com/swagger-api/swagger-ui/issues/2132
         // for this reason we are keeping this method as APIIgnore
@@ -133,8 +134,8 @@ public class PptxExporterController {
 
         DiagramResult result = diagramService.getDiagramResult(identifier);
         List<Long> toSelect = new ArrayList<>();
-        if (sel != null) toSelect.add(sel);
-        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
+        if (sel != null) toSelect.addAll(getDatabaseIdentifiers(sel));
+//        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
         decorator.setSelected(toSelect);
 
         if (flg != null && !flg.isEmpty()) {
@@ -176,18 +177,34 @@ public class PptxExporterController {
         return rle;
     }
 
-    private List<Long> getDatabaseIdentifiers(Collection<String> stableIdentifiers){
+    /**
+     * Transforms stable identifiers (and old stable identifiers) to database identifiers. It keeps database identifiers
+     *
+     * @param identifiers a list of identifiers that can mix stable identifiers, database identifiers and old stable identifiers
+     * @return The provided 'identifiers' list with the stable identifiers transformed to database identifiers
+     */
+    private List<Long> getDatabaseIdentifiers(Collection<String> identifiers) {
+        List<String> aux = new ArrayList<>();
+
+        List<Long> rtn = new ArrayList<>();
+        for (String identifier : identifiers) {
+            String id = DatabaseObjectUtils.getIdentifier(identifier);
+            if (DatabaseObjectUtils.isStId(id)) aux.add(id);
+            else if (DatabaseObjectUtils.isDbId(id)) rtn.add(Long.valueOf(id));
+        }
+
         String query = "" +
                 "MATCH (d:DatabaseObject) " +
-                "WHERE d.stId IN {stableIdentifiers} " +
+                "WHERE d.stId IN {identifiers} " +
                 "RETURN d.dbId ";
         Map<String, Object> params = new HashMap<>();
-        params.put("stableIdentifiers", stableIdentifiers);
+        params.put("identifiers", aux);
         try {
-            return new ArrayList<>(ados.getCustomQueryResults(Long.class, query, params));
+            rtn.addAll(ados.getCustomQueryResults(Long.class, query, params));
         } catch (CustomQueryException e) {
-            return new ArrayList<>();
+            //Nothing here
         }
+        return rtn;
     }
 
     @Autowired

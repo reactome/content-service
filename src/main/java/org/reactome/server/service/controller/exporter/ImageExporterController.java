@@ -75,7 +75,7 @@ public class ImageExporterController {
 
                              @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
                             @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
-                             @ApiParam(value = "Flag element in the diagram.")
+                             @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                             @RequestParam(value = "flg", required = false) String flg,
                              @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                             @RequestParam(value = "sel", required = false) List<String> sel,
@@ -165,7 +165,7 @@ public class ImageExporterController {
 
                               @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
                              @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
-                              @ApiParam(value = "Flag element(s) in the diagram. CSV line.")
+                              @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                              @RequestParam(value = "flg", required = false) String flg,
                               @ApiParam(value = "Highlight element selection in the diagram.")
                              @RequestParam(value = "sel", required = false) List<String> sel,
