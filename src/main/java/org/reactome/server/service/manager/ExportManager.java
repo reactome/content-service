@@ -90,6 +90,8 @@ public class ExportManager {
     }
 
     public File getReactionPPTX(ReactionLikeEvent rle, String colorProfile, Decorator decorator, HttpServletResponse response) throws DiagramJsonDeserializationException, DiagramProfileException {
+        if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
+
         File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/pptx/" + colorProfile.toLowerCase());
         if (!outputFolder.exists()) {
             infoLogger.debug("Creating the directory tree for storing pptx files");
