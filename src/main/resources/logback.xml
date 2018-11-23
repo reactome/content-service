@@ -65,9 +65,9 @@
 
         <smtpHost>${mail.host}</smtpHost>
         <smtpPort>${mail.port}</smtpPort>
-        <to>${mail.to}</to>
-        <from>${mail.from}</from>
-        <subject>${mail.subject}</subject>
+        <subject>${cnf.mail.error.subject}</subject>
+        <from>${cnf.mail.error.from}</from>
+        <to>${cnf.mail.error.to}</to>
 
         <maxMessages>5</maxMessages>
         <timeInterval>1</timeInterval>
