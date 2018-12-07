@@ -42,8 +42,8 @@
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <graph.core>1.1.16-SNAPSHOT</graph.core>
-        <search.core>1.2.0</search.core>
+        <graph.core>1.1.16</graph.core>
+        <search.core>1.3.0</search.core>
         <interactors.core>1.0.14</interactors.core>
         <diagram.exporter>1.3.11-SNAPSHOT</diagram.exporter>
         <reaction.exporter>1.0.0-SNAPSHOT</reaction.exporter>
