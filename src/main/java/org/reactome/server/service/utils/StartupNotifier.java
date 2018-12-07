@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -56,7 +57,7 @@ public class StartupNotifier extends Thread {
             body += "\n\n List of who is logged in: \n";
             body += getWho();
 
-            sms.send(SENDER_NAME, from, to, subject, body);
+            sms.start(SENDER_NAME, from, to, subject, body);
 
             logger.debug("Sent!");
         } catch (Exception e) {
@@ -73,6 +74,6 @@ public class StartupNotifier extends Thread {
     private String getWho() throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder("who");
         Process process = pb.start();
-        return process.waitFor() == 0 ? IOUtils.toString(process.getInputStream()) : "<<Couldn't execute 'who' command>>";
+        return process.waitFor() == 0 ? IOUtils.toString(process.getInputStream(), Charset.defaultCharset()) : "<<Couldn't execute 'who' command>>";
     }
 }

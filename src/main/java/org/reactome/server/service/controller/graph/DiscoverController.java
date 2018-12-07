@@ -45,7 +45,7 @@ public class DiscoverController {
         try {
             Event event = databaseObjectService.findById(identifier);
             if(event == null) throw new NotFoundException(identifier + " not found");
-            dataSet = new SchemaDataSet(event, generalService.getDBVersion());
+            dataSet = new SchemaDataSet(event, generalService.getDBInfo().getVersion());
         } catch (ClassCastException ex) {
             throw new UnprocessableEntityException();
         }

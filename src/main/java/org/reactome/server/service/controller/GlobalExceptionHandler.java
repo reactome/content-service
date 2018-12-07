@@ -311,6 +311,14 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseBody
+    ResponseEntity<String> handleIllegalArgumentException(HttpServletRequest request, IllegalArgumentException e) {
+        logger.warn("IllegalArgumentException was caught for request: " + request.getRequestURL(), e);
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ClassNotFoundException.class)
     @ResponseBody
     ResponseEntity<String> handleClassNotFoundException(HttpServletRequest request, ClassNotFoundException e) {
