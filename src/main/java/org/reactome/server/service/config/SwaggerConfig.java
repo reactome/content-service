@@ -42,7 +42,7 @@ public class SwaggerConfig {
                 "Content Service",
                 "RESTFul service for Reactome content",
                 "1.1",
-                "about/license-agreement",
+                "/license",
                 new Contact("Reactome", "https://reactome.org", "help@reactome.org"),
                 "Creative Commons Attribution 3.0 Unported License",
                 "http://creativecommons.org/licenses/by/3.0/legalcode",
