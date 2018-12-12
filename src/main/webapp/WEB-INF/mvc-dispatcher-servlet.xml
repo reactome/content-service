@@ -90,6 +90,11 @@
         <constructor-arg name="svgSummary" value="${svg.summary.file}"/>
     </bean>
 
+    <bean id="fireworksExporter" class="org.reactome.server.tools.fireworks.exporter.FireworksExporter">
+        <constructor-arg name="fireworkPath" value="${fireworks.json.folder}"/>
+        <constructor-arg name="analysisPath" value="${analysis.token}"/>
+    </bean>
+
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="${mail.host}" />
         <property name="port" value="${mail.port}" />

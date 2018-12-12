@@ -9,7 +9,6 @@ import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
 import org.reactome.server.graph.service.util.DatabaseObjectUtils;
-import org.reactome.server.search.domain.DiagramOccurrencesResult;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
@@ -66,6 +65,8 @@ public class PptxExporterController {
                                         @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
                                          @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                         @RequestParam(value = "flg", required = false) String flg,
+                                         @ApiParam(value = "Defines whether to take into account interactors for the flagging")
+                                        @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
                                          @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                                         @RequestParam(value = "sel", required = false) List<String> sel,
                                         HttpServletResponse response) throws DiagramJsonNotFoundException, DiagramJsonDeserializationException, DiagramProfileException, IOException {
@@ -84,8 +85,8 @@ public class PptxExporterController {
 
         if (flg != null && !flg.isEmpty()) {
             try {
-                DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
-                decorator.setFlags(getDatabaseIdentifiers(occ.getOccurrences()));
+                Collection<String> flag = searchManager.getDiagramFlagging(result.getDiagramStId(), flg, flgInteractors);
+                decorator.setFlags(getDatabaseIdentifiers(flag));
             } catch (SolrSearcherException e) {
                 //Nothing to be flagged
             }
@@ -123,6 +124,8 @@ public class PptxExporterController {
                                          @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
                                           @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                          @RequestParam(value = "flg", required = false) String flg,
+                                          @ApiParam(value = "Defines whether to take into account interactors for the flagging")
+                                         @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
                                           @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                                          @RequestParam(value = "sel", required = false) List<String> sel,
                                          HttpServletResponse response) throws Exception {
@@ -140,8 +143,8 @@ public class PptxExporterController {
 
         if (flg != null && !flg.isEmpty()) {
             try {
-                DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
-                decorator.setFlags(getDatabaseIdentifiers(occ.getOccurrences()));
+                Collection<String> flag = searchManager.getDiagramFlagging(result.getDiagramStId(), flg, flgInteractors);
+                decorator.setFlags(getDatabaseIdentifiers(flag));
             } catch (SolrSearcherException e) {
                 //Nothing to be flagged
             }

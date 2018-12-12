@@ -25,7 +25,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -160,19 +159,13 @@ class SearchController {
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
     @ResponseBody
-    public Collection<String> fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
+    public FireworksOccurrencesResult fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
                                                 @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
         Species sp = speciesService.getSpeciesByName(species);
         if (sp == null) throw new BadRequestException("No species found for '" + species + "'");
 
-        List<String> speciess = new ArrayList<>(); speciess.add(species);
-        Query queryObject = new Query(query, speciess, null, null, null);
-        //Filter the result by species. This is necessary when the query term is a chemical
-        String prefix = "R-" + sp.getAbbreviation();
-        Collection<String> rtn = searchService.fireworksFlagging(queryObject).stream()
-                .filter(s -> s.startsWith(prefix))
-                .collect(Collectors.toList());
+        FireworksOccurrencesResult rtn = searchManager.getFireworksOccurrencesResult(sp, query);
         if (rtn.isEmpty()) throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
         return rtn;
     }

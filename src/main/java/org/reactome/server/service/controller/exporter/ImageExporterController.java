@@ -6,7 +6,6 @@ import org.reactome.server.graph.domain.model.ReactionLikeEvent;
 import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
-import org.reactome.server.search.domain.DiagramOccurrencesResult;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
@@ -76,6 +75,8 @@ public class ImageExporterController {
                             @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
                              @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                             @RequestParam(value = "flg", required = false) String flg,
+                             @ApiParam(value = "Defines whether to take into account interactors for the flagging")
+                            @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
                              @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
                             @RequestParam(value = "sel", required = false) List<String> sel,
                              @ApiParam(value = "Sets whether the name of the pathway is shown below", defaultValue = "true")
@@ -116,8 +117,7 @@ public class ImageExporterController {
 
             if (flg != null && !flg.isEmpty()) {
                 try {
-                    DiagramOccurrencesResult occ = searchManager.getDiagramOccurrencesResult(result.getDiagramStId(), flg);
-                    args.setFlags(occ.getOccurrences());
+                    args.setFlags(searchManager.getDiagramFlagging(result.getDiagramStId(), flg, flgInteractors));
                 } catch (SolrSearcherException e) {
                     //Nothing to be flagged
                 }
@@ -165,6 +165,8 @@ public class ImageExporterController {
                              @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
                               @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                              @RequestParam(value = "flg", required = false) String flg,
+                              @ApiParam(value = "Defines whether to take into account interactors for the flagging")
+                             @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
                               @ApiParam(value = "Highlight element selection in the diagram.")
                              @RequestParam(value = "sel", required = false) List<String> sel,
                               @ApiParam(value = "Sets whether the name of the reaction is shown below", defaultValue = "true")
@@ -199,8 +201,7 @@ public class ImageExporterController {
         args.setProfiles(new ColorProfiles(diagramProfile, analysisProfile, null));
 
         if (flg != null && !flg.isEmpty()) {
-            DiagramOccurrencesResult flag = searchManager.getDiagramOccurrencesResult(diagram.getStableId(), flg);
-            args.setFlags(flag.getOccurrences());
+            args.setFlags(searchManager.getDiagramFlagging(diagram.getStableId(), flg, flgInteractors));
         }
         args.setSelected(sel);
         args.setToken(token);

@@ -399,6 +399,14 @@ class GlobalExceptionHandler {
         return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(FireworksExporterException.class)
+    @ResponseBody
+    ResponseEntity<String> handleFireworksExporterException(HttpServletRequest request, FireworksExporterException e) {
+        logger.warn("FireworksExporterException was caught for request: " + request.getRequestURL());
+        return toJsonResponse(HttpStatus.BAD_REQUEST, request, e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MissingSBMLException.class)
     @ResponseBody
