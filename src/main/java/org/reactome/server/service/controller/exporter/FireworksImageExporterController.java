@@ -71,6 +71,9 @@ public class FireworksImageExporterController {
         Species s = speciesService.getSpecies(species);
         if (s == null) throw new FireworksExporterException(String.format("'%s' is not a species", species));
 
+        //NO PDF for the time being
+        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
+
         FireworkArgs args = new FireworkArgs(s.getDisplayName().replace(" ", "_"), ext);
         args.setSelected(sel);
         args.setProfile(profile);
@@ -92,6 +95,7 @@ public class FireworksImageExporterController {
         try {
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + s.getDisplayName() + "." +  ext + "\"");
             fireworksExporter.render(args, response.getOutputStream());
         } catch (IOException | AnalysisServerError | TranscoderException e) {
             e.printStackTrace();
