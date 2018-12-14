@@ -90,6 +90,8 @@ public class ImageExporterController {
 
                              @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
                             @RequestParam(value = "token", required = false) String token,
+                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                            @RequestParam(value = "resource", required = false, defaultValue = "total") String resource,
                              @ApiParam(value = "Analysis  Color Profile", defaultValue = "Standard", allowableValues = "Standard, Strosobar, Copper%20Plus")
                             @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
                              @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
@@ -123,12 +125,13 @@ public class ImageExporterController {
                 }
             }
 
-            args.setToken(token);
-            args.setQuality(quality);
-            args.setColumn(expColumn);
-            args.setMargin(margin);
-            args.setEhld(ehld);
             args.setWriteTitle(title);
+            args.setQuality(quality);
+            args.setEhld(ehld);
+            args.setMargin(margin);
+            args.setToken(token);
+            args.setResource(resource);
+            args.setColumn(expColumn);
 
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
@@ -180,6 +183,8 @@ public class ImageExporterController {
                              @RequestParam(value = "token", required = false) String token,
                               @ApiParam(value = "Analysis  Color Profile", defaultValue = "Standard", allowableValues = "Standard, Strosobar, Copper%20Plus")
                              @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
+                              @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                             @RequestParam(value = "resource", required = false, defaultValue = "total") String resource,
                               @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                              @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
@@ -205,6 +210,7 @@ public class ImageExporterController {
         }
         args.setSelected(sel);
         args.setToken(token);
+        args.setResource(resource);
         args.setQuality(quality);
         args.setColumn(expColumn);
         args.setMargin(margin);

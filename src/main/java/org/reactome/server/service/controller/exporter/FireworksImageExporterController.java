@@ -59,8 +59,10 @@ public class FireworksImageExporterController {
                             @RequestParam(value = "margin", defaultValue = "15", required = false) Integer margin,
                              @ApiParam(value = "Diagram Color Profile", defaultValue = "Copper", allowableValues = "Copper, Copper plus, Barium Lithium, Calcium Salts")
                             @RequestParam(value = "diagramProfile", defaultValue = "Copper", required = false) String profile,
-                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
+                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given pathways overview")
                             @RequestParam(value = "token", required = false) String token,
+                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                            @RequestParam(value = "resource", required = false, defaultValue = "total") String resource,
                              @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                             @RequestParam(value = "expColumn", required = false) Integer expColumn,
 
@@ -76,6 +78,7 @@ public class FireworksImageExporterController {
         args.setQuality(quality);
         args.setMargin(margin);
         args.setToken(token);
+        args.setResource(resource);
         args.setColumn(expColumn);
 
         if (flg != null && !flg.isEmpty()) {
