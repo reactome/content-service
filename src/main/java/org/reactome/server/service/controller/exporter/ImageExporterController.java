@@ -103,11 +103,19 @@ public class ImageExporterController {
         if (result == null) throw new DiagramExporterException(String.format("'%s' is not an event", identifier));
         infoLogger.info("Exporting the Diagram {} to {} for color profile {}", result.getDiagramStId(), ext, diagramProfile);
 
+        //NO PDF for the time being
+        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
+
+
         int size = result.getSize() * (int) Math.ceil(quality * 0.3);
         try {
-            synchronized (RASTER_SEMAPHORE) {
-                while ((CURRENT_RASTER_SIZE + size) >= MAX_RASTER_SIZE) RASTER_SEMAPHORE.wait();
-                CURRENT_RASTER_SIZE += size;
+            boolean isSVG = ext.equalsIgnoreCase("svg");
+
+            if(!isSVG) {
+                synchronized (RASTER_SEMAPHORE) {
+                    while ((CURRENT_RASTER_SIZE + size) >= MAX_RASTER_SIZE) RASTER_SEMAPHORE.wait();
+                    CURRENT_RASTER_SIZE += size;
+                }
             }
 
             final RasterArgs args = new RasterArgs(result.getDiagramStId(), ext);
@@ -133,7 +141,7 @@ public class ImageExporterController {
             args.setResource(resource);
             args.setColumn(expColumn);
 
-            String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
+            String type = isSVG ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
             rasterExporter.export(args, response.getOutputStream());
         } catch (IndexOutOfBoundsException e) { //When the output stream is closed, it throws this exception
@@ -192,6 +200,9 @@ public class ImageExporterController {
 
         ReactionLikeEvent rle = getReactionLikeEvent(identifier);
         infoLogger.info("Exporting the Reaction {} to {} for color profile {}", rle.getStId(), ext, diagramProfile);
+
+        //NO PDF for the time being
+        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
 
         Layout layout = reactionExporter.getReactionLayout(rle);
         Diagram diagram = reactionExporter.getReactionDiagram(layout);
