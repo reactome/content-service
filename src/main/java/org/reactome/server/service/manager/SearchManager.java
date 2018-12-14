@@ -1,6 +1,8 @@
 package org.reactome.server.service.manager;
 
 import org.reactome.server.graph.domain.model.Species;
+import org.reactome.server.graph.exception.CustomQueryException;
+import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.search.domain.DiagramOccurrencesResult;
 import org.reactome.server.search.domain.FireworksOccurrencesResult;
 import org.reactome.server.search.domain.Query;
@@ -10,10 +12,7 @@ import org.reactome.server.service.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,13 +22,14 @@ import java.util.stream.Collectors;
 public class SearchManager {
 
     private SearchService searchService;
+    private AdvancedDatabaseObjectService ados;
 
     public DiagramOccurrencesResult getDiagramOccurrencesResult(String pathway, String query) throws SolrSearcherException {
         DiagramOccurrencesResult rtn = new DiagramOccurrencesResult();
         Query queryObject = new Query(query, pathway, null, null, null, null);
         List<DiagramOccurrencesResult> diagramOccurrencesList = searchService.getDiagramFlagging(queryObject);
         for (DiagramOccurrencesResult diagramOccurrencesResult : diagramOccurrencesList) {
-            if(diagramOccurrencesResult.getInDiagram()){
+            if (diagramOccurrencesResult.getInDiagram()) {
                 rtn.addOccurrences(Collections.singletonList(diagramOccurrencesResult.getDiagramEntity()));
             }
             rtn.addOccurrences(diagramOccurrencesResult.getOccurrences());
@@ -40,14 +40,30 @@ public class SearchManager {
 
     public Collection<String> getDiagramFlagging(String pathway, String query, Boolean includeInteractors) throws SolrSearcherException {
         DiagramOccurrencesResult occ = getDiagramOccurrencesResult(pathway, query);
-        Collection<String> rtn = occ.getOccurrences()!=null ? occ.getOccurrences(): new ArrayList<>();
-        if (includeInteractors && occ.getInteractsWith() != null) rtn.addAll(occ.getInteractsWith());
-        return rtn;
+        Collection<String> toFlag = occ.getOccurrences() != null ? occ.getOccurrences() : new ArrayList<>();
+        if (includeInteractors && occ.getInteractsWith() != null) toFlag.addAll(occ.getInteractsWith());
+
+        try {
+            String q = "" +
+                    "MATCH path=(p:Pathway)-[:hasEvent*]->(rle:ReactionLikeEvent) " +
+                    "WHERE p.stId IN {toFlag} AND NONE(x IN NODES(path) WHERE (x:Pathway) AND x.hasDiagram) " +
+                    "RETURN DISTINCT rle.stId AS identifier " +
+                    "UNION " +
+                    "MATCH (d:DatabaseObject) " +
+                    "WHERE NOT(d:Pathway) AND d.stId IN {toFlag} " +
+                    "RETURN DISTINCT d.stId AS identifier";
+            Map<String, Object> params = new HashMap<>();
+            params.put("toFlag", toFlag);
+            return new HashSet<>(ados.getCustomQueryResults(String.class, q, params));
+        } catch (CustomQueryException e) {
+            return new HashSet<>();
+        }
     }
 
     @SuppressWarnings("Duplicates")
     public FireworksOccurrencesResult getFireworksOccurrencesResult(Species species, String query) throws SolrSearcherException {
-        List<String> speciess = new ArrayList<>(); speciess.add(species.getDisplayName());
+        List<String> speciess = new ArrayList<>();
+        speciess.add(species.getDisplayName());
         Query queryObject = new Query(query, speciess, null, null, null);
 
 
@@ -69,7 +85,8 @@ public class SearchManager {
                     .forEach(rtn::addInteractsWith);
         }
 
-        if (rtn.isEmpty()) throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
+        if (rtn.isEmpty())
+            throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
 
         return rtn;
     }
@@ -80,12 +97,18 @@ public class SearchManager {
         FireworksOccurrencesResult occ = getFireworksOccurrencesResult(species, query);
         Collection<String> rtn = occ.getLlps() != null ? occ.getLlps() : new ArrayList<>();
         if (includeInteractors && occ.getInteractsWith() != null) rtn.addAll(occ.getInteractsWith());
-        if (rtn.isEmpty()) throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
+        if (rtn.isEmpty())
+            throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
         return rtn;
     }
 
     @Autowired
     public void setSearchService(SearchService searchService) {
         this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setAdos(AdvancedDatabaseObjectService ados) {
+        this.ados = ados;
     }
 }
