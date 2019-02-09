@@ -90,9 +90,21 @@
         <constructor-arg name="svgSummary" value="${svg.summary.file}"/>
     </bean>
 
+    <bean id="eventExporter" class="org.reactome.server.tools.event.exporter.EventExporter">
+        <constructor-arg name="diagramPath" value="${diagram.json.folder}"/>
+        <constructor-arg name="ehldPath" value="${ehld.folder}"/>
+        <constructor-arg name="analysisPath" value="${analysis.token}"/>
+        <constructor-arg name="fireworksPath" value="${fireworks.json.folder}"/>
+        <constructor-arg name="svgSummary" value="${svg.summary.file}"/>
+    </bean>
+
     <bean id="fireworksExporter" class="org.reactome.server.tools.fireworks.exporter.FireworksExporter">
         <constructor-arg name="fireworkPath" value="${fireworks.json.folder}"/>
         <constructor-arg name="analysisPath" value="${analysis.token}"/>
+    </bean>
+
+    <bean id="tokenUtils" class="org.reactome.server.analysis.core.result.utils.TokenUtils">
+        <property name="pathDirectory" value="${analysis.token}"/>
     </bean>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
