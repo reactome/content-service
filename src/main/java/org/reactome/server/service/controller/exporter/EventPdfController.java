@@ -33,10 +33,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
@@ -215,9 +212,13 @@ public class EventPdfController {
         Map<String, String> result = new HashMap<>();
         result.put("user-agent", request.getHeader("User-Agent"));
         String remoteAddr = request.getHeader("X-FORWARDED-FOR"); // Client IP
-        if (StringUtils.isEmpty(remoteAddr)) {
+        if (!StringUtils.isEmpty(remoteAddr)) {
+            // The general format of the field is: X-Forwarded-For: client, proxy1, proxy2 ... we only want the client
+            remoteAddr = new StringTokenizer(remoteAddr, ",").nextToken().trim();
+        } else {
             remoteAddr = request.getRemoteAddr();
         }
+
         result.put("ip-address", remoteAddr);
         return result;
     }
