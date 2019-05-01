@@ -47,17 +47,14 @@ public class SearchManager {
             String q = "" +
                     "MATCH path=(p:Pathway)-[:hasEvent*]->(rle:ReactionLikeEvent) " +
                     "WHERE p.stId IN {toFlag} AND NONE(x IN NODES(path) WHERE (x:Pathway) AND x.hasDiagram) " +
-                    "RETURN DISTINCT rle.stId AS identifier " +
-                    "UNION " +
-                    "MATCH (d:DatabaseObject) " +
-                    "WHERE NOT(d:Pathway) AND d.stId IN {toFlag} " +
-                    "RETURN DISTINCT d.stId AS identifier";
+                    "RETURN DISTINCT rle.stId AS identifier ";
             Map<String, Object> params = new HashMap<>();
             params.put("toFlag", toFlag);
-            return new HashSet<>(ados.getCustomQueryResults(String.class, q, params));
+            toFlag.addAll(ados.getCustomQueryResults(String.class, q, params));
         } catch (CustomQueryException e) {
-            return new HashSet<>();
+            //Nothing here
         }
+        return toFlag;
     }
 
     @SuppressWarnings("Duplicates")
