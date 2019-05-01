@@ -62,8 +62,7 @@ public class ImageExporterController {
     )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Stable Identifier does not match with any of the available diagrams."),
-            @ApiResponse(code = 500, message = "Could not deserialize diagram file."),
-            @ApiResponse(code = 503, message = "Service was unable to export to Power Point.")
+            @ApiResponse(code = 500, message = "Could not deserialize diagram file.")
     })
     @RequestMapping(value = "/diagram/{identifier}.{ext:.*}", method = RequestMethod.GET)
     public void diagramImage(@ApiParam(value = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, defaultValue = "R-HSA-177929")
@@ -163,8 +162,7 @@ public class ImageExporterController {
     )
     @ApiResponses({
             @ApiResponse(code = 404, message = "Stable Identifier does not match with any of the reactions."),
-            @ApiResponse(code = 500, message = "Could not deserialize diagram file."),
-            @ApiResponse(code = 503, message = "Service was unable to export to Power Point.")
+            @ApiResponse(code = 500, message = "Could not deserialize diagram file.")
     })
     @RequestMapping(value = "/reaction/{identifier}.{ext:.*}", method = RequestMethod.GET)
     public void reactionImage(@ApiParam(value = "Reaction identifier", required = true, defaultValue = "R-HSA-6787403")
