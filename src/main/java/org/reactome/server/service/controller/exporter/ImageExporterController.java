@@ -103,14 +103,12 @@ public class ImageExporterController {
         infoLogger.info("Exporting the Diagram {} to {} for color profile {}", result.getDiagramStId(), ext, diagramProfile);
 
         //NO PDF for the time being
-        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
-
+        if (ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
 
         int size = result.getSize() * (int) Math.ceil(quality * 0.3);
+        boolean isSVG = ext.equalsIgnoreCase("svg");
         try {
-            boolean isSVG = ext.equalsIgnoreCase("svg");
-
-            if(!isSVG) {
+            if (!isSVG) {
                 synchronized (RASTER_SEMAPHORE) {
                     while ((CURRENT_RASTER_SIZE + size) >= MAX_RASTER_SIZE) RASTER_SEMAPHORE.wait();
                     CURRENT_RASTER_SIZE += size;
@@ -148,9 +146,11 @@ public class ImageExporterController {
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         } finally {
-            synchronized (RASTER_SEMAPHORE) {
-                CURRENT_RASTER_SIZE -= size;
-                RASTER_SEMAPHORE.notify();
+            if (!isSVG) {
+                synchronized (RASTER_SEMAPHORE) {
+                    CURRENT_RASTER_SIZE -= size;
+                    RASTER_SEMAPHORE.notify();
+                }
             }
         }
     }
