@@ -6,6 +6,7 @@ import org.reactome.server.graph.domain.model.ReactionLikeEvent;
 import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
+import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
@@ -20,6 +21,7 @@ import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
 import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.reactome.server.tools.diagram.exporter.raster.profiles.ColorProfiles;
 import org.reactome.server.tools.reaction.exporter.ReactionExporter;
+import org.reactome.server.tools.reaction.exporter.compartment.ReactomeCompartmentFactory;
 import org.reactome.server.tools.reaction.exporter.layout.model.Layout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,5 +270,10 @@ public class ImageExporterController {
     @Autowired
     public void setSearchManager(SearchManager searchManager) {
         this.searchManager = searchManager;
+    }
+
+    @Autowired
+    public void setSchemaService(SchemaService schemaService) {
+        ReactomeCompartmentFactory.setSchemaService(schemaService);
     }
 }
