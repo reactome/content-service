@@ -17,9 +17,11 @@ import org.reactome.server.analysis.core.result.AnalysisStoredResult;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
 import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.service.exception.BadRequestException;
 import org.reactome.server.tools.event.exporter.DocumentArgs;
 import org.reactome.server.tools.event.exporter.EventExporter;
+import org.reactome.server.tools.reaction.exporter.compartment.ReactomeCompartmentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,5 +238,10 @@ public class EventPdfController {
     @Autowired
     public void setEventExporter(EventExporter eventExporter) {
         this.eventExporter = eventExporter;
+    }
+
+    @Autowired
+    public void setSchemaService(SchemaService schemaService) {
+        ReactomeCompartmentFactory.setSchemaService(schemaService);
     }
 }

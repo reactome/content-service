@@ -46,7 +46,7 @@
         <search.core>1.3.1</search.core>
         <interactors.core>1.0.14</interactors.core>
         <diagram.exporter>1.3.12</diagram.exporter>
-        <reaction.exporter>1.1.0</reaction.exporter>
+        <reaction.exporter>1.1.1</reaction.exporter>
         <fireworks.exporter>1.1.4</fireworks.exporter>
         <sbml.exporter>2.0.0</sbml.exporter>
         <event.pdf>1.0.4</event.pdf>
@@ -61,7 +61,7 @@
         <activation.version>1.1.1</activation.version>
         <kryo.version>2.22</kryo.version>
         <tika.version>1.12</tika.version>
-        <reactome.utils.version>1.0.7</reactome.utils.version>
+        <reactome.utils.version>1.0.8</reactome.utils.version>
 
         <tomcat.version>2.2</tomcat.version>
         <maven.compiler.version>3.5.1</maven.compiler.version>

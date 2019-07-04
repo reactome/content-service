@@ -6,6 +6,7 @@ import org.reactome.server.graph.domain.model.ReactionLikeEvent;
 import org.reactome.server.graph.domain.result.DiagramResult;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
+import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.service.exception.DiagramExporterException;
 import org.reactome.server.service.exception.NotFoundException;
@@ -20,6 +21,7 @@ import org.reactome.server.tools.diagram.exporter.raster.api.RasterArgs;
 import org.reactome.server.tools.diagram.exporter.raster.ehld.exception.EhldException;
 import org.reactome.server.tools.diagram.exporter.raster.profiles.ColorProfiles;
 import org.reactome.server.tools.reaction.exporter.ReactionExporter;
+import org.reactome.server.tools.reaction.exporter.compartment.ReactomeCompartmentFactory;
 import org.reactome.server.tools.reaction.exporter.layout.model.Layout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,14 +105,12 @@ public class ImageExporterController {
         infoLogger.info("Exporting the Diagram {} to {} for color profile {}", result.getDiagramStId(), ext, diagramProfile);
 
         //NO PDF for the time being
-        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
-
+        if (ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
 
         int size = result.getSize() * (int) Math.ceil(quality * 0.3);
+        boolean isSVG = ext.equalsIgnoreCase("svg");
         try {
-            boolean isSVG = ext.equalsIgnoreCase("svg");
-
-            if(!isSVG) {
+            if (!isSVG) {
                 synchronized (RASTER_SEMAPHORE) {
                     while ((CURRENT_RASTER_SIZE + size) >= MAX_RASTER_SIZE) RASTER_SEMAPHORE.wait();
                     CURRENT_RASTER_SIZE += size;
@@ -148,9 +148,11 @@ public class ImageExporterController {
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         } finally {
-            synchronized (RASTER_SEMAPHORE) {
-                CURRENT_RASTER_SIZE -= size;
-                RASTER_SEMAPHORE.notify();
+            if (!isSVG) {
+                synchronized (RASTER_SEMAPHORE) {
+                    CURRENT_RASTER_SIZE -= size;
+                    RASTER_SEMAPHORE.notify();
+                }
             }
         }
     }
@@ -268,5 +270,10 @@ public class ImageExporterController {
     @Autowired
     public void setSearchManager(SearchManager searchManager) {
         this.searchManager = searchManager;
+    }
+
+    @Autowired
+    public void setSchemaService(SchemaService schemaService) {
+        ReactomeCompartmentFactory.setSchemaService(schemaService);
     }
 }
