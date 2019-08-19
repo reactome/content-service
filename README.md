@@ -28,85 +28,80 @@ Maven Profile is a set of configuration values which can be used to set or overr
 Add the following code-snippet containing all the Reactome properties inside the tag ```<profiles>``` into your ```~/.m2/settings.xml```.
 Please refer to Maven Profile [Guideline](http://maven.apache.org/guides/introduction/introduction-to-profiles.html) if you don't have settings.xml
 
-
 ```html
 <profile>
-    <id>ContentService-Local</id>
+    <id>reactome</id>
     <properties>
-        <!-- Neo4j Configuration -->
+        <mail.host>localhost</mail.host>
+        <mail.port>8181</mail.port>
+        <mail.username>username</mail.username>
+        <mail.password>password</mail.password>
+        <mail.enable.auth>true</mail.enable.auth>
+
+        <!-- Neo4J Configuration -->
         <neo4j.host>localhost</neo4j.host>
         <neo4j.port>7474</neo4j.port>
         <neo4j.user>neo4j</neo4j.user>
-        <neo4j.password>neo4j</neo4j.password>
+        <neo4j.password>password</neo4j.password>
 
-        <!-- SolR Configuration -->
-        <solr.host>http://localhost:8983/solr/reactome</solr.host>
-        <solr.user>solr</solr.user>
-        <solr.password>solr</solr.password>
+        <!-- Solr Configuration -->
+        <solr.host>http://localhost:8983/solr</solr.host>
+        <solr.core>reactome</solr.core>
+        <solr.user>admin</solr.user>
+        <solr.password>password</solr.password>
 
-        <!-- Interators Database -->
-        <interactors.SQLite>/Users/reactome/Reactome/interactors/interactors.db</interactors.SQLite>
+        <!-- MySQL Configuration -->
+        <mysql.host>localhost</mysql.host>
+        <mysql.port>3306</mysql.port>
+        <mysql.reactome.database>reactome</mysql.reactome.database>
+        <mysql.report.database>report</mysql.report.database>
+        <mysql.user>curator</mysql.user>
+        <mysql.password>password</mysql.password>
+
+        <template.server>https://localhost/</template.server>
+
+        <!-- Log report -->
+        <cnf.mail.error.subject>Automated Error Report</cnf.mail.error.subject>
+        <cnf.mail.error.name>Error Report Agent</cnf.mail.error.name>
+        <cnf.mail.error.from>noreply@reactome.org</cnf.mail.error.from>
+        <cnf.mail.error.to>mail@domain.ac.uk</cnf.mail.error.to>
+
+        <!-- Report mail Configuration -->
+        <cnf.mail.report.hostname>reactome.org</cnf.mail.report.hostname>
+        <cnf.mail.report.from>noreply@reactome.org</cnf.mail.report.from>
+        <cnf.mail.report.to>mail@domain.ac.uk</cnf.mail.report.to>
+
+        <!-- Results not found internal Report -->
+        <report.user>reportadmin</report.user>
+        <report.password>password</report.password>
 
         <!-- Logging -->
-        <logging.dir>/Users/reactome/Reactome/search</logging.dir>
-        <logging.database>${logging.dir}/search.db</logging.database>
+        <logging.level>ERROR</logging.level>
+        <logging.dir>/var/log/tomcat7</logging.dir>
 
-        <!-- Mail Configuration, using FakeSMTP -->
-        <!-- Properties are ready to use GMail, etc. -->
-        <mail.host>localhost</mail.host>
-        <mail.port>8081</mail.port>
-        <mail.username>username</mail.username>
-        <mail.password>password</mail.password>
-        <mail.enable.auth>false</mail.enable.auth>
-        <mail.error.dest>bug-fixing-team@mycompany.co.uk</mail.error.dest>
-        <mail.support.dest>helpdesk@mycompany.co.uk</mail.support.dest>
+        <!-- Analysis intermediate file  -->
+        <analysis.structure.file>/usr/local/reactomes/Reactome/production/AnalysisService/input/analysis.bin</analysis.structure.file>
+        <analysis.result.root>/usr/local/reactomes/Reactome/production/AnalysisService/temp</analysis.result.root>
 
-        <!-- Reactome Server to query header and footer -->
-        <template.server>http://reactomedev.oicr.on.ca/</template.server>
+        <!-- Common folders and file locations -->
+        <fireworks.json.folder>/usr/local/reactomes/Reactome/production/Website/static/download/current/fireworks</fireworks.json.folder>
+        <diagram.json.folder>/usr/local/reactomes/Reactome/production/Website/static/download/current/diagram</diagram.json.folder>
+        <diagram.exporter.temp.folder>/usr/local/reactomes/Reactome/production/ContentService/exporter/</diagram.exporter.temp.folder>
+        <tuples.uploaded.files.folder>/usr/local/reactomes/Reactome/production/ContentService/custom</tuples.uploaded.files.folder>
 
-        <!-- Interactor custom folder -->
-        <tuples.uploaded.files.folder>/Users/reactome/Reactome/interactors/tuple</tuples.uploaded.files.folder>
+        <!-- Needed for the Content-Service / Raster exporter -->
+        <ehld.folder>/usr/local/reactomes/Reactome/production/Website/static/download/current/ehld</ehld.folder>
+        <svg.summary.file>/usr/local/reactomes/Reactome/production/Website/static/download/current/ehld/svgsummary.txt</svg.summary.file>
 
-        <!--
-            The cron has to match 6 fields which are: second, minute, hour, day of month, month, day(s) of week
-            e.g run every 10 minutes =>  0 */10 * * * *
-                (*) - match any
-                */X - means every "X"
-        -->
-        <psicquic.resources.cache.cron>0 */59 * * * *</psicquic.resources.cache.cron>
-
-        <!-- PPTX Exporter -->
-        <diagram.json.folder>/Users/reactome/Reactome/diagram/static</diagram.json.folder>
-        <diagram.exporter.temp.folder>/Users/reactome/Reactome/diagram/exporter</diagram.exporter.temp.folder>
-
-        <!-- AOP: Do not enable. -->
-        <aop.enabled>false</aop.enabled>
+        <!-- Path to the experiments binary file -->
+        <experiments.data.file>/usr/local/reactomes/Reactome/production/AnalysisService/digester/experiments.bin</experiments.data.file>
     </properties>
 </profile>
 ```
 
-##### Running ContentService activating ```ContentService-Local``` profile
+##### Running ContentService activating ```reactome``` profile.
 ```console
-mvn tomcat7:run -P ContentService-Local
-```
-
-in case you didn't set up the profile it is still possible to run Reactome Content Service. You may need to add all the properties into a command-line call.
-```console
-mvn tomcat7:run \
-    -Dneo4j.user=neo4j -Dneo4j.password=neo4j -Dneo4j.host=localhost -Dneo4j.port=7474 \
-    -Dsolr.host=http://localhost:8983/solr/reactome -Dsolr.user=solr -Dsolr.password=solr \
-    -Dinteractors.SQLite=/Users/reactome/Reactome/interactors/interactors.db \
-    -Dlogging.dir=/Users/reactome/Reactome/search \
-    -Dlogging.database=/Users/reactome/Reactome/search/search.db \
-    -Dmail.host=localhost -Dmail.port=8081 -Dmail.username=username -Dmail.password=password \
-    -Dmail.enable.auth=false -Dmail.error.dest=bug-fixing-team@mycompany.co.uk \
-    -Dmail.support.dest=helpdesk@mycompany.co.uk \
-    -Dtemplate.server=http://reactomedev.oicr.on.ca/ \
-    -Dtuples.uploaded.files.folder=/Users/reactome/Reactome/interactors/tuple \
-    -Dpsicquic.resources.cache.cron="0 */59 * * * *" \
-    -Ddiagram.json.folder=/Users/reactome/Reactome/diagram/static \
-    -Ddiagram.exporter.temp.folder=/Users/reactome/Reactome/diagram/exporter \
-    -Daop.enabled=false
+mvn tomcat7:run -P reactome
 ```
 
 Check if Tomcat has been initialised
