@@ -44,7 +44,7 @@ public class SwaggerConfig {
                 "1.1",
                 "/license",
                 new Contact("Reactome", "https://reactome.org", "help@reactome.org"),
-                "Creative Commons Attribution 3.0 Unported License",
+                "Creative Commons Attribution 3.0 Unsupported License",
                 "http://creativecommons.org/licenses/by/3.0/legalcode",
                 Collections.emptyList()
         );
