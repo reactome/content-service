@@ -115,7 +115,7 @@ public class HeaderFooterCacher extends Thread {
             rtn = rtn.replaceAll("favth-content-block", "");
 
             return rtn;
-        } catch (IOException e) {
+        } catch (IOException | UnprocessableEntityException e) {
             logger.warn("The template file is not available. Please check '" + templateURL + "'");
             return String.format("" +
                     "<span style='color:red'>%s is not available</span>" +
