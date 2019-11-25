@@ -26,7 +26,7 @@ public class SearchManager {
 
     public DiagramOccurrencesResult getDiagramOccurrencesResult(String pathway, String query) throws SolrSearcherException {
         DiagramOccurrencesResult rtn = new DiagramOccurrencesResult();
-        Query queryObject = new Query(query, pathway, null, null, null, null);
+        Query queryObject = new Query.Builder(query).addFilterQuery(pathway).build();
         List<DiagramOccurrencesResult> diagramOccurrencesList = searchService.getDiagramFlagging(queryObject);
         for (DiagramOccurrencesResult diagramOccurrencesResult : diagramOccurrencesList) {
             if (diagramOccurrencesResult.getInDiagram()) {
@@ -61,8 +61,7 @@ public class SearchManager {
     public FireworksOccurrencesResult getFireworksOccurrencesResult(Species species, String query) throws SolrSearcherException {
         List<String> speciess = new ArrayList<>();
         speciess.add(species.getDisplayName());
-        Query queryObject = new Query(query, speciess, null, null, null);
-
+        Query queryObject = new Query.Builder(query).forSpecies(speciess).build();
 
         FireworksOccurrencesResult occ = searchService.fireworksFlagging(queryObject);
 

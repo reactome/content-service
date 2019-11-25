@@ -99,7 +99,7 @@ class SearchController {
                                    @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                    @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
-        Query queryObject = new Query(query, species, types, compartments, keywords);
+        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).build();
         return searchService.getFacetingInformation(queryObject);
     }
 
@@ -121,7 +121,7 @@ class SearchController {
                                    @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
                                    HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query(query, "", species, types, compartments, keywords, start, rows, getReportInformation(request));
+        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).build();
         GroupedResult result = searchService.getEntries(queryObject, cluster);
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
             Set<TargetResult> targets = null;
@@ -144,7 +144,7 @@ class SearchController {
                                               HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>(); speciess.add(species);
-        Query queryObject = new Query(query, "", speciess, types, null, null, start, rows, getReportInformation(request));
+        Query queryObject = new Query.Builder(query).forSpecies(speciess).withTypes(types).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).build();
         FireworksResult fireworksResult = searchService.getFireworks(queryObject);
         if (fireworksResult == null || fireworksResult.getFound() == 0) {
             Set<TargetResult> targets = null;
@@ -179,7 +179,7 @@ class SearchController {
                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                           @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         checkDiagramIdentifier(diagram);
-        Query queryObject = new Query(query, diagram, null, types, null, null, start, rows);
+        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfrows(rows).build();
         DiagramResult rtn = searchService.getDiagrams(queryObject);
         if (rtn == null || rtn.getFound() == 0) throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
         return rtn;
@@ -192,7 +192,7 @@ class SearchController {
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
                                                           @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types) throws SolrSearcherException {
         checkIdentifiers(diagram, instance);
-        Query queryObject = new Query(instance, diagram, null, types, null, null);
+        Query queryObject = new Query.Builder(instance).addFilterQuery(diagram).withTypes(types).build();
         DiagramOccurrencesResult rtn = searchService.getDiagramOccurrencesResult(queryObject);
         if (rtn == null) throw new NotFoundException(String.format("No occurrences of '%s' found in '%s'", instance, diagram));
         return rtn;
@@ -229,7 +229,7 @@ class SearchController {
         infoLogger.info("Requested diagram summary for query {}", query);
         List<String> speciess = new ArrayList<>();
         speciess.add(species);
-        Query queryObject = new Query(query, diagram, speciess, null, null, null);
+        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).forSpecies(speciess).build();
         return searchService.getDiagramSearchSummary(queryObject);
     }
 
