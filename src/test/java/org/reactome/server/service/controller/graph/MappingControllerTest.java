@@ -20,13 +20,11 @@ public class MappingControllerTest extends BaseTest {
         mvcGetResult("/data/mapping/ENSEMBL/NTN1/reactions", "application/json;Charset=UTF-8");
         //pten should be PTEN
         mvcGetResultNotFound("/data/mapping/UniProt/pten/reactions");
-
     }
 
     @Test
     public void getPathways() throws Exception {
 
-        mvcGetResult("/data/mapping/UnniProt/PTEN/pathways", "application/json;Charset=UTF-8");
+        mvcGetResult("/data/mapping/UniProt/PTEN/pathways", "application/json;Charset=UTF-8");
     }
-
 }
