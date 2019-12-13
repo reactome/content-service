@@ -25,13 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
-public class QueryObjectControllerPostTest extends BaseTest {
-
-    @Test
-    public void getBean() {
-
-        findBeanByName("queryObjectController");
-    }
+public class QueryObjectControllerPostEXTest extends BaseTest {
 
     @Test
     public void findById() {

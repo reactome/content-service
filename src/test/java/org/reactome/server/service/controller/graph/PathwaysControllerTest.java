@@ -21,11 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PathwaysControllerTest extends BaseTest {
 
     @Test
-    public void getBean() {
-        findBeanByName("pathwaysController");
-    }
-
-    @Test
     public void getContainedEvents() throws Exception {
 
         MvcResult mvcResult = this.getMockMvc().perform(
@@ -58,7 +53,6 @@ public class PathwaysControllerTest extends BaseTest {
         mvcGetResult("/data/pathways/top/9606", "application/json;charset=UTF-8");
 
         mvcGetResultNotFound("/data/pathways/top/12345");
-
     }
 
     @Test
@@ -71,7 +65,6 @@ public class PathwaysControllerTest extends BaseTest {
     public void getPathwaysForAllFormsOf() throws Exception {
 
         mvcGetResult("/data/pathways/top/9606", "application/json;charset=UTF-8", "species", "9606");
-
     }
 
     @Test
@@ -80,7 +73,6 @@ public class PathwaysControllerTest extends BaseTest {
         mvcGetResult("/data/pathways/low/diagram/entity/R-HSA-1640170", "application/json;charset=UTF-8", "species", "9606");
 
         mvcGetResultNotFound("/data/pathways/low/diagram/entity/R-HSA-5675194", "species", "9606");
-
     }
 
     @Test
@@ -100,7 +92,7 @@ public class PathwaysControllerTest extends BaseTest {
     public void getEntitiesInDiagramForIdentifier() throws Exception {
 
         mvcGetResult("/data/diagram/R-HSA-4085001/entities/CTSA", "application/json;charset=UTF-8");
-        //   mvcGetResult("/data/diagram/R-HSA-446203/entities/CTSA", "application/json;charset=UTF-8");  pathway id is wrong
+        //   mvcGetResult("/data/diagram/R-HSA-446203/entities/CTSA", "application/json;charset=UTF-8"); // pathway id is wrong
     }
 
     @Test

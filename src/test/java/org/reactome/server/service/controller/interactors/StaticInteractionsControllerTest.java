@@ -26,11 +26,6 @@ public class StaticInteractionsControllerTest extends BaseTest {
     //Todo: the staticInteractionsController works with lower case AC numbers but return empty response
 
     @Test
-    public void getBean() {
-        findBeanByName("staticInteractionsController");
-    }
-
-    @Test
     public void getProteinSummaryByAcc() throws Exception {
 
         mvcGetResult("/interactors/static/molecule/P16885/summary", "application/json;charset=UTF-8");
@@ -81,13 +76,9 @@ public class StaticInteractionsControllerTest extends BaseTest {
     @Test
     public void getLowerLevelPathways() throws Exception {
 
-        // Todo molecule/{acc}/pathways
-
         Map<String, Object> params = new HashMap<>();
         params.put("species", "Homo sapiens");
         params.put("onlyDiagrammed", false);
-
         mvcGetResult("/interactors/static/molecule/Q9BXM7-1/pathways", "application/json;charset=UTF-8", params);
-
     }
 }

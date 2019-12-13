@@ -29,12 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
-public class PathwaysControllerExampleTest  extends BaseTest {
-
-    @Test
-    public void getBean() {
-      findBeanByName("pathwaysController");
-    }
+public class PathwaysControllerExampleTest extends BaseTest {
 
     @Test
     public void getContainedEvents() throws Exception {
@@ -114,7 +109,7 @@ public class PathwaysControllerExampleTest  extends BaseTest {
 
         MvcResult mvcResult = this.getMockMvc().perform(get("/data/pathways/low/entity/R-HSA-199420/allForms")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("species","9606"))
+                .param("species", "9606"))
                 .andExpect(status().isOk())
                 .andReturn();
 

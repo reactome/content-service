@@ -27,24 +27,28 @@ public class ImageExporterControllerTest extends BaseTest {
         Map<String, Object> params = new HashMap<>();
         params.put("quality", 5);
         //solr
-        // params.put("flg", "UNC5B");
+        params.put("flg", "UNC5B");
         params.put("flgInteractors", true);
         params.put("title", false);
         params.put("diagramProfile", "Modern");
         params.put("resource", "total");
 
+        //pathway
         mvcGetResult("/exporter/diagram/166520.png", "image/png", params);
-        //getMockMvc().perform(get("/exporter/diagram/177929.png").param("flg","EGFR")).andExpect(content().bytes(FileUtils.readFileToByteArray(new File("/Users/chuqiao/Downloads/R-HSA-177929.png"))));
+
+        //reaction
+        mvcGetResult("/exporter/diagram/6789031.png", "image/png", params);
     }
 
     @Test
     public void reactionImage() throws Exception {
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("quality", 5);
-        params.put("flgInteractors", true);
-        params.put("resource", "total");
-        mvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
+        //todo: comment for now
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("quality", 5);
+//        params.put("flgInteractors", true);
+//        params.put("resource", "total");
+//        mvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
 
     }
 }

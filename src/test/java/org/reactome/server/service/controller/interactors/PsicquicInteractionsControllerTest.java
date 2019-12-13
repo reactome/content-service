@@ -2,7 +2,6 @@ package org.reactome.server.service.controller.interactors;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.reactome.server.service.utils.BaseTest;
 import org.springframework.http.MediaType;
@@ -10,10 +9,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
@@ -21,8 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PsicquicInteractionsControllerTest extends BaseTest {
 
     @Test
-    public void getBean() {
-        findBeanByName("psicquicInteractionsController");
+    public void getResources() throws Exception {
+
+        mvcGetResult("/interactors/psicquic/resources", "application/json;charset=UTF-8");
     }
 
     @Test
@@ -59,5 +59,6 @@ public class PsicquicInteractionsControllerTest extends BaseTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.entities[0].count", Matchers.greaterThan(25))) // 38
                 .andReturn();
+
     }
 }

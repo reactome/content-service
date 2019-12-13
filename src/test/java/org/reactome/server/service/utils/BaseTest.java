@@ -33,7 +33,7 @@ public class BaseTest {
     private MockMvc mockMvc;
 
     /**
-     initialize the mockMvc object
+     * initialize the mockMvc object
      */
     @Before
     public void setup() {
@@ -78,7 +78,7 @@ public class BaseTest {
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
 
-        //    params.forEach(requestBuilder::param);
+            //    params.forEach(requestBuilder::param);
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
@@ -114,7 +114,7 @@ public class BaseTest {
             MockHttpServletRequestBuilder requestBuilder = get(url);
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
-           // params.forEach(requestBuilder::param);
+            // params.forEach(requestBuilder::param);
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().isNotFound())
                     .andReturn();
@@ -128,7 +128,6 @@ public class BaseTest {
 
 
     /**
-     *
      * Bad request
      */
     public MvcResult mvcGetResultBadRequest(String url, Map<String, Object> params) throws Exception {
@@ -150,18 +149,49 @@ public class BaseTest {
     }
 
 
-
     /**
      * Testing spring mvc controller post
      */
+
+
     public MvcResult mvcPostResult(String url, String content) throws Exception {
-        return this.mockMvc.perform(
-                post(url)
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content(content))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn();
+        return mvcPostResult(url, content, null);
+    }
+
+    public MvcResult mvcPostResult(String url, String content, String paramName, String paramValue) throws Exception {
+        if (paramName == null && paramValue == null) return mvcPostResult(url, content, null);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(paramName, paramValue);
+        return mvcPostResult(url, content, params);
+    }
+
+
+    public MvcResult mvcPostResult(String url, String content, Map<String, Object> params) throws Exception {
+
+        if (params != null && !params.isEmpty()) {
+
+            MockHttpServletRequestBuilder requestBuilder = post(url)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .content(content);
+
+            for (Map.Entry<String, Object> entry : params.entrySet())
+                requestBuilder.param(entry.getKey(), entry.getValue().toString());
+
+            return this.mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType("application/json;charset=UTF-8"))
+
+                    .andReturn();
+        } else {
+            return this.mockMvc.perform(
+                    post(url)
+                            .contentType(MediaType.TEXT_PLAIN)
+                            .content(content))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType("application/json;charset=UTF-8"))
+                    .andReturn();
+        }
     }
 
 
