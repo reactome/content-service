@@ -159,7 +159,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     ResponseEntity<String> handleCustomPsicquicInteractionClusterException(HttpServletRequest request, CustomPsicquicInteractionClusterException e) {
         logger.warn("CustomPsicquicInteractionClusterException was caught for request: " + request.getRequestURL());
-        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Error querying your PSICQUIC Resource.");
+        return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Error querying your PSICQUIC Resource: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
