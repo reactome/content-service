@@ -37,8 +37,8 @@ public class PersonController {
 
     //ToDo in regards to data privacy, should this not be removed or restricted? emails have been removed, is this enough
     @ApiOperation(
-            value = "A list of people with first or last name exactly matching a given string",
-            notes = "Retrieves a list of people in Reactome with either their first or last name matching exactly the given string.",
+            value = "A list of people with first AND last name exactly matching a given string",
+            notes = "Retrieves a list of people in Reactome with their first AND last name matching exactly the given string.",
             response = DatabaseObject.class, responseContainer = "List"
     )
     @ApiResponses({
@@ -47,7 +47,7 @@ public class PersonController {
     })
     @RequestMapping(value = "/people/name/{name}/exact", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Person> findPersonByName(@ApiParam(value = "Person's first or last name", defaultValue = "Steve Jupe", required = true) @PathVariable String name) {
+    public Collection<Person> findPersonByName(@ApiParam(value = "Person's first and last name", defaultValue = "Steve Jupe", required = true) @PathVariable String name) {
         Collection<Person> persons = personService.findPersonByName(name);
         if (persons == null || persons.isEmpty()) throw new NotFoundException("No persons found for name: " + name);
         infoLogger.info("Request for person with name: {}", name);
@@ -117,7 +117,7 @@ public class PersonController {
     })
     @RequestMapping(value = "/person/{id}/publications", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Publication> getPublicationsOfPerson(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+    public Collection<Publication> getPublicationsOfPerson(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
         Collection<Publication> publications = personService.getPublicationsOfPerson(id);
         infoLogger.info("Request for all publications of person with id: {}", id);
         return publications;
@@ -135,7 +135,7 @@ public class PersonController {
     })
     @RequestMapping(value = "/person/{id}/authoredPathways", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId, DbId or Email", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+    public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
         Collection<Pathway> pathways = personService.getAuthoredPathways(id);
         infoLogger.info("Request for all authored pathways of person with id: {}", id);
         return pathways;
