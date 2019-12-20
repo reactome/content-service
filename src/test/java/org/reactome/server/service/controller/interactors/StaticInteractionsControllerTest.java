@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StaticInteractionsControllerTest extends BaseTest {
 
 
-    //Todo: the staticInteractionsController works with lower case AC numbers but return empty response
+    //Todo: the staticInteractionsController works with lower case AC numbers but return empty response in get and post method
 
     @Test
     public void getProteinSummaryByAcc() throws Exception {

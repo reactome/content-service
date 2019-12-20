@@ -21,37 +21,37 @@ public class SchemaControllerTest extends BaseTest {
     public void getDatabaseObjectsForClassName() throws Exception {
 
         Map<String, Object> parmas = new HashMap<>();
-        parmas.put("species",9606);
-        parmas.put("page",1);
-        parmas.put("offset",20);
+        parmas.put("species", 9606);
+        parmas.put("page", 1);
+        parmas.put("offset", 20);
 
-        mvcGetResult("/data/schema/TopLevelPathway","Application/json;Charset=UTF-8", parmas);
+        mvcGetResult("/data/schema/TopLevelPathway", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
     public void getSimpleDatabaseObjectByClassName() throws Exception {
 
         Map<String, Object> parmas = new HashMap<>();
-        parmas.put("species",9606);
-        parmas.put("page",1);
-        parmas.put("offset",20);
+        parmas.put("species", 9606);
+        parmas.put("page", 1);
+        parmas.put("offset", 20);
 
-        mvcGetResult("/data/schema/TopLevelPathway/min","Application/json;Charset=UTF-8", parmas);
+        mvcGetResult("/data/schema/TopLevelPathway/min", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
     public void getSimpleReferencesObjectsByClassName() throws Exception {
 
         Map<String, Object> parmas = new HashMap<>();
-        parmas.put("page",1);
-        parmas.put("offset",200);
+        parmas.put("page", 1);
+        parmas.put("offset", 200);
 
-        mvcGetResult("/data/schema/ReferenceGroup/reference","Application/json;Charset=UTF-8", parmas);
+        mvcGetResult("/data/schema/ReferenceGroup/reference", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
     public void countEntries() throws Exception {
 
-        mvcGetResult("/data/schema/TopLevelPathway/count","Application/json;Charset=UTF-8", "species","9606");
+        mvcGetResult("/data/schema/TopLevelPathway/count", "Application/json;Charset=UTF-8", "species", "9606");
     }
 }
