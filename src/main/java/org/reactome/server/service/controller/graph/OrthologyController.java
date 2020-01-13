@@ -54,8 +54,9 @@ public class OrthologyController {
     @RequestMapping(value = "/orthologies/ids/species/{speciesId}", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
     public Map<Object, DatabaseObject> getOrthologies(@ApiParam(value = "The species for which the orthology is requested", defaultValue = "49633", required = true)
-                                         @PathVariable Long speciesId,
-                                         @RequestBody String post) {
+                                                      @PathVariable Long speciesId,
+                                                      @ApiParam(value = "The events or entities for which the orthology is requested", required = true)
+                                                      @RequestBody String post) {
         Collection<Object> ids = new ArrayList<>();
         for (String id : post.split(",|;|\\n|\\t")) {
             ids.add(id.trim());
