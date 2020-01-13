@@ -17,11 +17,6 @@ public class CustomPsicquicControllerTest extends BaseTest {
     @Test
     public void registryPsicquicURL() throws Exception {
 
-        // todo internal server error ->Gui fix it
-        //String urlWrong = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/*?firstResult=10000&maxResults=50";
-
-        //String urlWrong2 = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/query/Q9UBU9";
-
         String url = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/query";
 
         mvcPostResult("/interactors/upload/psicquic/url", url, "name", "CSTest");
