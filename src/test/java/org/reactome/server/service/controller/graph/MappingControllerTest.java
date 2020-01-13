@@ -18,7 +18,7 @@ public class MappingControllerTest extends BaseTest {
     public void getReactionsLikeEvent() throws Exception {
 
         mvcGetResult("/data/mapping/ENSEMBL/NTN1/reactions", "application/json;Charset=UTF-8");
-        //pten should be PTEN
+        //pten should be PTEN, same as mapping pathways,lower case will cause 404
         mvcGetResultNotFound("/data/mapping/UniProt/pten/reactions");
     }
 
