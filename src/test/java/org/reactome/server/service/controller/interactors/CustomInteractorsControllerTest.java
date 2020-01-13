@@ -69,7 +69,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
         files.add(extendFileTest);
         files.add(tsvFileTest);
 
-
         MockMultipartHttpServletRequestBuilder requestBuilder = fileUpload("/interactors/upload/tuple/form");
 
         for (MockMultipartFile file : files) {
@@ -99,9 +98,5 @@ public class CustomInteractorsControllerTest extends BaseTest {
         String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q9UBU9";
 
         mvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");
-
-        // Todo: this url is not working
-        // String urlNotWorking = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/*?firstResult=10000&maxResults=50";
-
     }
 }
