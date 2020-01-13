@@ -15,6 +15,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,9 +43,6 @@ public class SearchControllerTest extends BaseTest {
     @Test
     public void facet_type() throws Exception {
 
-        // mvcGetResult("/search/facet_query","application/json;Charset=UTF-8");
-
-        //todo parameter is a list
         this.getMockMvc().perform(get("/search/facet_query")
                 .param("query", "PTEN")
                 .param("species", "Homo sapiens")
@@ -52,21 +50,13 @@ public class SearchControllerTest extends BaseTest {
                 .param("types", "Pathway")
                 .param("compartments", "cotosol"))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn();
     }
 
     @Test
     public void getResult() throws Exception {
 
-
-//        MultiValuedMap<String, String> params = new ArrayListValuedHashMap<>();
-//        params.put("query","enzme");
-//        params.put("species","Homo sapiens");
-//        params.put("species","Rattus norvegicus");
-//        params.put("types","Pathway");
-//        params.put("cluster","ture");
-
-        //todo parameter is a list
         this.getMockMvc().perform(get("/search/query")
                 .param("query", "enzyme")
                 .param("species", "Homo sapiens")
