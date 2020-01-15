@@ -43,12 +43,10 @@ public class ImageExporterControllerTest extends BaseTest {
     @Test
     public void reactionImage() throws Exception {
 
-        //todo: comment for now
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("quality", 5);
-//        params.put("flgInteractors", true);
-//        params.put("resource", "total");
-//        mvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
-
+        Map<String, Object> params = new HashMap<>();
+        params.put("quality", 5);
+        params.put("flgInteractors", true);
+        params.put("resource", "total");
+        mvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
     }
 }
