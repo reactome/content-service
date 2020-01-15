@@ -20,7 +20,7 @@ public class SbxxExporterControllerTest extends BaseTest {
 
         //pathway
         //todo ERROR: Trying to write a SBGN file that already exists, but test passed
-        mvcGetResult("/exporter/event/68886.sbgnnn", "application/sbgn+xml");
+        mvcGetResult("/exporter/event/68886.sbgn", "application/sbgn+xml");
 
         //reaction
         mvcGetResult("/exporter/event/R-HSA-5205682.sbgn","application/sbgn+xml");
