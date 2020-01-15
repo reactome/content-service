@@ -22,9 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class StaticInteractionsControllerTest extends BaseTest {
 
-
-    //Todo: the staticInteractionsController works with lower case AC numbers but return empty response in get and post method
-
     @Test
     public void getProteinSummaryByAcc() throws Exception {
 
@@ -41,6 +38,14 @@ public class StaticInteractionsControllerTest extends BaseTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.entities[0].count", Matchers.greaterThan(15))) //20
+                .andReturn();
+
+        this.getMockMvc().perform(
+                get("/interactors/static/molecule/q13501/details")
+                        .param("page", "-1")
+                        .param("pageSize", "-1"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json"))
                 .andReturn();
     }
 
@@ -70,6 +75,16 @@ public class StaticInteractionsControllerTest extends BaseTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.entities[0].count", Matchers.greaterThan(30)))  //35
                 .andExpect(jsonPath("$.entities[1].count", Matchers.greaterThan(40)))  //68
+                .andReturn();
+
+        this.getMockMvc().perform(
+                post("/interactors/static/molecules/details")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("p23025,O95632,O95634,O95635,O95636,O95637,O95638")
+                        .param("page", "-1")
+                        .param("pageSize", "-1"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json"))
                 .andReturn();
     }
 
