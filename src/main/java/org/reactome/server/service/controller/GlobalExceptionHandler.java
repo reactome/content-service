@@ -408,9 +408,9 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(MissingSBMLException.class)
+    @ExceptionHandler(MissingSBXXException.class)
     @ResponseBody
-    ResponseEntity<String> handleMissingSBMLException(HttpServletRequest request, MissingSBMLException e) {
+    ResponseEntity<String> handleMissingSBMLException(HttpServletRequest request, MissingSBXXException e) {
         logger.error("MissingSBMLException was caught for request: " + request.getRequestURL(), e);
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
