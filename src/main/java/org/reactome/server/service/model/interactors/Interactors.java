@@ -42,4 +42,14 @@ public class Interactors {
         this.entities = entities;
     }
 
+    public boolean hasInteractorsInEntities() {
+        int count = 0;
+        for (InteractorEntity list : getEntities()) {
+            count += list.getCount();
+            if (count > 0) {
+                break;
+            }
+        }
+        return count == 0;
+    }
 }
