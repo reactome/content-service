@@ -25,7 +25,7 @@ public class SchemaControllerTest extends BaseTest {
         parmas.put("page", 1);
         parmas.put("offset", 20);
 
-        mvcGetResult("/data/schema/TopLevelPathway", "Application/json;Charset=UTF-8", parmas);
+        mockMvcGetResult("/data/schema/TopLevelPathway", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class SchemaControllerTest extends BaseTest {
         parmas.put("page", 1);
         parmas.put("offset", 20);
 
-        mvcGetResult("/data/schema/TopLevelPathway/min", "Application/json;Charset=UTF-8", parmas);
+        mockMvcGetResult("/data/schema/TopLevelPathway/min", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
@@ -46,12 +46,11 @@ public class SchemaControllerTest extends BaseTest {
         parmas.put("page", 1);
         parmas.put("offset", 200);
 
-        mvcGetResult("/data/schema/ReferenceGroup/reference", "Application/json;Charset=UTF-8", parmas);
+        mockMvcGetResult("/data/schema/ReferenceGroup/reference", "Application/json;Charset=UTF-8", parmas);
     }
 
     @Test
     public void countEntries() throws Exception {
-
-        mvcGetResult("/data/schema/TopLevelPathway/count", "Application/json;Charset=UTF-8", "species", "9606");
+        mockMvcGetResult("/data/schema/TopLevelPathway/count", "Application/json;Charset=UTF-8", "species", "9606");
     }
 }

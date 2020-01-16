@@ -56,28 +56,27 @@ public class BaseTest {
 
 
     /**
-     * Testing spring mvc controller get method
+     * Get request testing of Spring MVC controllers
      */
-    public MvcResult mvcGetResult(String url, String contentType, String paramName, String paramValue) throws Exception {
-        if (paramName == null && paramValue == null) return mvcGetResult(url, contentType, null);
+    public MvcResult mockMvcGetResult(String url, String contentType, String paramName, String paramValue) throws Exception {
+        if (paramName == null && paramValue == null) return mockMvcGetResult(url, contentType, null);
 
         Map<String, Object> params = new HashMap<>();
         params.put(paramName, paramValue);
-        return mvcGetResult(url, contentType, params);
+        return mockMvcGetResult(url, contentType, params);
     }
 
-    public MvcResult mvcGetResult(String url, String contentType) throws Exception {
-        return mvcGetResult(url, contentType, null);
+    public MvcResult mockMvcGetResult(String url, String contentType) throws Exception {
+        return mockMvcGetResult(url, contentType, null);
     }
 
-    public MvcResult mvcGetResult(String url, String contentType, Map<String, Object> params) throws Exception {
+    public MvcResult mockMvcGetResult(String url, String contentType, Map<String, Object> params) throws Exception {
         if (params != null && !params.isEmpty()) {
 
             MockHttpServletRequestBuilder requestBuilder = get(url);
 
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
-
             //    params.forEach(requestBuilder::param);
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().isOk())
@@ -92,29 +91,29 @@ public class BaseTest {
         }
     }
 
-    /**
-     * Testing spring mvc controller get 404
-     */
-    public MvcResult mvcGetResultNotFound(String url, String paramName, String paramValue) throws Exception {
 
-        if (paramName == null && paramValue == null) return mvcGetResultNotFound(url, null);
+    /**
+     * Get request not found testing of Spring MVC controllers
+     */
+    public MvcResult mockMvcGetResultNotFound(String url, String paramName, String paramValue) throws Exception {
+
+        if (paramName == null && paramValue == null) return mockMvcGetResultNotFound(url, null);
 
         Map<String, Object> params = new HashMap<>();
         params.put(paramName, paramValue);
-        return mvcGetResultNotFound(url, params);
+        return mockMvcGetResultNotFound(url, params);
     }
 
-    public MvcResult mvcGetResultNotFound(String url) throws Exception {
-        return mvcGetResultNotFound(url, null);
+    public MvcResult mockMvcGetResultNotFound(String url) throws Exception {
+        return mockMvcGetResultNotFound(url, null);
     }
 
-    public MvcResult mvcGetResultNotFound(String url, Map<String, Object> params) throws Exception {
+    public MvcResult mockMvcGetResultNotFound(String url, Map<String, Object> params) throws Exception {
         if (params != null && !params.isEmpty()) {
 
             MockHttpServletRequestBuilder requestBuilder = get(url);
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
-            // params.forEach(requestBuilder::param);
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().isNotFound())
                     .andReturn();
@@ -128,15 +127,14 @@ public class BaseTest {
 
 
     /**
-     * Bad request
+     * Bad request testing of Spring MVC controllers
      */
-    public MvcResult mvcGetResultBadRequest(String url, Map<String, Object> params) throws Exception {
+    public MvcResult mockMvcGetResultBadRequest(String url, Map<String, Object> params) throws Exception {
         if (params != null && !params.isEmpty()) {
 
             MockHttpServletRequestBuilder requestBuilder = get(url);
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
-            // params.forEach(requestBuilder::param);
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().is5xxServerError())
                     .andReturn();
@@ -150,24 +148,21 @@ public class BaseTest {
 
 
     /**
-     * Testing spring mvc controller post
+     * Post request testing of Spring MVC controllers
      */
-
-
-    public MvcResult mvcPostResult(String url, String content) throws Exception {
-        return mvcPostResult(url, content, null);
+    public MvcResult mockMvcPostResult(String url, String content) throws Exception {
+        return mockMvcPostResult(url, content, null);
     }
 
-    public MvcResult mvcPostResult(String url, String content, String paramName, String paramValue) throws Exception {
-        if (paramName == null && paramValue == null) return mvcPostResult(url, content, null);
+    public MvcResult mockMvcPostResult(String url, String content, String paramName, String paramValue) throws Exception {
+        if (paramName == null && paramValue == null) return mockMvcPostResult(url, content, null);
 
         Map<String, Object> params = new HashMap<>();
         params.put(paramName, paramValue);
-        return mvcPostResult(url, content, params);
+        return mockMvcPostResult(url, content, params);
     }
 
-
-    public MvcResult mvcPostResult(String url, String content, Map<String, Object> params) throws Exception {
+    public MvcResult mockMvcPostResult(String url, String content, Map<String, Object> params) throws Exception {
 
         if (params != null && !params.isEmpty()) {
 
@@ -196,7 +191,7 @@ public class BaseTest {
 
 
     /**
-     * Testing spring mvc controller post 404
+     * post not found request testing of Spring MVC controllers
      */
     public MvcResult mvcPostResultNotFound(String url, String content) throws Exception {
         return this.mockMvc.perform(

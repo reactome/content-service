@@ -21,20 +21,17 @@ public class PsicquicInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getResources() throws Exception {
-
-        mvcGetResult("/interactors/psicquic/resources", "application/json;charset=UTF-8");
+        mockMvcGetResult("/interactors/psicquic/resources", "application/json;charset=UTF-8");
     }
 
     @Test
     public void getProteinDetailsByResource() throws Exception {
-
-        mvcGetResult("/interactors/psicquic/molecule/mint/Q13501/details", "application/json;charset=UTF-8");
+        mockMvcGetResult("/interactors/psicquic/molecule/mint/Q13501/details", "application/json;charset=UTF-8");
     }
 
     @Test
     public void getProteinsDetailsByResource() throws Exception {
-
-        mvcPostResult("/interactors/psicquic/molecules/uniprot/details", "P11142, P3030");
+        mockMvcPostResult("/interactors/psicquic/molecules/uniprot/details", "P11142, P3030");
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
@@ -25,8 +26,8 @@ public class PptxExporterControllerTest extends BaseTest {
         params.put("flgInteractors", true);
 
         //pathway
-        mvcGetResult("/exporter/diagram/R-HSA-68886.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
+        mockMvcGetResult("/exporter/diagram/R-HSA-68886.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
         //reaction
-        mvcGetResult("/exporter/reaction/R-HSA-6789031.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
+        mockMvcGetResult("/exporter/reaction/R-HSA-6789031.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
     }
 }

@@ -16,6 +16,6 @@ public class ReferenceEntityControllerTest extends BaseTest {
 
     @Test
     public void getReferenceEntitiesFor() throws Exception {
-        mvcGetResult("/references/mapping/15357", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/references/mapping/15357", "application/json;Charset=UTF-8");
     }
 }

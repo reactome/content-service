@@ -10,6 +10,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
@@ -29,8 +30,8 @@ public class FireworksImageExporterControllerTest extends BaseTest {
         params.put("expColumn", "2");
         params.put("coverage", false);
 
-        mvcGetResult("/exporter/fireworks/9606.svg", "image/svg+xml;", params);
+        mockMvcGetResult("/exporter/fireworks/9606.svg", "image/svg+xml;", params);
 
-        mvcGetResult("/exporter/fireworks/9606.png", "image/png;", params);
+        mockMvcGetResult("/exporter/fireworks/9606.png", "image/png;", params);
     }
 }

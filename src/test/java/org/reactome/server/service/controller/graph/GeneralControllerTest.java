@@ -30,6 +30,6 @@ public class GeneralControllerTest extends BaseTest {
 
     @Test
     public void getDBVersion() throws Exception {
-        mvcGetResult("/data/database/version", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/database/version", "text/plain;charset=ISO-8859-1");
     }
 }

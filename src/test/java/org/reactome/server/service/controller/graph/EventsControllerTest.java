@@ -16,15 +16,14 @@ public class EventsControllerTest extends BaseTest {
 
     @Test
     public void getEventAncestors() throws Exception {
-
         //pathway
-        mvcGetResult("/data/event/9607240/ancestors", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/event/9607240/ancestors", "application/json;Charset=UTF-8");
         //reaction
-        mvcGetResult("/data/event/69173/ancestors", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/event/69173/ancestors", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void getEventHierarchy() throws Exception {
-        mvcGetResult("/data//eventsHierarchy/9913", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data//eventsHierarchy/9913", "application/json;Charset=UTF-8");
     }
 }

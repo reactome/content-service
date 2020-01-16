@@ -9,7 +9,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
@@ -17,11 +16,11 @@ public class DiseasesControllerTest extends BaseTest {
 
     @Test
     public void getDiseases() throws Exception {
-        mvcGetResult("/data/diseases", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/diseases", "application/json;charset=UTF-8");
     }
 
     @Test
     public void getDiseasesSummary() throws Exception {
-        mvcGetResult("/data/diseases/doid", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/diseases/doid", "text/plain;charset=ISO-8859-1");
     }
 }

@@ -16,18 +16,16 @@ public class ParticipantsControllerTest extends BaseTest {
 
     @Test
     public void getParticipants() throws Exception {
-        mvcGetResult("/data/participants/6799198", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/participants/6799198", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void getParticipatingPhysicalEntities() throws Exception {
-
-        mvcGetResult("/data/participants/6799198/participatingPhysicalEntities", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/participants/6799198/participatingPhysicalEntities", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void getParticipatingReferenceEntities() throws Exception {
-
-        mvcGetResult("/data/participants/6799198/referenceEntities", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/participants/6799198/referenceEntities", "application/json;Charset=UTF-8");
     }
 }

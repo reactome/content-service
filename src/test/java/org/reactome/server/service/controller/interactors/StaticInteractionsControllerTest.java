@@ -12,6 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,8 +25,7 @@ public class StaticInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinSummaryByAcc() throws Exception {
-
-        mvcGetResult("/interactors/static/molecule/P16885/summary", "application/json;charset=UTF-8");
+        mockMvcGetResult("/interactors/static/molecule/P16885/summary", "application/json;charset=UTF-8");
     }
 
     @Test
@@ -94,6 +94,6 @@ public class StaticInteractionsControllerTest extends BaseTest {
         Map<String, Object> params = new HashMap<>();
         params.put("species", "Homo sapiens");
         params.put("onlyDiagrammed", false);
-        mvcGetResult("/interactors/static/molecule/Q9BXM7-1/pathways", "application/json;charset=UTF-8", params);
+        mockMvcGetResult("/interactors/static/molecule/Q9BXM7-1/pathways", "application/json;charset=UTF-8", params);
     }
 }

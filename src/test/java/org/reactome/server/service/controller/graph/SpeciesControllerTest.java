@@ -16,11 +16,11 @@ public class SpeciesControllerTest extends BaseTest {
 
     @Test
     public void getSpecies() throws Exception {
-        mvcGetResult("/data/species/all", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/species/all", "application/json;charset=UTF-8");
     }
 
     @Test
     public void getAllSpecies() throws Exception {
-        mvcGetResult("/data/species/all", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/species/all", "application/json;charset=UTF-8");
     }
 }

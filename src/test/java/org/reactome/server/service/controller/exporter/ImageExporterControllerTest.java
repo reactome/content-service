@@ -11,6 +11,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
@@ -26,7 +28,7 @@ public class ImageExporterControllerTest extends BaseTest {
 
         Map<String, Object> params = new HashMap<>();
         params.put("quality", 5);
-        //solr
+        //get value from solr
         params.put("flg", "UNC5B");
         params.put("flgInteractors", true);
         params.put("title", false);
@@ -34,10 +36,9 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("resource", "total");
 
         //pathway
-        mvcGetResult("/exporter/diagram/166520.png", "image/png", params);
-
+        mockMvcGetResult("/exporter/diagram/166520.png", "image/png", params);
         //reaction
-        mvcGetResult("/exporter/diagram/6789031.png", "image/png", params);
+        mockMvcGetResult("/exporter/diagram/6789031.png", "image/png", params);
     }
 
     @Test
@@ -47,6 +48,6 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("quality", 5);
         params.put("flgInteractors", true);
         params.put("resource", "total");
-        mvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
+        mockMvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
     }
 }

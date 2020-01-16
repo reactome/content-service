@@ -20,19 +20,17 @@ public class SbxxExporterControllerTest extends BaseTest {
 
         //pathway
         //todo ERROR: Trying to write a SBGN file that already exists, but test passed
-        mvcGetResult("/exporter/event/68886.sbgn", "application/sbgn+xml");
-
+        mockMvcGetResult("/exporter/event/68886.sbgn", "application/sbgn+xml");
         //reaction
-        mvcGetResult("/exporter/event/R-HSA-5205682.sbgn","application/sbgn+xml");
+        mockMvcGetResult("/exporter/event/R-HSA-5205682.sbgn","application/sbgn+xml");
     }
 
     @Test
     public void eventSBML() throws Exception {
 
         //pathway
-        mvcGetResult("/exporter/event/R-HSA-157118.sbml", "application/sbml+xml");
-
+        mockMvcGetResult("/exporter/event/R-HSA-157118.sbml", "application/sbml+xml");
         //reaction
-        mvcGetResult("/exporter/event/R-HSA-5205682.sbml", "application/sbml+xml");
+        mockMvcGetResult("/exporter/event/R-HSA-5205682.sbml", "application/sbml+xml");
     }
 }

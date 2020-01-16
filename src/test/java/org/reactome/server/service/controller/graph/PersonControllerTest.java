@@ -18,22 +18,22 @@ public class PersonControllerTest extends BaseTest {
     public void findPersonByName() throws Exception {
 
         //equals
-        mvcGetResult("/data/people/name/bijay jassal/exact", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/bijay jassal/exact", "application/json;Charset=UTF-8");
 
-        mvcGetResult("/data/people/name/Bijay Jassal/exact", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/Bijay Jassal/exact", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void queryPersonByName() throws Exception {
 
         //contains
-        mvcGetResult("/data/people/name/Bijay Jassal", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/Bijay Jassal", "application/json;Charset=UTF-8");
 
-        mvcGetResult("/data/people/name/bijay jassal", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/bijay jassal", "application/json;Charset=UTF-8");
 
-        mvcGetResult("/data/people/name/bijay", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/bijay", "application/json;Charset=UTF-8");
 
-        mvcGetResult("/data/people/name/bijay", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/people/name/bijay", "application/json;Charset=UTF-8");
 
     }
 
@@ -41,33 +41,30 @@ public class PersonControllerTest extends BaseTest {
     public void findPerson() throws Exception {
 
         //orcid
-        mvcGetResult("/data/person/0000-0002-5039-5405", "application/json;Charset=UTF-8");
-
+        mockMvcGetResult("/data/person/0000-0002-5039-5405", "application/json;Charset=UTF-8");
         //dbid
-        mvcGetResult("/data/person/73447", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/person/73447", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void findPersonAttributeName() throws Exception {
 
-        mvcGetResult("/data/person/0000-0002-5039-5405/displayName", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/person/0000-0002-5039-5405/displayName", "text/plain;charset=ISO-8859-1");
 
-        mvcGetResult("/data/person/73447/displayName", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/person/73447/displayName", "text/plain;charset=ISO-8859-1");
 
-        mvcGetResult("/data/person/0000-0002-5039-5405/publications", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/person/0000-0002-5039-5405/publications", "application/json;charset=UTF-8");
 
-        mvcGetResult("/data/person/0000-0002-5039-5405/affiliation", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/person/0000-0002-5039-5405/affiliation", "text/plain;charset=ISO-8859-1");
     }
 
     @Test
     public void getPublicationsOfPerson() throws Exception {
-
-        mvcGetResult("/data/person/73447/publications", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/person/73447/publications", "application/json;charset=UTF-8");
     }
 
     @Test
     public void getAuthoredPathways() throws Exception {
-
-        mvcGetResult("/data/person/73447/authoredPathways", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/person/73447/authoredPathways", "application/json;charset=UTF-8");
     }
 }

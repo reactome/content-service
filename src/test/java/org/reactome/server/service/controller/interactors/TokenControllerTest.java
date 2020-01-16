@@ -36,7 +36,7 @@ public class TokenControllerTest extends BaseTest {
          */
 
         //Todo this token only works for local testing
-        mvcPostResult("/interactors/token/" + token, "Q9UBU9");
+        mockMvcPostResult("/interactors/token/" + token, "Q9UBU9");
     }
 
     /* Get the newest file for a specific extension */

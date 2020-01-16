@@ -17,6 +17,8 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import static org.junit.Assert.*;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
@@ -88,7 +90,7 @@ public class CustomInteractorsControllerTest extends BaseTest {
 
         String content = "uniprotkb:Q9UBU9\tuniprotkb:P78406\t-\t-\tuniprotkb:NXF1(gene name)\tuniprotkb:RAE1(gene name)\tpsi-mi:\"MI:0004\"(affinity chromatography technology)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0463\"(biogrid)\tbiogrid:718103\tmentha-score:0.569";
 
-        mvcPostResult("/interactors/upload/tuple/content", content, "name", "CSTest");
+        mockMvcPostResult("/interactors/upload/tuple/content", content, "name", "CSTest");
     }
 
     @Test
@@ -96,6 +98,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
 
         String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q9UBU9";
 
-        mvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");
+        mockMvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");
     }
 }

@@ -19,6 +19,6 @@ public class CustomPsicquicControllerTest extends BaseTest {
 
         String url = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/query";
 
-        mvcPostResult("/interactors/upload/psicquic/url", url, "name", "CSTest");
+        mockMvcPostResult("/interactors/upload/psicquic/url", url, "name", "CSTest");
     }
 }
