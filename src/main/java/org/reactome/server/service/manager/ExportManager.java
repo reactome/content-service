@@ -12,7 +12,7 @@ import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.DiagramService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.controller.exporter.PptxExporterController;
-import org.reactome.server.service.exception.MissingSBMLException;
+import org.reactome.server.service.exception.MissingSBXXException;
 import org.reactome.server.tools.diagram.data.DiagramFactory;
 import org.reactome.server.tools.diagram.data.exception.DeserializationException;
 import org.reactome.server.tools.diagram.data.layout.Diagram;
@@ -144,17 +144,20 @@ public class ExportManager {
 
 
 
-    public File getCachedFile(Event event, String sbmlFileName) throws MissingSBMLException {
+    public File getCachedFile(Event event, String fileName) throws MissingSBXXException {
+        // filename contains sbgn or sbml that will be used in the temp folder.
+        String fileFolderName = fileName.substring(fileName.lastIndexOf('.') + 1).trim();
+
         if (!diagramExporterTempFolder.endsWith("/")) diagramExporterTempFolder += "/";
 
         // This folder will be created during release phase, double checking just in case
-        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/sbml");
+        File outputFolder = new File(diagramExporterTempFolder + generalService.getDBInfo().getVersion() + "/" + fileFolderName);
         if (outputFolder.exists()) {
-            File sbml = new File(outputFolder.getAbsolutePath() + "/" + sbmlFileName);
-            if (sbml.exists()) return sbml;
+            File file = new File(outputFolder.getAbsolutePath() + "/" + fileName);
+            if (file.exists()) return file;
         }
 
-        throw new MissingSBMLException(String.format("'%s' file has not been previously generated for '%s'", sbmlFileName, event.getStId()));
+        throw new MissingSBXXException(String.format("'%s' file has not been previously generated for '%s'", fileName, event.getStId()));
     }
 
     public InputStream saveSBML(String sbml, String sbmlFileName) throws FileNotFoundException {
