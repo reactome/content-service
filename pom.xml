@@ -46,10 +46,10 @@
         <search.core>1.4.1</search.core>
         <interactors.core>1.0.14</interactors.core>
         <diagram.exporter>1.3.12</diagram.exporter>
-        <reaction.exporter>1.1.1</reaction.exporter>
+        <reaction.exporter>1.1.2</reaction.exporter>
         <fireworks.exporter>1.1.4</fireworks.exporter>
         <sbml.exporter>2.0.0</sbml.exporter>
-        <event.pdf>1.0.4</event.pdf>
+        <event.pdf>1.0.5</event.pdf>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
