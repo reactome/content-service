@@ -52,14 +52,14 @@ public class CitationController {
 
             List<String> authors = new ArrayList<>();
             List<InstanceEdit> instanceEdits = null;
-            if (p.getAuthored() != null) {
+            if (p.getAuthored() != null && !p.getAuthored().isEmpty()) {
                 instanceEdits = p.getAuthored();
             }
             else if (p.getCreated() != null) {
                 instanceEdits = new ArrayList<>();
                 instanceEdits.add(p.getCreated());
             }
-            else if (p.getReviewed() != null) {
+            else if (p.getReviewed() != null && !p.getReviewed().isEmpty()) {
                 instanceEdits = p.getReviewed();
             }
 
