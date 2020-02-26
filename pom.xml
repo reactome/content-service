@@ -60,7 +60,7 @@
         <mail.version>1.6.0</mail.version>
         <activation.version>1.1.1</activation.version>
         <kryo.version>2.22</kryo.version>
-        <tika.version>1.12</tika.version>
+        <tika.version>1.22</tika.version>
         <reactome.utils.version>1.0.8</reactome.utils.version>
 
         <tomcat.version>2.2</tomcat.version>
