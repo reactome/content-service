@@ -31,6 +31,7 @@ import java.util.Map;
  * @since 11.02.2
  */
 
+@ApiIgnore
 @RestController
 @RequestMapping("/citation")
 public class CitationController {
@@ -42,7 +43,6 @@ public class CitationController {
     @Autowired
     private GeneralService generalService;
 
-    @ApiIgnore
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
                                              @PathVariable String id) {
@@ -85,7 +85,7 @@ public class CitationController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping(value = "/download/", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/download", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> downloadCitation() {
         String downloadLink = "https://reactome.org/download-data/";
         return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
