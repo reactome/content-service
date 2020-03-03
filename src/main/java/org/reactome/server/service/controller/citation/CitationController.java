@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,8 +86,8 @@ public class CitationController {
     }
 
     @GetMapping(value = "/download/", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> downloadCitation(HttpServletRequest request) {
-        String downlaodLink = "https://reactome.org/download-data/";
-        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downlaodLink);
+    public ResponseEntity<String> downloadCitation() {
+        String downloadLink = "https://reactome.org/download-data/";
+        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
     }
 }
