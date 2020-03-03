@@ -6,6 +6,7 @@ import org.reactome.server.graph.domain.model.InstanceEdit;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.Person;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
+import org.reactome.server.graph.service.GeneralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+
 
 /**
  * @author Yusra Haider (yhaiderr@ebi.ac.uk)
@@ -35,6 +42,8 @@ public class CitationController {
 
     @Autowired
     private AdvancedDatabaseObjectService advancedDatabaseObjectService;
+    @Autowired
+    private GeneralService generalService;
 
     @ApiIgnore
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,8 +59,9 @@ public class CitationController {
             map.put("pathwayTitle", p.getDisplayName());
             map.put("hasImage", p.getHasDiagram());
 
-            List<String> authors = new ArrayList<>();
+            List<String> authors = null;
             List<InstanceEdit> instanceEdits = null;
+
             if (p.getAuthored() != null && !p.getAuthored().isEmpty()) {
                 instanceEdits = p.getAuthored();
             }
@@ -64,6 +74,7 @@ public class CitationController {
             }
 
             if (instanceEdits != null) {
+                authors = new ArrayList<>();
                 for(InstanceEdit instanceEdit: instanceEdits){
                     for(Person person: instanceEdit.getAuthor()){
                         authors.add(person.getSurname()  + ", " + String.join(".", person.getInitial().split("")) + ".");
@@ -72,8 +83,20 @@ public class CitationController {
             }
 
             map.put("authors", authors);
+            map.put("releaseVersion", generalService.getDBInfo().getVersion());
         }
         return ResponseEntity.ok(map);
     }
 
+    @GetMapping(value = "/download/", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> downloadCitation(HttpServletRequest request) throws MalformedURLException{
+        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + getURLBase(request) + "/download-data/");
+    }
+
+    // helper function
+    public String getURLBase(HttpServletRequest request) throws MalformedURLException {
+        URL requestURL = new URL(request.getRequestURL().toString());
+        String port = requestURL.getPort() == -1 ? "" : ":" + requestURL.getPort();
+        return requestURL.getProtocol() + "://" + requestURL.getHost() + port;
+    }
 }
