@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.Map;
 
 /**
  * @author Yusra Haider (yhaiderr@ebi.ac.uk)
- * @since 11.02.2020.
+ * @since 11.02.2
  */
 
 @RestController
@@ -89,14 +87,8 @@ public class CitationController {
     }
 
     @GetMapping(value = "/download/", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> downloadCitation(HttpServletRequest request) throws MalformedURLException{
-        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + getURLBase(request) + "/download-data/");
-    }
-
-    // helper function
-    public String getURLBase(HttpServletRequest request) throws MalformedURLException {
-        URL requestURL = new URL(request.getRequestURL().toString());
-        String port = requestURL.getPort() == -1 ? "" : ":" + requestURL.getPort();
-        return requestURL.getProtocol() + "://" + requestURL.getHost() + port;
+    public ResponseEntity<String> downloadCitation(HttpServletRequest request) {
+        String downlaodLink = "https://reactome.org/download-data/";
+        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downlaodLink);
     }
 }
