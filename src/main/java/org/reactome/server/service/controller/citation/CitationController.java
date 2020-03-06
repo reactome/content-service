@@ -18,11 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 
@@ -51,12 +47,14 @@ public class CitationController {
         Map<String, Object> map = new HashMap<>();
         if (databaseObject instanceof Pathway) {
             Pathway p = (Pathway)databaseObject;
+            map.put("stid", id);
             map.put("publicationYear", p.getReleaseDate().substring(0,4));
             map.put("doi", p.getDoi());
             map.put("pathwayTitle", p.getDisplayName());
             map.put("hasImage", p.getHasDiagram());
+            map.put("isPathway", true);
 
-            List<String> authors = null;
+            List<HashMap<String, String>> authors = null;
             List<InstanceEdit> instanceEdits = null;
 
             if (p.getAuthored() != null && !p.getAuthored().isEmpty()) {
@@ -74,11 +72,14 @@ public class CitationController {
                 authors = new ArrayList<>();
                 for(InstanceEdit instanceEdit: instanceEdits){
                     for(Person person: instanceEdit.getAuthor()){
-                        authors.add(person.getSurname()  + ", " + String.join(".", person.getInitial().split("")) + ".");
+                        HashMap<String, String> author = new HashMap<>();
+                        author.put("lastName", person.getSurname());
+                        author.put("initials", String.join(".", person.getInitial().split("")) + ".");
+                        author.put("firstName", person.getFirstname());
+                        authors.add(author);
                     }
                 }
             }
-
             map.put("authors", authors);
             map.put("releaseVersion", generalService.getDBInfo().getVersion());
         }
