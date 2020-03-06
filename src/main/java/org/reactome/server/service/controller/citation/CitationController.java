@@ -76,6 +76,7 @@ public class CitationController {
                         author.put("lastName", person.getSurname());
                         author.put("initials", String.join(".", person.getInitial().split("")) + ".");
                         author.put("firstName", person.getFirstname());
+                        author.put("fullName", person.getDisplayName());
                         authors.add(author);
                     }
                 }
