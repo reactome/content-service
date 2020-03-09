@@ -23,7 +23,7 @@ import java.util.*;
 
 
 /**
- * @author Yusra Haider (yhaiderr@ebi.ac.uk)
+ * @author Yusra Haider (yhaider@ebi.ac.uk)
  * @since 11.02.2
  */
 
@@ -39,6 +39,7 @@ public class CitationController {
     @Autowired
     private GeneralService generalService;
 
+    // end point for getting data for citing a pathway
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
                                              @PathVariable String id) {
@@ -93,6 +94,7 @@ public class CitationController {
         return ResponseEntity.ok(map);
     }
 
+    // endpoint for getting the string citation for the download page
     @GetMapping(value = "/download", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> downloadCitation() {
         String downloadLink = "https://reactome.org/download-data/";
