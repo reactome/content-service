@@ -58,6 +58,11 @@ public class CitationController {
             List<HashMap<String, String>> authors = null;
             List<InstanceEdit> instanceEdits = null;
 
+            // the authors field gets populated in the order of priority as defined by
+            // the if else-if conditions below
+            // this is because we have pathways with missing authors, creators and reviewers
+            // in case none of these are available, the `authors` field will have a null value and
+            // won't show up in the response at all
             if (p.getAuthored() != null && !p.getAuthored().isEmpty()) {
                 instanceEdits = p.getAuthored();
             }
