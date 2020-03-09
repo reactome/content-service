@@ -49,6 +49,7 @@ public class CitationController {
             Pathway p = (Pathway)databaseObject;
             map.put("stid", id);
             map.put("publicationYear", p.getReleaseDate().substring(0,4));
+            map.put("publicationMonth", p.getReleaseDate().substring(6,7));
             map.put("doi", p.getDoi());
             map.put("pathwayTitle", p.getDisplayName());
             map.put("hasImage", p.getHasDiagram());
