@@ -21,7 +21,6 @@ import org.reactome.server.service.model.citation.PathwayCitation;
 import org.reactome.server.service.model.citation.StaticCitation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +51,13 @@ public class CitationController {
     private static final String EUROPE_PMC_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
 
 
-    @Autowired
-    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
-    @Autowired
-    private GeneralService generalService;
+    private final AdvancedDatabaseObjectService advancedDatabaseObjectService;
+    private final GeneralService generalService;
+
+    public CitationController(AdvancedDatabaseObjectService advancedDatabaseObjectService, GeneralService generalService) {
+        this.advancedDatabaseObjectService = advancedDatabaseObjectService;
+        this.generalService = generalService;
+    }
 
 
     // end point for getting data for citing a pathway
