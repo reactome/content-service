@@ -17,6 +17,8 @@ import org.reactome.server.graph.domain.model.Person;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.model.citation.Citation;
+import org.reactome.server.service.model.citation.PathwayCitation;
+import org.reactome.server.service.model.citation.StaticCitation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +30,11 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Yusra Haider (yhaider@ebi.ac.uk)
@@ -53,6 +49,7 @@ public class CitationController {
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
     private static final String STATIC_CITATION_ERROR = "Unable to fetch static citation";
     private static final String DOI_BASE_URL = "https://doi.org/";
+    private static final String EUROPE_PMC_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
 
 
     @Autowired
@@ -60,28 +57,120 @@ public class CitationController {
     @Autowired
     private GeneralService generalService;
 
-    // TO-DO: ADD THE DOI URL TO THIS
+
     // end point for getting data for citing a pathway
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
-                                             @PathVariable String id) {
+    public ResponseEntity<PathwayCitation> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
+                                                           @PathVariable String id) {
+        return ResponseEntity.ok(getPathwayCitationObject(id));
+    }
 
+
+    // endpoint for getting the string citation for the download page
+    @GetMapping(value = "/download", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> downloadCitation() {
+        String downloadLink = "https://reactome.org/download-data/";
+        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
+    }
+
+    // end point for getting data for citing any static citation, given the PMID
+    @GetMapping(value = "/static/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
+                                                 @PathVariable String id) {
+        try {
+            HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
+                    .setParameter("query", id)
+                    .setParameter("format", "dc")
+                    .setParameter("resultType", "core")
+                    .build());
+
+            try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                 CloseableHttpResponse response = httpClient.execute(request)) {
+
+                // if the EuropePMC API is down or response is not okay for whatever reason...
+                if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
+                    return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+                } else {
+                    String xmlResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
+                    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xmlResponse)));
+                    return ResponseEntity.ok(doc.getElementsByTagName("dcterms:bibliographicCitation").item(0).getTextContent());
+                }
+
+            } catch (Exception e) {
+                throw new Exception(e);
+            }
+        } catch (Exception e) {
+            infoLogger.error("Exception thrown in staticCitation method", e);
+            return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping(value = "/export")
+    public void export(@RequestParam Boolean isPathway,
+                       @RequestParam String id,
+                       @RequestParam String ext,
+                       @RequestParam String dateAccessed,
+                       HttpServletResponse response) throws IOException {
+
+        Citation citation;
+
+        if (isPathway) citation = getPathwayCitationObject(id);
+        else citation = getStaticCitationObject(id);
+
+        if (citation != null) {
+            String filename = "reactome_citation_" + id;
+            String contentType = "text/plain";
+            String citationString;
+
+            switch (ext) {
+                case "bib":
+                    citationString = citation.toBibtex(dateAccessed);
+                    filename += ".bib";
+                    contentType = "application/x-bibtex";
+                    break;
+                case "ris":
+                    citationString = citation.toRIS(dateAccessed);
+                    filename += ".ris";
+                    contentType = "application/x-research-info-systems";
+                    break;
+                default:
+                    citationString = citation.toText(dateAccessed);
+                    filename += ".txt";
+            }
+
+            response.setContentType(contentType);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+
+            InputStream in = new ByteArrayInputStream(citationString.getBytes(StandardCharsets.UTF_8));
+            OutputStream out = response.getOutputStream();
+            IOUtils.copy(in, out);
+            out.flush();
+            out.close();
+            in.close();
+        }
+    }
+
+
+    private PathwayCitation getPathwayCitationObject(String id) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id);
-        Map<String, Object> map = new HashMap<>();
+        PathwayCitation pathwayCitation = null;
         if (databaseObject instanceof Pathway) {
             Pathway p = (Pathway) databaseObject;
-            map.put("stid", id);
-            map.put("publicationYear", p.getReleaseDate().substring(0, 4));
-            map.put("publicationMonth", p.getReleaseDate().substring(6, 7));
+            pathwayCitation = new PathwayCitation(id, p.getDisplayName());
+            pathwayCitation.setYear(p.getReleaseDate().substring(0, 4));
+            pathwayCitation.setMonth(p.getReleaseDate().substring(6, 7));
             String doi = p.getDoi();
-            if(doi != null && !doi.isEmpty()) {
-                map.put("doi", p.getDoi());
-                map.put("doiURL", DOI_BASE_URL + p.getDoi());
-            }
-            map.put("pathwayTitle", p.getDisplayName());
-            map.put("hasImage", p.getHasDiagram());
+            List<String> urls = new ArrayList<>();
+            if (doi != null && !doi.isEmpty()) {
+                pathwayCitation.setDoi(doi);
+                urls.add(DOI_BASE_URL + p.getDoi());
+            } else urls.add("https://reactome.org" + "/content/detail/" + id);
+            pathwayCitation.setUrls(urls);
 
-            List<HashMap<String, String>> authors = null;
+            pathwayCitation.setReactomeReleaseVersion(generalService.getDBInfo().getVersion().toString());
+
+            List<Map<String, String>> authors = null;
             List<InstanceEdit> instanceEdits = null;
 
             // the authors field gets populated in the order of priority as defined by
@@ -111,151 +200,14 @@ public class CitationController {
                     }
                 }
             }
-            map.put("authors", authors);
-            map.put("releaseVersion", generalService.getDBInfo().getVersion());
+            pathwayCitation.setAuthors(authors);
         }
-        return ResponseEntity.ok(map);
+        return pathwayCitation;
     }
 
-    // endpoint for getting the string citation for the download page
-    @GetMapping(value = "/download", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> downloadCitation() {
-        String downloadLink = "https://reactome.org/download-data/";
-        return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
-    }
-
-    // end point for getting data for citing any static citation, given the PMID
-    @GetMapping(value = "/static/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
-                                                @PathVariable String id) throws Exception {
+    private StaticCitation getStaticCitationObject(String id) {
         try {
-            HttpGet request = new HttpGet(new URIBuilder()
-                    .setScheme("https")
-                    .setHost("www.ebi.ac.uk")
-                    .setPath("/europepmc/webservices/rest/search")
-                    .setParameter("query", id)
-                    .setParameter("format", "dc")
-                    .setParameter("resultType", "core")
-                    .build());
-
-            try (CloseableHttpClient httpClient = HttpClients.createDefault();
-                 CloseableHttpResponse response = httpClient.execute(request)) {
-
-                // if the EuropePMC API is down or response is not okay for whatever reason...
-                if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                    return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-
-                else {
-                    String xmlResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
-                    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xmlResponse)));
-                    return ResponseEntity.ok(doc.getElementsByTagName("dcterms:bibliographicCitation").item(0).getTextContent());
-                }
-
-            }
-            catch (Exception e) {
-                throw new Exception(e);
-            }
-        }
-        catch (Exception e) {
-            infoLogger.error("Exception thrown in staticCitation method", e);
-            return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping(value = "/export")
-    public void export(@RequestParam Boolean isPathway,
-                                                      @RequestParam String id,
-                                                      @RequestParam String ext,
-                                                      HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Map<String, Object> map;
-        if(isPathway) {
-            map = pathwayCitation(id).getBody();
-        }
-       else {
-            map = getStaticCitationForExport(id);
-        }
-
-        String citationString = "";
-        String filename = "reactome_citation";
-        String contentType = "";
-
-        if(map != null && !map.isEmpty()) {
-            map.put("isPathway", isPathway);
-            map.put("baseURL", getURLBase(request));
-            Citation citation = getCitationFromMap(map);
-
-            if(ext.equalsIgnoreCase("bib")) {
-                citationString = citation.toBibTeX();
-                filename += ".bib";
-                contentType = "application/x-bibtex";
-            }
-            else if(ext.equalsIgnoreCase("ris")) {
-                citationString = citation.toRIS();
-                filename += ".ris";
-                contentType = "application/x-research-info-systems";
-            }
-
-            response.setContentType(contentType);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-
-            InputStream in = new ByteArrayInputStream(citationString.getBytes(StandardCharsets.UTF_8));
-            OutputStream out = response.getOutputStream();
-            IOUtils.copy(in, out);
-            out.flush();
-            out.close();
-            in.close();
-        }
-    }
-
-
-
-    private Citation getCitationFromMap(Map<String, Object> map) {
-        Citation citation = new Citation();
-        citation.setId(map.containsKey("id") ? map.get("id").toString() : map.get("stid").toString());
-        citation.setTitle(map.containsKey("title") ? (String)map.get("title") : (String)map.get("pathwayTitle"));
-
-        Map<String, Object> journalInfo = map.containsKey("journalInfo") ? (Map<String, Object>)map.get("journalInfo") : null;
-        Map<String, Object> journal = journalInfo != null && journalInfo.containsKey("journal") ? (Map<String, Object>)journalInfo.get("journal") : null;
-        citation.setJournal(journal != null && journal.containsKey("title") ? journal.get("title").toString() : null);
-        citation.setYear(journalInfo != null && journalInfo.containsKey("yearOfPublication") ? journalInfo.get("yearOfPublication").toString() : map.get("publicationYear").toString());
-        citation.setMonth(journalInfo != null && journalInfo.containsKey("monthOfPublication") ? journalInfo.get("monthOfPublication").toString() : map.get("publicationMonth").toString());
-        citation.setNumber(journalInfo != null && journalInfo.containsKey("issue") ? journalInfo.get("issue").toString() : null);
-        citation.setVolume(journalInfo != null && journalInfo.containsKey("volume") ? journalInfo.get("volume").toString() : null);
-        citation.setIssn(journal != null && journal.containsKey("issn") ? journal.get("issn").toString() : null);
-        citation.setPages(map.containsKey("pages") ? map.get("pageInfo").toString() : null);
-
-        List<String> urls = new ArrayList<>();
-        if(map.containsKey("doi")){
-            String doi = (String)map.get("doi");
-            citation.setDoi(doi);
-            urls.add(DOI_BASE_URL + doi);
-        }
-        else if(map.containsKey("stid")) {
-            urls.add(map.get("baseURL") + "/content/detail/" + map.get("stid"));
-        }
-        citation.setUrls(urls);
-
-        if(map.containsKey("authorList")) {
-            Map<String, Object> authorList = (Map<String, Object>) map.get("authorList");
-            citation.setAuthors(authorList.containsKey("author") ? (List<Map<String, String>>)authorList.get("author") : null);
-        }
-        else if(map.containsKey("authors")) {
-            citation.setAuthors((List<Map<String, String>>)map.get("authors"));
-        }
-
-        citation.setPathway((Boolean)map.get("isPathway"));
-        return citation;
-    }
-
-    // private method for getting the citation details for a static citation
-    // for export purposes
-    private Map<String, Object> getStaticCitationForExport(String id) {
-        try {
-            HttpGet request = new HttpGet(new URIBuilder()
-                    .setScheme("https")
-                    .setHost("www.ebi.ac.uk")
-                    .setPath("/europepmc/webservices/rest/search")
+            HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
                     .setParameter("query", id)
                     .setParameter("format", "json")
                     .setParameter("resultType", "core")
@@ -267,28 +219,54 @@ public class CitationController {
                 // if the EuropePMC API is down or response is not okay for whatever reason...
                 if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
                     return null;
-                }
-
-                else {
+                } else {
                     String jsonResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
                     ObjectMapper objectMapper = new ObjectMapper();
-                    return objectMapper.convertValue(objectMapper.readTree(jsonResponse).get("resultList").get("result").get(0), new TypeReference<Map<String, Object>>(){});
+
+                    Map<String, Object> map = objectMapper.convertValue(objectMapper.readTree(jsonResponse).get("resultList").get("result").get(0), new TypeReference<Map<String, Object>>() {
+                    });
+                    Map<String, Object> journalInfo = map.containsKey("journalInfo") ? (Map<String, Object>) map.get("journalInfo") : null;
+                    Map<String, Object> journal = journalInfo != null && journalInfo.containsKey("journal") ? (Map<String, Object>) journalInfo.get("journal") : null;
+
+                    StaticCitation staticCitation = new StaticCitation(map.get("id").toString(), map.get("title").toString());
+                    if (map.containsKey("pageInfo")) staticCitation.setPages(map.get("pageInfo").toString());
+                    if (map.containsKey("pmid")) staticCitation.setPmid(map.get("pmid").toString());
+                    if (map.containsKey("pmcid")) staticCitation.setPmcid(map.get("pmcid").toString());
+
+                    if (journal != null && journal.containsKey("title"))
+                        staticCitation.setJournal(journal.get("title").toString());
+                    if (journalInfo != null && journalInfo.containsKey("yearOfPublication"))
+                        staticCitation.setYear(journalInfo.get("yearOfPublication").toString());
+                    if (journalInfo != null && journalInfo.containsKey("monthOfPublication"))
+                        staticCitation.setMonth(journalInfo.get("monthOfPublication").toString());
+                    if (journalInfo != null && journalInfo.containsKey("issue"))
+                        staticCitation.setNumber(journalInfo.get("issue").toString());
+                    if (journalInfo != null && journalInfo.containsKey("volume"))
+                        staticCitation.setVolume(journalInfo.get("volume").toString());
+                    if (journal != null && journal.containsKey("issn"))
+                        staticCitation.setIssn(journal.get("issn").toString());
+
+                    if (map.containsKey("doi") && map.get("doi") != null) {
+                        String doi = map.get("doi").toString();
+                        staticCitation.setDoi(doi);
+                        staticCitation.setUrls(new ArrayList<>(Arrays.asList(DOI_BASE_URL + doi)));
+                    }
+
+                    if (map.containsKey("authorList")) {
+                        Map<String, Object> authorList = (Map<String, Object>) map.get("authorList");
+                        if (authorList.containsKey("author"))
+                            staticCitation.setAuthors((List<Map<String, String>>) authorList.get("author"));
+                    }
+
+                    return staticCitation;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new Exception(e);
             }
-        }
-        catch (Exception e) {
-            infoLogger.error("Exception thrown in getStaticCitationForExport method", e);
+        } catch (Exception e) {
+            infoLogger.error("Exception thrown in getStaticCitationObject method", e);
             return null;
         }
     }
-
-    // helper function
-    public String getURLBase(HttpServletRequest request) throws MalformedURLException {
-        URL requestURL = new URL(request.getRequestURL().toString());
-        String port = requestURL.getPort() == -1 ? "" : ":" + requestURL.getPort();
-        return requestURL.getProtocol() + "://" + requestURL.getHost() + port;
-    }
 }
+
