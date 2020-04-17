@@ -215,7 +215,7 @@ public class StaticCitation extends Citation {
         }
 
         // setting title of publication
-        text += this.getTitle() + period + space;
+        text += this.getTitle() + space;
 
         // setting Journal name
         if (this.getJournal() != null) text += this.getJournal() + period + space;
