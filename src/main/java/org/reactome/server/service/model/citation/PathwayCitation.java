@@ -133,7 +133,7 @@ public class PathwayCitation extends Citation {
         return "Pathway Citation: " + pathwayCitation(dateOfAccess) + "\n" + "Image Citation: " + imageCitation(dateOfAccess);
     }
 
-    public String pathwayCitation(String dateOfAccess) {
+    private String pathwayCitation(String dateOfAccess) {
         String pathwayCitation;
 
         // adding authors
@@ -152,7 +152,7 @@ public class PathwayCitation extends Citation {
         return pathwayCitation;
     }
 
-    public String imageCitation(String dateOfAccess) {
+    private String imageCitation(String dateOfAccess) {
         return commonCitation(dateOfAccess);
     }
 

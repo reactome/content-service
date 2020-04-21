@@ -116,7 +116,7 @@ public class StaticCitation extends Citation {
         if (this.getPages() != null) bibtex += "Pages = " + openBracket + this.getPages() + endLine;
 
         // all the pub time related info
-        bibtex += "Year = " + openBracket + (this.getYear() != null ? this.getVolume() : "No year specified") + endLine; // compulsory field
+        bibtex += "Year = " + openBracket + (this.getYear() != null ? this.getYear() : "No year specified") + endLine; // compulsory field
         if (this.getMonth() != null) bibtex += "Month = " + openBracket + this.getMonth() + endLine;
 
         // any unique identifiers
@@ -244,17 +244,17 @@ public class StaticCitation extends Citation {
 
         // setting DOI
         if (this.getDoi() != null) {
-            text += this.getDoi() + period + space;
+            text += "doi: " + this.getDoi() + period + space;
         }
 
         // setting PMID
         if (this.getPmid() != null) {
-            text += this.getPmid() + period + space;
+            text += "PMID: " + this.getPmid() + period + space;
         }
 
         // setting PMCID
         if (this.getPmcid() != null) {
-            text += this.getPmcid() + period + space;
+            text += "PubMed Central PMCID:: " + this.getPmcid() + period + space;
         }
 
         return text;

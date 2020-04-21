@@ -76,7 +76,7 @@ public class CitationController {
     }
 
     // end point for getting data for citing any static citation, given the PMID
-    @GetMapping(value = "/static/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/static/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
                                                  @PathVariable String id) {
         try {
