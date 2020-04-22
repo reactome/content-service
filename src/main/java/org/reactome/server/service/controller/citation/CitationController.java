@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -29,10 +30,16 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -69,14 +76,14 @@ public class CitationController {
 
 
     // endpoint for getting the string citation for the download page
-    @GetMapping(value = "/download", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/download", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> downloadCitation() {
         String downloadLink = "https://reactome.org/download-data/";
         return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
     }
 
     // end point for getting data for citing any static citation, given the PMID
-    @GetMapping(value = "/static/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/static/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
                                                  @PathVariable String id) {
         try {
@@ -86,7 +93,10 @@ public class CitationController {
                     .setParameter("resultType", "core")
                     .build());
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault();
+            try (CloseableHttpClient httpClient = HttpClients.custom()
+                    .setSSLContext(getAllSSLContext())
+                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .build();
                  CloseableHttpResponse response = httpClient.execute(request)) {
 
                 // if the EuropePMC API is down or response is not okay for whatever reason...
@@ -214,8 +224,10 @@ public class CitationController {
                     .setParameter("format", "json")
                     .setParameter("resultType", "core")
                     .build());
-
-            try (CloseableHttpClient httpClient = HttpClients.createDefault();
+            try (CloseableHttpClient httpClient = HttpClients.custom()
+                    .setSSLContext(getAllSSLContext())
+                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .build();
                  CloseableHttpResponse response = httpClient.execute(request)) {
 
                 // if the EuropePMC API is down or response is not okay for whatever reason...
@@ -270,5 +282,26 @@ public class CitationController {
             return null;
         }
     }
+
+    // code taken from: https://www.javacodemonk.com/disable-ssl-certificate-check-resttemplate-e2c53583
+    private SSLContext getAllSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+        return sslContext;
+    }
 }
+
 
