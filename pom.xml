@@ -54,7 +54,7 @@
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
         <jstl.version>1.2</jstl.version>
-        <jackson.version>2.9.4</jackson.version>
+        <jackson.version>2.9.10.4</jackson.version>
         <swagger.version>2.7.0</swagger.version>
         <lang.version>3.6</lang.version>
         <mail.version>1.6.0</mail.version>
