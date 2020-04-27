@@ -1,5 +1,6 @@
 package org.reactome.server.service.model.citation;
 
+import java.text.DateFormatSymbols;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,10 @@ public abstract class Citation {
     }
 
     public void setMonth(String month) {
-        this.month = month;
+        Integer integerMonth = Integer.parseInt(month);
+        if (integerMonth > 0 && integerMonth <= 12) {
+            this.month = new DateFormatSymbols().getShortMonths()[integerMonth-1];
+        }
     }
 
     // converts a citation to RIS string

@@ -201,9 +201,14 @@ public class StaticCitation extends Citation {
     // converts citation to textual format
     @Override
     public String toText(String dateOfAccess) {
-        String text = "Provided by Reactome. Citation Accessed on " + dateOfAccess + "\n\n";
+        String text = "";
         String space = " ";
         String period = ".";
+        String semicolon = ";";
+
+        if (dateOfAccess != null) {
+            text += "Provided by Reactome. Citation Accessed on " + dateOfAccess + "\n\n";
+        }
 
         // setting authors
         if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
@@ -224,18 +229,17 @@ public class StaticCitation extends Citation {
             text += this.getYear();
 
             if (this.getMonth() != null) {
-                text += "/" + this.getMonth();
+                text += space + this.getMonth();
             }
-            text += period + space;
         }
 
         // setting volume and issue number
         if (this.getVolume() != null) {
-            text += this.getVolume();
+            text += semicolon + this.getVolume();
             if (this.getNumber() != null) {
                 text += "(" + this.getNumber() + ")";
             }
-            text += period + space;
+            text += space;
         }
         // setting page info
         if (this.getPages() != null) {
@@ -249,12 +253,12 @@ public class StaticCitation extends Citation {
 
         // setting PMID
         if (this.getPmid() != null) {
-            text += "PMID: " + this.getPmid() + period + space;
+            text += "PubMed PMID: " + this.getPmid() + period + space;
         }
 
         // setting PMCID
         if (this.getPmcid() != null) {
-            text += "PubMed Central PMCID:: " + this.getPmcid() + period + space;
+            text += "PubMed Central PMCID: " + this.getPmcid() + period + space;
         }
 
         return text;

@@ -26,16 +26,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -69,9 +69,18 @@ public class CitationController {
 
     // end point for getting data for citing a pathway
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PathwayCitation> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
-                                                           @PathVariable String id) {
-        return ResponseEntity.ok(getPathwayCitationObject(id));
+    public ResponseEntity<Map<String, String>> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
+                                                           @PathVariable String id,
+                                                           @RequestParam String dateAccessed) {
+        PathwayCitation pathwayCitation = getPathwayCitationObject(id);
+        Map<String, String> map = new HashMap<>();
+        if (pathwayCitation == null) {
+            return ResponseEntity.ok(map);
+        }
+        map.put("pathwayCitation",pathwayCitation.pathwayCitation(dateAccessed));
+        map.put("imageCitation",pathwayCitation.imageCitation(dateAccessed));
+
+        return ResponseEntity.ok(map);
     }
 
 
@@ -82,39 +91,16 @@ public class CitationController {
         return ResponseEntity.ok("\"Name of file\", Reactome, " + generalService.getDBInfo().getVersion() + ", " + downloadLink);
     }
 
+
     // end point for getting data for citing any static citation, given the PMID
     @GetMapping(value = "/static/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
                                                  @PathVariable String id) {
-        try {
-            HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
-                    .setParameter("query", id)
-                    .setParameter("format", "dc")
-                    .setParameter("resultType", "core")
-                    .build());
-
-            try (CloseableHttpClient httpClient = HttpClients.custom()
-                    .setSSLContext(getAllSSLContext())
-                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .build();
-                 CloseableHttpResponse response = httpClient.execute(request)) {
-
-                // if the EuropePMC API is down or response is not okay for whatever reason...
-                if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                    return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-                } else {
-                    String xmlResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
-                    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xmlResponse)));
-                    return ResponseEntity.ok(doc.getElementsByTagName("dcterms:bibliographicCitation").item(0).getTextContent());
-                }
-
-            } catch (Exception e) {
-                throw new Exception(e);
-            }
-        } catch (Exception e) {
-            infoLogger.error("Exception thrown in staticCitation method", e);
+        StaticCitation staticCitation = getStaticCitationObject(id);
+        if(staticCitation == null) {
             return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        return ResponseEntity.ok(staticCitation.toText(null));
     }
 
 
@@ -207,7 +193,6 @@ public class CitationController {
                         author.put("lastName", person.getSurname());
                         author.put("initials", String.join(".", person.getInitial().split("")) + ".");
                         author.put("firstName", person.getFirstname());
-                        author.put("fullName", person.getDisplayName());
                         authors.add(author);
                     }
                 }
@@ -220,7 +205,7 @@ public class CitationController {
     private StaticCitation getStaticCitationObject(String id) {
         try {
             HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
-                    .setParameter("query", id)
+                    .setParameter("query", "ext_id:" + id)
                     .setParameter("format", "json")
                     .setParameter("resultType", "core")
                     .build());

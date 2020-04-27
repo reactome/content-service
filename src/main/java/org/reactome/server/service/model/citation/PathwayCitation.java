@@ -133,16 +133,21 @@ public class PathwayCitation extends Citation {
         return "Pathway Citation: " + pathwayCitation(dateOfAccess) + "\n" + "Image Citation: " + imageCitation(dateOfAccess);
     }
 
-    private String pathwayCitation(String dateOfAccess) {
+    public String pathwayCitation(String dateOfAccess) {
         String pathwayCitation;
 
         // adding authors
         if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
             List<String> authorDetails = new ArrayList<>();
             for (Map<String, String> author : this.getAuthors()) {
-                authorDetails.add(author.get("fullName"));
+                authorDetails.add(author.get("lastName") + "," + " " + author.get("initials"));
             }
-            pathwayCitation = String.join(" " + ",", authorDetails);
+            String authorCitation = authorDetails.get(authorDetails.size() - 1);
+            if (authorDetails.size() > 1) {
+                authorCitation = String.join(" " + ",", authorDetails.subList(0,authorDetails.size() - 1)) + " & " + authorCitation;
+            }
+
+            pathwayCitation = authorCitation;
         } else {
             pathwayCitation = DEFAULT_AUTHOR_STRING;
         }
@@ -152,8 +157,8 @@ public class PathwayCitation extends Citation {
         return pathwayCitation;
     }
 
-    private String imageCitation(String dateOfAccess) {
-        return commonCitation(dateOfAccess);
+    public String imageCitation(String dateOfAccess) {
+        return "Image Citation for " + commonCitation(dateOfAccess);
     }
 
     private String commonCitation(String dateOfAccess) {
