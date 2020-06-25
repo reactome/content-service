@@ -3,6 +3,7 @@ package org.reactome.server.service.controller.interactors;
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.service.exception.ErrorInfo;
+import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+
 
 /**
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
@@ -41,7 +43,11 @@ public class StaticInteractionsController {
     @ResponseBody
     public Interactors getProteinSummaryByAcc(@ApiParam(value = "Accession", required = true, defaultValue = "Q13501") @PathVariable String acc) {
         infoLogger.info("Static interaction summary query for accession {}", acc);
-        return interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
+        Interactors interactors = interactions.getStaticProteinsSummary(Collections.singletonList(acc), STATIC_RESOURCE_NAME);
+        if (interactors == null || interactors.getEntities().isEmpty()) {
+            throw new NotFoundException("No interactors found for accession: " + acc);
+        }
+        return interactors;
     }
 
     @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = Interactors.class, produces = "application/json")
@@ -56,7 +62,11 @@ public class StaticInteractionsController {
                                               @ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                               @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
         infoLogger.info("Static interaction details query for accession {}", acc);
-        return interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
+        Interactors interactors = interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
+        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasInteractorsInEntities() ) {
+            throw new NotFoundException("No interactors found for accession: " + acc);
+        }
+        return interactors;
     }
 
     @ApiOperation(value = "Retrieve a summary of a given accession list", response = Interactors.class, produces = "application/json")
@@ -74,9 +84,11 @@ public class StaticInteractionsController {
         for (String id : proteins.split(",|;|\\n|\\t")) {
             accs.add(id.trim());
         }
-
-        return interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
-
+        Interactors interactors =  interactions.getStaticProteinsSummary(accs, STATIC_RESOURCE_NAME);
+        if (interactors == null || interactors.getEntities().isEmpty()) {
+            throw new NotFoundException("No interactors found for accession: " + proteins);
+        }
+        return interactors;
     }
 
     @ApiOperation(value = "Retrieve a detailed interaction information of a given accession", response = Interactors.class, produces = "application/json")
@@ -96,8 +108,11 @@ public class StaticInteractionsController {
         for (String id : proteins.split(",|;|\\n|\\t")) {
             accs.add(id.trim());
         }
-
-        return interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
+        Interactors interactors = interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
+        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasInteractorsInEntities()) {
+            throw new NotFoundException("No interactors found for accession: " + proteins);
+        }
+        return interactors;
     }
 
     @ApiOperation(value = "Retrieve a list of lower level pathways where the interacting molecules can be found", response = Interactors.class, produces = "application/json")
@@ -114,6 +129,10 @@ public class StaticInteractionsController {
                                                      @RequestParam(required = false) String species,
                                                       @ApiParam(value = "Specifies whether the pathways has to have an associated diagram or not", defaultValue = "false")
                                                      @RequestParam(required = false, defaultValue = "false") Boolean onlyDiagrammed){
-        return interactions.getLowerLevelPathways(acc, species, onlyDiagrammed);
+        Collection<Pathway> lowerLevelPathways = interactions.getLowerLevelPathways(acc, species, onlyDiagrammed);
+        if (lowerLevelPathways.isEmpty()) {
+            throw new NotFoundException("No pathways found for molecule: " + acc);
+        }
+        return lowerLevelPathways;
     }
 }

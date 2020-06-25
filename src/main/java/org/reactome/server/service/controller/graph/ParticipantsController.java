@@ -42,7 +42,7 @@ public class ParticipantsController {
     })
     @RequestMapping(value = "/participants/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Participant> getParticipants(@ApiParam(value = "DbId or StId of a PhysicalEntity", defaultValue = "5205685",required = true) @PathVariable String id)  {
+    public Collection<Participant> getParticipants(@ApiParam(value = "DbId or StId of an Event", defaultValue = "5205685",required = true) @PathVariable String id)  {
         Collection<Participant> participants = participantService.getParticipants(id);
         infoLogger.info("Request for participants of event with id: {}", id);
         return participants;

@@ -55,7 +55,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
+    @RequestMapping(value = "/spellcheck", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<String> spellcheckerSuggestions(@ApiParam(value = "Search term", defaultValue = "repoduction", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for spellcheck suggestions for query {}", query);
@@ -67,7 +67,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/suggest", method = RequestMethod.GET)
+    @RequestMapping(value = "/suggest", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "platele", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for autocomplete suggestions for query {}", query);
@@ -79,7 +79,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/facet", method = RequestMethod.GET)
+    @RequestMapping(value = "/facet", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FacetMapping facet() throws SolrSearcherException {
         infoLogger.info("Request for faceting information of all Reactome data");
@@ -91,7 +91,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/facet_query", method = RequestMethod.GET)
+    @RequestMapping(value = "/facet_query", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "TP53", required = true) @RequestParam String query,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
@@ -109,7 +109,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/query", method = RequestMethod.GET)
+    @RequestMapping(value = "/query", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
@@ -134,7 +134,7 @@ class SearchController {
     }
 
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/fireworks", method = RequestMethod.GET)
+    @RequestMapping(value = "/fireworks", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FireworksResult getFireworksResult(@ApiParam(defaultValue = "BRAF", required = true) @RequestParam String query,
                                               @ApiParam(value = "Species name", defaultValue = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
@@ -157,7 +157,7 @@ class SearchController {
     }
 
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET)
+    @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FireworksOccurrencesResult fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
                                                 @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
@@ -171,7 +171,7 @@ class SearchController {
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-8848021", required = true) @PathVariable String diagram,
                                           @ApiParam(defaultValue = "MAD", required = true) @RequestParam String query,
@@ -186,7 +186,7 @@ class SearchController {
     }
 
     @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
-    @RequestMapping(value = "/diagram/{diagram}/occurrences/{instance}", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/{diagram}/occurrences/{instance}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
@@ -218,7 +218,7 @@ class SearchController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/diagram/summary", method = RequestMethod.GET)
+    @RequestMapping(value = "/diagram/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DiagramSearchSummary diagramSearchSummary(@ApiParam(value = "Search term", defaultValue = "KIF", required = true)
                                                      @RequestParam String query,

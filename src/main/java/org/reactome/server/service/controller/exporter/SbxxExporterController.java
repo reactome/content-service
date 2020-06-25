@@ -7,7 +7,7 @@ import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.exception.DiagramExporterException;
-import org.reactome.server.service.exception.MissingSBMLException;
+import org.reactome.server.service.exception.MissingSBXXException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.ExportManager;
 import org.reactome.server.tools.diagram.exporter.sbgn.SbgnConverter;
@@ -68,7 +68,7 @@ public class SbxxExporterController {
             File file = exportManager.getCachedFile(event, fileName);
             sbgn = new FileInputStream(file);
             infoLogger.info("Exporting the event {} to SBGN retrieved from previously generated file", event.getStId());
-        } catch (MissingSBMLException | IOException e) {
+        } catch (MissingSBXXException | IOException e) {
             SbgnConverter converter = new SbgnConverter(exportManager.getDiagram(event));
             sbgn = exportManager.saveSBGN(converter.getSbgn(), fileName);
             infoLogger.info("Exporting the event {} to SBGN", event.getStId());
@@ -109,7 +109,7 @@ public class SbxxExporterController {
             File file = exportManager.getCachedFile(event, fileName);
             sbml = new FileInputStream(file);
             infoLogger.info("Exporting the event {} to SBML retrieved from previously generated file", event.getStId());
-        } catch (MissingSBMLException | IOException e) {
+        } catch (MissingSBXXException | IOException e) {
             SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
             converter.convert();
             String content = converter.toString();

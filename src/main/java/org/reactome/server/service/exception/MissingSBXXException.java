@@ -4,8 +4,8 @@ package org.reactome.server.service.exception;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 
-public class MissingSBMLException extends Exception {
-    public MissingSBMLException(String message) {
+public class MissingSBXXException extends Exception {
+    public MissingSBXXException(String message) {
         super(message);
     }
 }

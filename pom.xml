@@ -72,6 +72,9 @@
         <maven.javadoc.version>2.10.3</maven.javadoc.version>
         <maven.info.report.version>2.8.1</maven.info.report.version>
         <pmd.version>3.6</pmd.version>
+
+        <hamcrest.library.version>2.2</hamcrest.library.version>
+        <json.path.version>2.4.0</json.path.version>
     </properties>
 
     <dependencies>
@@ -220,6 +223,20 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
             <version>${kryo.version}</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest.library.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json.path.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
