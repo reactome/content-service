@@ -32,5 +32,8 @@ public class SbxxExporterControllerTest extends BaseTest {
         mockMvcGetResult("/exporter/event/R-HSA-157118.sbml", "application/sbml+xml");
         //reaction
         mockMvcGetResult("/exporter/event/R-HSA-5205682.sbml", "application/sbml+xml");
+
+        mockMvcGetResult("/exporter/event/R-HSA-9679191.sbml", "application/sbml+xml");
+
     }
 }
