@@ -1,7 +1,7 @@
 package org.reactome.server.service.controller.graph.util;
 
+import org.jsoup.Jsoup;
 import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.graph.domain.model.Summation;
 import org.reactome.server.service.exception.NotFoundTextPlainException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,27 +38,23 @@ public class ControllerUtils {
     private static String toTSV(Object object) {
         if (object instanceof DatabaseObject){
             DatabaseObject dbo = (DatabaseObject) object;
+            String display;
+            try {
+                display = Jsoup.parse(((String) dbo.getClass().getMethod("getText").invoke(dbo))).text();
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                display = dbo.getDisplayName();
+            }
             String id = dbo.getStId();
-            return ((id!=null && !id.isEmpty()) ? id : dbo.getDbId()) + "\t" + dbo.getDisplayName() + "\t" + dbo.getSchemaClass();
+            return ((id!=null && !id.isEmpty()) ? id : dbo.getDbId()) + "\t" + display + "\t" + dbo.getSchemaClass();
         }
         if (object instanceof Collection){
-            Collection<?> list = (Collection) object;
+            Collection<?> list = (Collection<?>) object;
             StringBuilder stringBuilder = new StringBuilder();
             for (Object o : list) {
-                if (o instanceof Summation) {
-                    stringBuilder.append(summationToTSV(o)).append("\n");
-                } else {
-                    stringBuilder.append(toTSV(o)).append("\n");
-                }
+                stringBuilder.append(toTSV(o)).append("\n");
             }
             return stringBuilder.toString();
         }
         return object.toString();
-    }
-
-    private static String summationToTSV(Object object) {
-            Summation dbo = (Summation) object;
-            String id = dbo.getStId();
-            return ((id!=null && !id.isEmpty()) ? id : dbo.getDbId()) + "\t" + dbo.getText().replaceAll("<.*?>", "") + "\t" + dbo.getSchemaClass();
     }
 }
