@@ -138,7 +138,6 @@ public class PptxExporterController {
         DiagramResult result = diagramService.getDiagramResult(identifier);
         List<Long> toSelect = new ArrayList<>();
         if (sel != null) toSelect.addAll(getDatabaseIdentifiers(sel));
-//        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
         decorator.setSelected(toSelect);
 
         if (flg != null && !flg.isEmpty()) {
