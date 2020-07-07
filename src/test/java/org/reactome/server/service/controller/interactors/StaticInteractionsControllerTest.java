@@ -30,7 +30,6 @@ public class StaticInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinDetailsByAcc() throws Exception {
-
         this.getMockMvc().perform(
                 get("/interactors/static/molecule/Q13501/details")
                         .param("page", "-1")
@@ -51,7 +50,6 @@ public class StaticInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinsSummaryByAccs() throws Exception {
-
         this.getMockMvc().perform(
                 post("/interactors/static/molecules/summary")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -64,7 +62,6 @@ public class StaticInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinsDetailsByAccs() throws Exception {
-
         this.getMockMvc().perform(
                 post("/interactors/static/molecules/details")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -90,10 +87,10 @@ public class StaticInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getLowerLevelPathways() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("species", "Homo sapiens");
         params.put("onlyDiagrammed", false);
+
         mockMvcGetResult("/interactors/static/molecule/Q9BXM7-1/pathways", "application/json;charset=UTF-8", params);
     }
 }

@@ -27,9 +27,7 @@ public class QueryObjectControllerTest extends BaseTest {
 
     @Test
     public void findByIds() throws Exception {
-
         mockMvcPostResult("/data/query/ids", "R-HSA-141409, R-HSA-141431, R-HSA-141422");
-
         mvcPostResultNotFound("/data/query/ids", "R-HSA-141409R-HSA-141431");
     }
 

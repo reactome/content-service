@@ -16,7 +16,6 @@ public class CustomPsicquicControllerTest extends BaseTest {
 
     @Test
     public void registryPsicquicURL() throws Exception {
-
         String url = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/query";
 
         mockMvcPostResult("/interactors/upload/psicquic/url", url, "name", "CSTest");

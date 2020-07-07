@@ -36,7 +36,6 @@ public class PsicquicInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinSummaryByResource() throws Exception {
-
         this.getMockMvc().perform(
                 get("/interactors/psicquic/molecule/MINT/P30304/summary"))
                 .andExpect(status().isOk())
@@ -47,7 +46,6 @@ public class PsicquicInteractionsControllerTest extends BaseTest {
 
     @Test
     public void getProteinsSummaryByResource() throws Exception {
-
         this.getMockMvc().perform(
                 post("/interactors/psicquic/molecules/intact/summary")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -56,6 +54,5 @@ public class PsicquicInteractionsControllerTest extends BaseTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.entities[0].count", Matchers.greaterThan(25))) // 38
                 .andReturn();
-
     }
 }

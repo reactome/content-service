@@ -19,13 +19,13 @@ public class EventPdfControllerTest extends BaseTest {
 
     @Test
     public void eventPdf() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("level", 1);
         params.put("diagramProfile", "Modern");
         params.put("resource", "total");
         params.put("expColumn", 1);
         params.put("analysisProfile", "Standard");
+
         mockMvcGetResult("/exporter/document/event/R-HSA-1632852.pdf", "application/pdf", params);
     }
 }

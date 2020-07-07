@@ -16,7 +16,6 @@ public class DiscoverControllerTest extends BaseTest {
 
     @Test
     public void eventDiscovery() throws Exception {
-
         //pathway
         mockMvcGetResult("/data/discover/5693532", "application/json;charset=UTF-8");
         //reaction

@@ -39,7 +39,6 @@ public class SearchControllerTest extends BaseTest {
 
     @Test
     public void facet_type() throws Exception {
-
         this.getMockMvc().perform(get("/search/facet_query")
                 .param("query", "PTEN")
                 .param("species", "Homo sapiens")
@@ -53,7 +52,6 @@ public class SearchControllerTest extends BaseTest {
 
     @Test
     public void getResult() throws Exception {
-
         this.getMockMvc().perform(get("/search/query")
                 .param("query", "enzyme")
                 .param("species", "Homo sapiens")
@@ -66,7 +64,6 @@ public class SearchControllerTest extends BaseTest {
 
     @Test
     public void getFireworksResult() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("query", "RAF");
         params.put("species", "Homo sapiens");
@@ -76,7 +73,6 @@ public class SearchControllerTest extends BaseTest {
 
     @Test
     public void fireworksFlagging() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("query", "PTEN");
         params.put("species", "Homo sapiens");
@@ -102,7 +98,6 @@ public class SearchControllerTest extends BaseTest {
     //##################### API Ignored  #####################//
     @Test
     public void diagramSearchSummary() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("query", "KIF");
         params.put("species", "Homo sapiens");

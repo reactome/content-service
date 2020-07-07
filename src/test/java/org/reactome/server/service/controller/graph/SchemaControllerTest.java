@@ -17,7 +17,6 @@ public class SchemaControllerTest extends BaseTest {
 
     @Test
     public void getDatabaseObjectsForClassName() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("species", 9606);
         params.put("page", 1);

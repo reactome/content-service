@@ -19,7 +19,6 @@ public class FireworksImageExporterControllerTest extends BaseTest {
 
     @Test
     public void diagramImage() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("quality", "5");
         params.put("flg", "PTEN");
@@ -31,7 +30,6 @@ public class FireworksImageExporterControllerTest extends BaseTest {
         params.put("coverage", false);
 
         mockMvcGetResult("/exporter/fireworks/9606.svg", "image/svg+xml;", params);
-
         mockMvcGetResult("/exporter/fireworks/9606.png", "image/png;", params);
     }
 }
