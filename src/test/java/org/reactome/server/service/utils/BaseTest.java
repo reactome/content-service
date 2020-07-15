@@ -2,6 +2,7 @@ package org.reactome.server.service.utils;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
@@ -29,6 +30,9 @@ public class BaseTest {
 
     @Autowired
     private WebApplicationContext wac;
+
+    @Autowired
+    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
 
     private MockMvc mockMvc;
 
@@ -70,11 +74,20 @@ public class BaseTest {
         return mockMvcGetResult(url, contentType, null);
     }
 
+    public MvcResult mockMvcGetResult(String url) throws Exception {
+        return mockMvcGetResult(url, null, null);
+    }
+
     public MvcResult mockMvcGetResult(String url, String contentType, Map<String, Object> params) throws Exception {
+        if(contentType == null){
+            return this.mockMvc.perform(
+                    get(url))
+                    .andExpect(status().isOk())
+                    .andReturn();
+        }
+
         if (params != null && !params.isEmpty()) {
-
             MockHttpServletRequestBuilder requestBuilder = get(url);
-
             for (Map.Entry<String, Object> entry : params.entrySet())
                 requestBuilder.param(entry.getKey(), entry.getValue().toString());
             //    params.forEach(requestBuilder::param);
@@ -96,7 +109,6 @@ public class BaseTest {
      * Get request not found testing of Spring MVC controllers
      */
     public MvcResult mockMvcGetResultNotFound(String url, String paramName, String paramValue) throws Exception {
-
         if (paramName == null && paramValue == null) return mockMvcGetResultNotFound(url, null);
 
         Map<String, Object> params = new HashMap<>();
@@ -163,7 +175,6 @@ public class BaseTest {
     }
 
     public MvcResult mockMvcPostResult(String url, String content, Map<String, Object> params) throws Exception {
-
         if (params != null && !params.isEmpty()) {
 
             MockHttpServletRequestBuilder requestBuilder = post(url)

@@ -24,6 +24,6 @@ public class EventsControllerTest extends BaseTest {
 
     @Test
     public void getEventHierarchy() throws Exception {
-        mockMvcGetResult("/data//eventsHierarchy/9913", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/eventsHierarchy/9913", "application/json;Charset=UTF-8");
     }
 }
