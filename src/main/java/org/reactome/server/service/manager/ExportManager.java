@@ -114,7 +114,7 @@ public class ExportManager {
         } else {
             infoLogger.debug("Export Diagram {} based on StableId {}", pptxFile.getName(), stId);
             Diagram diagram = reactionExporter.getReactionDiagram(reactionExporter.getReactionLayout(rle));
-            File newFile = diagramExporterService.exportToPPTX(diagram, colorProfile, outputFolder.getPath(), decorator);
+            File newFile = diagramExporterService.exportToPPTX(stId, diagram, colorProfile, outputFolder.getPath(), decorator);
             response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + pptxFileName + "\"");
             return newFile;

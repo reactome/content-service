@@ -62,7 +62,7 @@ public class PptxExporterController {
     public synchronized void diagramPPTX(@ApiParam(value = "Stable Identifier", required = true, defaultValue = "R-HSA-177929")
                                         @PathVariable String identifier,
                                          @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
-                                        @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
+                                        @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
                                          @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                         @RequestParam(value = "flg", required = false) String flg,
                                          @ApiParam(value = "Defines whether to take into account interactors for the flagging")
@@ -74,7 +74,7 @@ public class PptxExporterController {
         DiagramResult result = diagramService.getDiagramResult(identifier);
         // IMPORTANT: Downloading the file on Swagger does not work - https://github.com/swagger-api/swagger-ui/issues/2132
         // for this reason we are keeping this method as APIIgnore
-        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", result.getDiagramStId(), colorProfile);
+        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", result.getDiagramStId(), diagramProfile);
 
         Decorator decorator = new Decorator();
 
@@ -92,7 +92,7 @@ public class PptxExporterController {
             }
         }
 
-        File pptx = exportManager.getDiagramPPTX(result.getDiagramStId(), colorProfile, decorator, response);
+        File pptx = exportManager.getDiagramPPTX(result.getDiagramStId(), diagramProfile, decorator, response);
 
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
@@ -121,7 +121,7 @@ public class PptxExporterController {
     public synchronized void reactionPPTX(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-5205682")
                                          @PathVariable String identifier,
                                           @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
-                                         @RequestParam(value = "profile", defaultValue = "Modern", required = false) String colorProfile,
+                                         @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
                                           @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
                                          @RequestParam(value = "flg", required = false) String flg,
                                           @ApiParam(value = "Defines whether to take into account interactors for the flagging")
@@ -131,14 +131,13 @@ public class PptxExporterController {
                                          HttpServletResponse response) throws Exception {
         // IMPORTANT: Downloading the file on Swagger does not work - https://github.com/swagger-api/swagger-ui/issues/2132
         // for this reason we are keeping this method as APIIgnore
-        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", identifier, colorProfile);
+        infoLogger.info("Exporting the Diagram {} to PPTX for color profile {}", identifier, diagramProfile);
 
         Decorator decorator = new Decorator();
 
         DiagramResult result = diagramService.getDiagramResult(identifier);
         List<Long> toSelect = new ArrayList<>();
         if (sel != null) toSelect.addAll(getDatabaseIdentifiers(sel));
-//        toSelect.addAll(getDatabaseIdentifiers(result.getEvents()));
         decorator.setSelected(toSelect);
 
         if (flg != null && !flg.isEmpty()) {
@@ -151,7 +150,7 @@ public class PptxExporterController {
         }
 
         ReactionLikeEvent rle = getReactionLikeEvent(identifier);
-        File pptx = exportManager.getReactionPPTX(rle, colorProfile, decorator, response);
+        File pptx = exportManager.getReactionPPTX(rle, diagramProfile, decorator, response);
 
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
