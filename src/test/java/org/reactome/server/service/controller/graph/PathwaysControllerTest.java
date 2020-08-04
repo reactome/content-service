@@ -14,10 +14,8 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class PathwaysControllerTest extends BaseTest {
 

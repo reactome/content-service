@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class SchemaControllerTest extends BaseTest {
 

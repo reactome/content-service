@@ -10,10 +10,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class PhysicalEntityControllerTest extends BaseTest {
 
