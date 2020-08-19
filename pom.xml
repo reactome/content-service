@@ -19,12 +19,6 @@
 
     <developers>
         <developer>
-            <id>fabregat</id>
-            <name>Antonio Fabregat</name>
-            <email>fabregat@ebi.ac.uk</email>
-            <organization>http://www.ebi.ac.uk/</organization>
-        </developer>
-        <developer>
             <id>gviteri</id>
             <name>Guilherme S Viteri</name>
             <email>gviteri@ebi.ac.uk</email>
@@ -33,8 +27,10 @@
         <developer>
             <id>fkorn</id>
             <name>Florian Korninger</name>
-            <email>fkorn@ebi.ac.uk</email>
-            <organization>http://www.ebi.ac.uk/</organization>
+        </developer>
+        <developer>
+            <id>amundo</id>
+            <name>Antonio Mundo</name>
         </developer>
     </developers>
 
@@ -45,9 +41,9 @@
         <graph.core>1.1.21</graph.core>
         <search.core>1.4.1</search.core>
         <interactors.core>1.0.14</interactors.core>
-        <diagram.exporter>1.3.13-SANPSHOT</diagram.exporter>
+        <diagram.exporter>1.3.14</diagram.exporter>
+        <fireworks.exporter>1.1.5</fireworks.exporter>
         <reaction.exporter>1.1.2</reaction.exporter>
-        <fireworks.exporter>1.1.4</fireworks.exporter>
         <sbml.exporter>2.0.0</sbml.exporter>
         <event.pdf>1.0.5</event.pdf>
         <spring.version>4.3.10.RELEASE</spring.version>
