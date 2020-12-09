@@ -75,10 +75,21 @@ public class MappingController {
                                           @RequestParam(required = false) String species) {
         species = getSpecies(resource, species);
         Collection<Pathway> rtn;
-        if (species != null && !species.isEmpty()) {
-            rtn = mappingService.getPathways(resource, identifier, species);
-        } else {
-            rtn = mappingService.getPathways(resource, identifier);
+
+        //Retrieves pathways for which a gene ontology identifier within it. It uses different cypher query than returning pathways from different resource.
+        if (resource.toLowerCase().equals("go")){
+            String goIdentifier = identifier.toLowerCase().startsWith("go") ? identifier.replaceAll("[^0-9]", "") : identifier;
+            if (species != null && !species.isEmpty()) {
+                rtn = mappingService.getGoPathways(goIdentifier, species);
+            } else {
+                rtn = mappingService.getGoPathways(goIdentifier);
+            }
+        } else{
+            if (species != null && !species.isEmpty()) {
+                rtn = mappingService.getPathways(resource, identifier, species);
+            } else {
+                rtn = mappingService.getPathways(resource, identifier);
+            }
         }
 
         if (rtn == null || rtn.isEmpty()) throw new NotFoundException("No pathways found for " + resource + ":" + identifier);
