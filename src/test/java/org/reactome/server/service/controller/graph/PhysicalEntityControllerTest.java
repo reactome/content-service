@@ -10,16 +10,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class PhysicalEntityControllerTest extends BaseTest {
 
     @Test
     public void getOtherFormsOf() throws Exception {
-
         //stId
         mockMvcGetResult("/data/entity/R-HSA-202772/otherForms", "application/json;Charset=UTF-8");
         //dbId
@@ -54,19 +51,19 @@ public class PhysicalEntityControllerTest extends BaseTest {
 
     @Test
     public void getReferenceSequences() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("page", 1);
         params.put("offset", 20);
+
         mockMvcGetResult("/data/referenceSequences", "application/json;Charset=UTF-8", params);
     }
 
     @Test
     public void getReferenceSequencesSummary() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("page", 1);
         params.put("offset", 20);
+
         mockMvcGetResult("/data/referenceSequences/identifiers", "text/plain;charset=ISO-8859-1", params);
     }
 }

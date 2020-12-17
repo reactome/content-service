@@ -11,20 +11,16 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class PptxExporterControllerTest extends BaseTest {
 
     @Test
     public void diagramPPTX() throws Exception {
-
         Map<String, Object> params = new HashMap<>();
         params.put("profile", "Modern");
         params.put("flgInteractors", true);
-
         //pathway
         mockMvcGetResult("/exporter/diagram/R-HSA-68886.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
         //reaction

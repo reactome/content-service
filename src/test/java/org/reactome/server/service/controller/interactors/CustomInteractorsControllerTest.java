@@ -17,16 +17,13 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class CustomInteractorsControllerTest extends BaseTest {
 
     @Test
     public void postFile() throws Exception {
-
         //PSI-MI Tab
         String pSIMITABF = "uniprotkb:Q0PC27\tuniprotkb:Q0P8D3\t-\t-\tuniprotkb:EXBD3(gene name)\tuniprotkb:Q0P8D3(gene name)\tpsi-mi:\"MI:0397\"(two hybrid array)\t-\tpubmed:17615063\ttaxid:192222(Campylobacter jejuni subsp. jejuni NCTC 11168 = ATCC 700819)\ttaxid:192222(Campylobacter jejuni subsp. jejuni NCTC 11168 = ATCC 700819)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0469\"(IntAct)\tintact:EBI-1345937\tmentha-score:0.126\n" +
                 "uniprotkb:P78406\tuniprotkb:Q9NVU0\t-\t-\tuniprotkb:RAE1(gene name)\tuniprotkb:POLR3E(gene name)\tpsi-mi:\"MI:0004\"(affinity chromatography technology)\t-\tpubmed:19615732\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0463\"(biogrid)\tbiogrid:424131\tmentha-score:0.126\n" +
@@ -44,7 +41,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
                 "uniprotkb:Q9UBU9\tuniprotkb:P78406\t-\t-\tuniprotkb:NXF1(gene name)\tuniprotkb:RAE1(gene name)\tpsi-mi:\"MI:0096\"(pull down)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0407\"(direct interaction)\tpsi-mi:\"MI:0471\"(MINT)\tmint:MINT-14383\tmentha-score:0.569\n" +
                 "uniprotkb:Q9UBU9\tuniprotkb:P78406\t-\t-\tuniprotkb:NXF1(gene name)\tuniprotkb:RAE1(gene name)\tpsi-mi:\"MI:0004\"(affinity chromatography technology)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0463\"(biogrid)\tbiogrid:718103\tmentha-score:0.569\n" +
                 "uniprotkb:P78406\tuniprotkb:Q9UBU9\t-\t-\tuniprotkb:RAE1(gene name)\tuniprotkb:NXF1(gene name)\tpsi-mi:\"MI:0019\"(coimmunoprecipitation)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0471\"(MINT)\tmint:MINT-14382\tmentha-score:0.569";
-
 
         String extendFile = "#ID A\tID B\tALIAS A\tALIAS B\tTAX_ID A\tTAX_ID B\tEVIDENCE\t\tSCORE\n" +
                 "Q13501\tQ9H0R8\tSQSTM\tGBRL1\t9606\t\t9606\t\tEBI-1010739\t\t0.48\n" +
@@ -64,7 +60,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
         MockMultipartFile PSIMITabFileTest = new MockMultipartFile("file", "tuple-mentha-psimitab-ex.txt", "multipart/form-data", pSIMITABF.getBytes());
         MockMultipartFile extendFileTest = new MockMultipartFile("file", "extend-ex.txt", "multipart/form-data", extendFile.getBytes());
         MockMultipartFile tsvFileTest = new MockMultipartFile("file", "tsv-ex.txt", "multipart/form-data", tsvFile.getBytes());
-
 
         List<MockMultipartFile> files = new ArrayList<>();
         files.add(PSIMITabFileTest);
@@ -87,7 +82,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
 
     @Test
     public void postFileContent() throws Exception {
-
         String content = "uniprotkb:Q9UBU9\tuniprotkb:P78406\t-\t-\tuniprotkb:NXF1(gene name)\tuniprotkb:RAE1(gene name)\tpsi-mi:\"MI:0004\"(affinity chromatography technology)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0463\"(biogrid)\tbiogrid:718103\tmentha-score:0.569";
 
         mockMvcPostResult("/interactors/upload/tuple/content", content, "name", "CSTest");
@@ -95,7 +89,6 @@ public class CustomInteractorsControllerTest extends BaseTest {
 
     @Test
     public void postUrl() throws Exception {
-
         String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q9UBU9";
 
         mockMvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");

@@ -17,7 +17,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class TokenControllerTest extends BaseTest {
 
@@ -26,7 +26,6 @@ public class TokenControllerTest extends BaseTest {
 
     @Test
     public void getInteractors() throws Exception {
-
         String token = getLastestPSIFile(tokenFolder);
 
         /*
@@ -34,7 +33,6 @@ public class TokenControllerTest extends BaseTest {
           The token (PSI--XXXXX.bin) will be written in the file system based on the <tuples.uploaded.files.folder> property.
           e.g <tuples.uploaded.files.folder>/Users/reactome/Reactome/custom</tuples.uploaded.files.folder>
          */
-
         //Todo this token only works for local testing
         mockMvcPostResult("/interactors/token/" + token, "Q9UBU9");
     }

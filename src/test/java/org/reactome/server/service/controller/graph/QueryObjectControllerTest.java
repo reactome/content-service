@@ -8,10 +8,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources-test/mvc-dispatcher-servlet-test.xml"})
+@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
 @WebAppConfiguration
 public class QueryObjectControllerTest extends BaseTest {
 
@@ -27,9 +25,7 @@ public class QueryObjectControllerTest extends BaseTest {
 
     @Test
     public void findByIds() throws Exception {
-
         mockMvcPostResult("/data/query/ids", "R-HSA-141409, R-HSA-141431, R-HSA-141422");
-
         mvcPostResultNotFound("/data/query/ids", "R-HSA-141409R-HSA-141431");
     }
 
