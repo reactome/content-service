@@ -40,12 +40,12 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfo(
                 "Content Service",
-                "RESTFul service for Reactome content",
-                "1.1",
+                "REST API for Reactome content",
+                "1.2",
                 "/license",
                 new Contact("Reactome", "https://reactome.org", "help@reactome.org"),
-                "Creative Commons Attribution 3.0 Unsupported License",
-                "http://creativecommons.org/licenses/by/3.0/legalcode",
+                "Creative Commons Attribution 4.0 International (CC BY 4.0) License",
+                "https://creativecommons.org/licenses/by/4.0/",
                 Collections.emptyList()
         );
     }
