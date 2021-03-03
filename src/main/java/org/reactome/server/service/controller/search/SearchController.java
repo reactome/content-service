@@ -37,6 +37,7 @@ import java.util.*;
 class SearchController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    public static final int PRE_DETERMINED = 0;
 
     private final Integer releaseNumber;
 
@@ -111,26 +112,42 @@ class SearchController {
     })
     @RequestMapping(value = "/query", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
+    public GroupedResult getSearchResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
+                                         @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                         @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
+                                         @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                         @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
+                                         @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
+                                         @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false) ParserType parserType,
+                                         @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
+                                         @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+                                         HttpServletRequest request) throws SolrSearcherException {
+        infoLogger.info("Search request for query: {}", query);
+        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
+        return searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster).getGroupedResult();
+    }
+
+    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format.", response = GroupedResult.class, produces = "application/json")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Entry not found. Targets inform if the term is our scope of annotation", response = ErrorInfo.class),
+            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
+            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+    })
+    @RequestMapping(value = "/query/paginated", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
+                                   @ApiParam(value = "Page", defaultValue = "0", required = true) @RequestParam Integer page,
+                                   @ApiParam(value = "Rows per page", defaultValue = "10", required = true) @RequestParam Integer rowCount,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                    @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
                                    @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                    @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                   @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
-                                   @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+                                   @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false) ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).build();
-        GroupedResult result = searchService.getEntries(queryObject, cluster);
-        if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
-            Set<TargetResult> targets = null;
-            if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
-                targets = result.getTargetResults();
-            }
-            throw new NoResultsFoundException("No entries found for query: " + query, targets);
-        }
-        return result;
+        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
+        return searchService.getSearchResult(queryObject, rowCount, page, cluster).getGroupedResult();
     }
 
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
@@ -143,7 +160,8 @@ class SearchController {
                                               @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
                                               HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
-        List<String> speciess = new ArrayList<>(); speciess.add(species);
+        List<String> speciess = new ArrayList<>();
+        speciess.add(species);
         Query queryObject = new Query.Builder(query).forSpecies(speciess).withTypes(types).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).build();
         FireworksResult fireworksResult = searchService.getFireworks(queryObject);
         if (fireworksResult == null || fireworksResult.getFound() == 0) {
@@ -160,13 +178,14 @@ class SearchController {
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FireworksOccurrencesResult fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
-                                                @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
+                                                        @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
         Species sp = speciesService.getSpeciesByName(species);
         if (sp == null) throw new BadRequestException("No species found for '" + species + "'");
 
         FireworksOccurrencesResult rtn = searchManager.getFireworksOccurrencesResult(sp, query);
-        if (rtn.isEmpty()) throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
+        if (rtn.isEmpty())
+            throw new NotFoundException("No entries found for query: '" + query + "' in species '" + species + "'");
         return rtn;
     }
 
@@ -181,7 +200,8 @@ class SearchController {
         checkDiagramIdentifier(diagram);
         Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfrows(rows).build();
         DiagramResult rtn = searchService.getDiagrams(queryObject);
-        if (rtn == null || rtn.getFound() == 0) throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
+        if (rtn == null || rtn.getFound() == 0)
+            throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
         return rtn;
     }
 
@@ -190,11 +210,12 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @ApiParam(value = "Types to filter")@RequestParam(required = false) List<String> types) throws SolrSearcherException {
+                                                          @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types) throws SolrSearcherException {
         checkIdentifiers(diagram, instance);
         Query queryObject = new Query.Builder(instance).addFilterQuery(diagram).withTypes(types).build();
         DiagramOccurrencesResult rtn = searchService.getDiagramOccurrencesResult(queryObject);
-        if (rtn == null) throw new NotFoundException(String.format("No occurrences of '%s' found in '%s'", instance, diagram));
+        if (rtn == null)
+            throw new NotFoundException(String.format("No occurrences of '%s' found in '%s'", instance, diagram));
         return rtn;
     }
 
@@ -202,13 +223,14 @@ class SearchController {
     @RequestMapping(value = "/diagram/{pathwayId}/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DiagramOccurrencesResult getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
-                                                                    @PathVariable String pathwayId,
-                                                                    @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
-                                                                    @RequestParam String query) throws SolrSearcherException {
+                                                                      @PathVariable String pathwayId,
+                                                                      @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
+                                                                      @RequestParam String query) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
         DiagramOccurrencesResult rtn = searchManager.getDiagramOccurrencesResult(pathwayId, query);
         infoLogger.info("Request for all entities in diagram with identifier: {}", query);
-        if (rtn.isEmpty()) throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
+        if (rtn.isEmpty())
+            throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
         return rtn;
     }
 
@@ -280,7 +302,7 @@ class SearchController {
      * better HttpStatus codes depending on the paramenters (more accurate error messages)
      *
      * @param diagram a valid identifier to a diagrammed pathway (does not accept null)
-     * @param object a valid identifier to any object in Reactome (accepts null)
+     * @param object  a valid identifier to any object in Reactome (accepts null)
      */
     private void checkIdentifiers(String diagram, String object) {
         SortedSet<String> report = new TreeSet<>();
@@ -289,9 +311,9 @@ class SearchController {
             report.add(String.format("'%s' is not a valid identifier", diagram));
         } else {
             DatabaseObject d = dos.findByIdNoRelations(diagram);
-            if (d == null){
+            if (d == null) {
                 report.add(String.format("'%s' cannot be found", diagram));
-            } else if(!(d instanceof Pathway)) {
+            } else if (!(d instanceof Pathway)) {
                 report.add(String.format("'%s' does not belong to a pathway", diagram));
             } else {
                 Pathway p = (Pathway) d;
