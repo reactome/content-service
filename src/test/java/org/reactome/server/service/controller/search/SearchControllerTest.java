@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,6 +56,22 @@ public class SearchControllerTest extends BaseTest {
                 .param("species", "Homo sapiens")
                 .param("species", "Rattus norvegicus")
                 .param("types", "Pathway")
+                .param("parserType", "STD")
+                .param("cluster", "true"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    public void getResultPaginated() throws Exception {
+        this.getMockMvc().perform(get("/search/query/paginated")
+                .param("query", "enzyme")
+                .param("species", "Homo sapiens")
+                .param("species", "Rattus norvegicus")
+                .param("page", "1")
+                .param("rowCount", "20")
+                .param("types", "Pathway")
+                .param("parserType", "STD")
                 .param("cluster", "true"))
                 .andExpect(status().isOk())
                 .andReturn();

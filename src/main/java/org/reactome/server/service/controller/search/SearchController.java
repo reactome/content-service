@@ -119,8 +119,8 @@ class SearchController {
                                          @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                          @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
                                          @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
-                                         @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
-                                         @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+                                         @ApiParam(value = "Start row", defaultValue = "0") @RequestParam(value = "Start row", required = false, defaultValue = "0") Integer start,
+                                         @ApiParam(value = "Number of rows to include", defaultValue = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
