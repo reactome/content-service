@@ -124,7 +124,8 @@ class SearchController {
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
-        GroupedResult result = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster).getGroupedResult();
+        SearchResult searchResult = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster);
+        GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
             Set<TargetResult> targets = null;
             if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
@@ -156,7 +157,8 @@ class SearchController {
                                    HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
-        GroupedResult result = searchService.getSearchResult(queryObject, rowCount, page, cluster).getGroupedResult();
+        SearchResult searchResult = searchService.getSearchResult(queryObject, rowCount, page, cluster);
+        GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
             Set<TargetResult> targets = null;
             if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
