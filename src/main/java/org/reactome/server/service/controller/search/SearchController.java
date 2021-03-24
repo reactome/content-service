@@ -118,13 +118,22 @@ class SearchController {
                                          @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                          @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                          @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                         @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false) ParserType parserType,
+                                         @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                          @ApiParam(value = "Start row") @RequestParam(value = "Start row", required = false) Integer start,
                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
-        return searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster).getGroupedResult();
+        GroupedResult result = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster).getGroupedResult();
+        if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
+            Set<TargetResult> targets = null;
+            if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
+                targets = result.getTargetResults();
+            }
+            throw new NoResultsFoundException("No entries found for query: " + query, targets);
+        }
+        return result;
+
     }
 
     @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format.", response = GroupedResult.class, produces = "application/json")
@@ -143,11 +152,19 @@ class SearchController {
                                    @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                    @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                   @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false) ParserType parserType,
+                                   @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
-        return searchService.getSearchResult(queryObject, rowCount, page, cluster).getGroupedResult();
+        GroupedResult result = searchService.getSearchResult(queryObject, rowCount, page, cluster).getGroupedResult();
+        if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
+            Set<TargetResult> targets = null;
+            if (result != null && result.getTargetResults() != null && !result.getTargetResults().isEmpty()) {
+                targets = result.getTargetResults();
+            }
+            throw new NoResultsFoundException("No entries found for query: " + query, targets);
+        }
+        return result;
     }
 
     @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
