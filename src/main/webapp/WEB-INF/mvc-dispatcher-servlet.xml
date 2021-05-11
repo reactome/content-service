@@ -123,5 +123,13 @@
             </props>
         </property>
     </bean>
+    
+    <bean id="mysqlDba" class="org.gk.persistence.MySQLAdaptor">
+      <constructor-arg index="0" value="${mysql.host}"/>
+      <constructor-arg index="1" value="${mysql.database}"/>
+      <constructor-arg index="2" value="${mysql.user}"/>
+      <constructor-arg index="3" value="${mysql.password}"/>
+      <constructor-arg index="4" value="${mysql.port}"/>
+    </bean>
 
 </beans>
