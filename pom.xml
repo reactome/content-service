@@ -41,11 +41,11 @@
         <graph.core>1.1.24</graph.core>
         <search.core>1.4.3</search.core>
         <interactors.core>1.0.15-SNAPSHOT</interactors.core>
-        <diagram.exporter>1.3.17</diagram.exporter>
-        <fireworks.exporter>1.1.7</fireworks.exporter>
+        <diagram.exporter>1.3.18</diagram.exporter>
+        <fireworks.exporter>1.1.8</fireworks.exporter>
         <reaction.exporter>1.1.4</reaction.exporter>
-        <sbml.exporter>2.1.0</sbml.exporter>
-        <event.pdf>1.0.7</event.pdf>
+        <sbml.exporter>2.1.1</sbml.exporter>
+        <event.pdf>1.0.8</event.pdf>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
         <jsp.version>2.1</jsp.version>
