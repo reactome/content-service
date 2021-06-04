@@ -3,6 +3,7 @@ package org.reactome.server.service.controller.graph;
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.result.EventProjectionWrapper;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.HierarchyService;
 import org.reactome.server.graph.service.helper.PathwayBrowserNode;
@@ -21,7 +22,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "events", description = "Reactome Data: Queries related to events")
+@Api(tags = {"events"})
 @RequestMapping("/data")
 public class EventsController {
 
@@ -48,9 +49,9 @@ public class EventsController {
     })
     @RequestMapping(value = "/event/{id}/ancestors", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Collection<Pathway>> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
+    public Collection<EventProjectionWrapper> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
                                                              @PathVariable String id) {
-        Collection<Collection<Pathway>> ancestors = eventsService.getEventAncestors(id);
+        Collection<EventProjectionWrapper> ancestors = eventsService.getEventAncestors(id);
         if (ancestors == null || ancestors.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
         infoLogger.info("Request for all Ancestors of Event with id: {}", id);
         return ancestors;

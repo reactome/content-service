@@ -37,7 +37,7 @@ import java.util.*;
  */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class PptxExporterController {
 

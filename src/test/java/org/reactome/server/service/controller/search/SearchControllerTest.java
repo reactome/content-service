@@ -1,24 +1,17 @@
 package org.reactome.server.service.controller.search;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
+import org.junit.jupiter.api.Test;
+import org.reactome.server.service.utils.BaseTest;
 
 import java.util.HashMap;
-
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class SearchControllerTest extends BaseTest {
 
     @Test
@@ -97,12 +90,12 @@ public class SearchControllerTest extends BaseTest {
 
     @Test
     public void getDiagramResult() throws Exception {
-        mockMvcGetResult("/search/diagram/R-HSA-9612973", "application/json;charset=UTF-8", "query", "PTEN");
+        mockMvcGetResult("/search/diagram/R-HSA-69620", "application/json;charset=UTF-8", "query", "PTEN");
     }
 
     @Test
     public void getDiagramOccurrences() throws Exception {
-        mockMvcGetResult("/search/diagram/R-HSA-9612973/occurrences/R-HSA-5672817", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/search/diagram/R-HSA-68886/occurrences/R-HSA-141433", "application/json;Charset=UTF-8");
     }
 
     @Test

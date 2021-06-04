@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "query", description = "Reactome Data: Common data retrieval")
+@Api(tags = {"query"})
 @RequestMapping("/data")
 public class QueryObjectController {
 

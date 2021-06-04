@@ -1,16 +1,10 @@
 package org.reactome.server.service.controller.exporter;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
 public class SbxxExporterControllerTest extends BaseTest {
 
     @Test
@@ -19,7 +13,7 @@ public class SbxxExporterControllerTest extends BaseTest {
         //todo ERROR: Trying to write a SBGN file that already exists, but test passed
         mockMvcGetResult("/exporter/event/68886.sbgn", "application/sbgn+xml");
         //reaction
-        mockMvcGetResult("/exporter/event/R-HSA-5205682.sbgn","application/sbgn+xml");
+        mockMvcGetResult("/exporter/event/R-HSA-5205682.sbgn", "application/sbgn+xml");
     }
 
     @Test

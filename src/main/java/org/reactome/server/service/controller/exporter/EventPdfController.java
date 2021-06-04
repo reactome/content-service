@@ -28,7 +28,7 @@ import java.net.URL;
  * @author Lorente-Arencibia, Pascual (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class EventPdfController {
 

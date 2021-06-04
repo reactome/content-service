@@ -1,18 +1,13 @@
 package org.reactome.server.service.controller.graph;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class PhysicalEntityControllerTest extends BaseTest {
 
     @Test
@@ -46,7 +41,7 @@ public class PhysicalEntityControllerTest extends BaseTest {
 
     @Test
     public void getReferenceMoleculesSummary() throws Exception {
-        mockMvcGetResult("/data/referenceMolecules/identifiers", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/referenceMolecules/identifiers", "text/plain;charset=UTF-8");
     }
 
     @Test
@@ -64,6 +59,6 @@ public class PhysicalEntityControllerTest extends BaseTest {
         params.put("page", 1);
         params.put("offset", 20);
 
-        mockMvcGetResult("/data/referenceSequences/identifiers", "text/plain;charset=ISO-8859-1", params);
+        mockMvcGetResult("/data/referenceSequences/identifiers", "text/plain;charset=UTF-8", params);
     }
 }

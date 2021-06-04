@@ -21,7 +21,7 @@ import java.util.HashSet;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags = {"interactors"})
 @RequestMapping("/interactors/static")
 @RestController
 public class StaticInteractionsController {
@@ -58,6 +58,7 @@ public class StaticInteractionsController {
     })
     @RequestMapping(value = "/molecule/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
+    //todo: Error mapping GraphModel to instance of Interaction and wait for a new library in graph core, the org.neo4j.ogm is going to deprecated
     public Interactors getProteinDetailsByAcc(@ApiParam(value = "Interactor accession (or identifier)", required = true, defaultValue = "Q13501") @PathVariable String acc,
                                               @ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                               @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
@@ -99,6 +100,7 @@ public class StaticInteractionsController {
     })
     @RequestMapping(value = "/molecules/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
+    //todo: Error mapping GraphModel to instance of Interaction and wait for a new library in graph core, the org.neo4j.ogm is going to deprecated
     public Interactors getProteinsDetailsByAccs(@ApiParam(value = "For paginating the results") @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                                 @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize,
                                                 @ApiParam(value = "Interactor accessions (or identifiers)", required = true, defaultValue = "O95631") @RequestBody String proteins) {

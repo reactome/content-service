@@ -32,7 +32,7 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "search", description = "Reactome Search")
+@Api(tags = {"search"})
 @RequestMapping("/search")
 class SearchController {
 
@@ -123,7 +123,7 @@ class SearchController {
                                          @ApiParam(value = "Number of rows to include", defaultValue = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
+        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
         SearchResult searchResult = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster);
         GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
@@ -181,7 +181,7 @@ class SearchController {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>();
         speciess.add(species);
-        Query queryObject = new Query.Builder(query).forSpecies(speciess).withTypes(types).start(start).numberOfrows(rows).withReportInfo(getReportInformation(request)).build();
+        Query queryObject = new Query.Builder(query).forSpecies(speciess).withTypes(types).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).build();
         FireworksResult fireworksResult = searchService.getFireworks(queryObject);
         if (fireworksResult == null || fireworksResult.getFound() == 0) {
             Set<TargetResult> targets = null;
@@ -217,7 +217,7 @@ class SearchController {
                                           @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
                                           @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         checkDiagramIdentifier(diagram);
-        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfrows(rows).build();
+        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfRows(rows).build();
         DiagramResult rtn = searchService.getDiagrams(queryObject);
         if (rtn == null || rtn.getFound() == 0)
             throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));

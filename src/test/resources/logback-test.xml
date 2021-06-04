@@ -16,7 +16,7 @@
     </appender>
 
     <!--Add additivity ="false" to fix appenders accumulate(duplicate log messages)-->
-    <logger name="testLogger" level="ERROR" additivity="false">
+    <logger name="testLogger" level="ERROR" additivity="false">false
         <appender-ref ref="STDOUT"/>
     </logger>
 

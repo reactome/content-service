@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "entities", description = "Reactome Data: PhysicalEntity queries")
+@Api(tags = {"entities"})
 @RequestMapping("/data")
 public class PhysicalEntityController {
 
@@ -142,7 +142,7 @@ public class PhysicalEntityController {
     @RequestMapping(value = "/referenceMolecules/identifiers", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
     public String getReferenceMoleculesSummary() {
-        List<String> rtn = schemaService.getByClass(ReferenceMolecule.class).stream().map(r -> r.getId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
+        List<String> rtn = schemaService.getByClass(ReferenceMolecule.class).stream().map(r -> r.getStId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
         infoLogger.info("Request total list of ReferenceMolecules");
         return String.join("\n", rtn);
     }
@@ -167,7 +167,7 @@ public class PhysicalEntityController {
                                                @RequestParam Integer page,
                                                @ApiParam(value = "Number of elements per page", defaultValue = "20")
                                                @RequestParam Integer offset) {
-        List<String> rtn = schemaService.getByClass(ReferenceSequence.class, page, offset).stream().map(r -> r.getId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
+        List<String> rtn = schemaService.getByClass(ReferenceSequence.class, page, offset).stream().map(r -> r.getStId() + "\t" + r.getDatabaseName() + ":" + r.getIdentifier()).collect(Collectors.toList());
         infoLogger.info("Request total list of ReferenceSequences");
         return String.join("\n", rtn);
     }

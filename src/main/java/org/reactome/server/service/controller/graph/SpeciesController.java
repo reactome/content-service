@@ -23,7 +23,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "species", description = "Reactome Data: Species related queries")
+@Api(tags = {"species"})
 @RequestMapping("/data")
 public class SpeciesController {
 

@@ -1,3 +1,4 @@
+<!--
 <web-app version="2.4"
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
@@ -20,7 +21,8 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
-	<!-- Adds the headers to support cross-origin resource sharing in the web clients -->
+	&lt;!&ndash; Adds the headers to support cross-origin resource sharing in the web clients &ndash;&gt;
+
 	<filter>
 		<filter-name>crs</filter-name>
 		<filter-class>org.reactome.server.service.utils.CustomRequestFilter</filter-class>
@@ -153,4 +155,4 @@
 		<url-pattern>/content/*</url-pattern>
 	</servlet-mapping>
 
-</web-app>
+</web-app>-->

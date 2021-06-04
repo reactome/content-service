@@ -1,21 +1,12 @@
 package org.reactome.server.service.utils;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.stereotype.Component;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import javax.servlet.ServletContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,39 +16,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Component
+/**
+ * Using MockMvc with Entire Application Context
+ *
+ * @SpringBootTest This annotation uses the SpringBootTestContextBootstrapper class to create the application context.
+ * When you use @SpringBootTest, all beans configured in your application are added to the context.
+ * @AutoConfigureMockMvc annotation will automatically configure the MockMvc object when used in combination with @SpringBootTest.
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
 public class BaseTest {
 
     @Autowired
-    private WebApplicationContext wac;
-
-    @Autowired
-    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
-
     private MockMvc mockMvc;
 
-    /**
-     * initialize the mockMvc object
-     */
-    @Before
-    public void setup() {
-        DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.wac);
-        this.mockMvc = builder.build();
-    }
 
     protected MockMvc getMockMvc() {
         return mockMvc;
     }
-
-    /* verify that we're loading the WebApplicationContext object (wac) properly */
-    protected void findBeanByName(String beanName) {
-        ServletContext servletContext = wac.getServletContext();
-
-        Assert.assertNotNull(servletContext);
-        Assert.assertTrue(servletContext instanceof MockServletContext);
-        Assert.assertNotNull(wac.getBean(beanName));
-    }
-
 
     /**
      * Get request testing of Spring MVC controllers
@@ -79,7 +55,7 @@ public class BaseTest {
     }
 
     public MvcResult mockMvcGetResult(String url, String contentType, Map<String, Object> params) throws Exception {
-        if(contentType == null){
+        if (contentType == null) {
             return this.mockMvc.perform(
                     get(url))
                     .andExpect(status().isOk())
@@ -187,7 +163,6 @@ public class BaseTest {
             return this.mockMvc.perform(requestBuilder)
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/json;charset=UTF-8"))
-
                     .andReturn();
         } else {
             return this.mockMvc.perform(
@@ -210,7 +185,7 @@ public class BaseTest {
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(content))
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType("application/json"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn();
     }
 }

@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -103,7 +104,7 @@ public class HeaderFooterCacher extends Thread {
     private String getTemplate() {
         String templateURL = this.server + TEMPLATE_PAGE;
         try {
-            String rtn = IOUtils.toString(getTemplateInputStream(templateURL));
+            String rtn = IOUtils.toString(getTemplateInputStream(templateURL), StandardCharsets.UTF_8);
 
             rtn = getReplaced(rtn, TITLE_OPEN, TITLE_CLOSE, TITLE_REPLACE);
             rtn = getReplaced(rtn, HEADER_CLOSE, HEADER_CLOSE, HEADER_CLOSE_REPLACE);
@@ -165,7 +166,8 @@ public class HeaderFooterCacher extends Thread {
     // trusting all certificate
     @SuppressWarnings("Duplicates")
     private void doTrustToCertificates() throws NoSuchAlgorithmException, KeyManagementException {
-        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+       // Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        Security.addProvider(Security.getProvider("SunJSSE"));
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() {
