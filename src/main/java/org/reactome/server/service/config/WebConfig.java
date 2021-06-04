@@ -71,7 +71,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        System.out.println("hi this is converters");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
@@ -86,7 +85,6 @@ public class WebConfig implements WebMvcConfigurer {
 
         converters.add(mappingJackson2HttpMessageConverter);
         converters.add(stringHttpMessageConverter);
-        System.out.println("Bye from converter");
     }
 
     @Override
