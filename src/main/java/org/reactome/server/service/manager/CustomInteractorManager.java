@@ -74,9 +74,6 @@ public class CustomInteractorManager {
             }
             return result;
         } catch (IOException | ClassCastException e) {
-            System.out.println("******");
-            e.printStackTrace();
-            System.out.println("******");
             throw new UnprocessableEntityException(); //TODO: Place the right exception here
         }
     }
