@@ -98,4 +98,19 @@ public class ServletConfig {
         registration.setName("crs");
         return registration;
     }
+
+//    configuration in application.properties
+//    @Bean
+//    public FilterRegistrationBean<CharacterEncodingFilter> encodingFilterR() {
+//        System.out.println(" hi encoding filter");
+//        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+//        FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
+//        characterEncodingFilter.setForceEncoding(true);
+//        characterEncodingFilter.setEncoding("UTF-8");
+//        registrationBean.setFilter(characterEncodingFilter);
+//        registrationBean.setName("encodingFilter");
+//        registrationBean.addUrlPatterns("/*");
+//        System.out.println(" bye encoding filter");
+//        return registrationBean;
+//    }
 }

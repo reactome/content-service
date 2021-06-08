@@ -4,10 +4,14 @@ package org.reactome.server.service.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.Aspects;
+import org.reactome.server.analysis.core.result.utils.TokenUtils;
 import org.reactome.server.graph.aop.LazyFetchAspect;
 import org.reactome.server.interactors.service.PsicquicService;
 import org.reactome.server.service.utils.AspectLazyLoadingPrevention;
 import org.reactome.server.service.utils.TupleManager;
+import org.reactome.server.service.utils.TuplesFileCheckerController;
+import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
+import org.reactome.server.tools.event.exporter.EventExporter;
 import org.reactome.server.tools.fireworks.exporter.FireworksExporter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,14 +39,73 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${analysis.token}")
     String analysisToken;
 
+    @Value("${diagram.json.folder}")
+    String diagramPath;
+
+    @Value("${ehld.folder}")
+    String ehldPath;
+
+    @Value("${analysis.token}")
+    String analysisPath;
+
+    @Value("${svg.summary.file}")
+    String svgSummary;
+
+    @Value("${fireworks.json.folder}")
+    String fireworksPath;
+
+
     @Bean
     public FireworksExporter fireworksExporter(@Value("${fireworks.json.folder}") String fireworkPath, @Value("${analysis.token}") String analysisPath) {
         return new FireworksExporter(fireworkPath, analysisPath);
     }
 
+
+    @Bean
+    public RasterExporter rasterExporter(@Value("${diagram.json.folder}") String diagramPath,
+                                         @Value("${ehld.folder}") String ehldPath,
+                                         @Value("${analysis.token}") String analysisPath,
+                                         @Value("${svg.summary.file}") String svgSummary) {
+        return new RasterExporter(diagramPath, ehldPath, analysisPath, svgSummary);
+    }
+
+    @Bean
+    public EventExporter eventExporter(@Value("${diagram.json.folder}") String diagramPath,
+                                       @Value("${ehld.folder}") String ehldPath,
+                                       @Value("${analysis.token}") String analysisToken,
+                                       @Value("${fireworks.json.folder}") String fireworksPath,
+                                       @Value("${svg.summary.file}") String svgSummary) {
+        return new EventExporter(diagramPath, ehldPath, analysisToken, fireworksPath, svgSummary);
+    }
+
+    @Bean
+    public TokenUtils tokenUtils() {
+        TokenUtils tokenUtils = new TokenUtils();
+        tokenUtils.setPathDirectory(analysisToken);
+        return tokenUtils;
+    }
+
     @Bean
     public PsicquicService psicquicService() {
         return new PsicquicService();
+    }
+
+    @Bean
+    public TuplesFileCheckerController fileCheckerController() {
+        TuplesFileCheckerController fileCheckerController = new TuplesFileCheckerController();
+        fileCheckerController.setPathDirectory(tuplesFolder);
+        fileCheckerController.setMaxSize(2684354560L); // 2684354560 = 2.5GB // 5368709120 = 5 GB // 10737418240 = 10GB
+        fileCheckerController.setThreshold(524288000L); //10485760 = 10MB // 524288000 = 500MB // 1073741824 = 1GB
+        fileCheckerController.setTime(10000L); // 10 sec
+        fileCheckerController.setTtl(604800000L); // 1 week (SAB suggestion)
+        return fileCheckerController;
+    }
+
+    @Bean
+    public CommonsMultipartResolver multipartResolver() {
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+        multipartResolver.setMaxUploadSize(52428800); //10 MB  // 52428800 = 50 MB // 209715200 = 200MB
+        return multipartResolver;
     }
 
     @Bean
@@ -89,7 +152,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
         registry.addResourceHandler("/**").addResourceLocations("/resources/");
 
         registry.addResourceHandler("swagger-ui.html")
@@ -97,5 +159,4 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
-
 }

@@ -65,6 +65,7 @@
         <pmd.version>3.14.0</pmd.version>
         <hamcrest.library.version>2.2</hamcrest.library.version>
         <json.path.version>2.5.0</json.path.version>
+        <jsoup.version>1.13.1</jsoup.version>
 
         <jdk.version>11</jdk.version>
         <deploymentPath>/</deploymentPath>
@@ -78,11 +79,11 @@
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.reactome.server.graph</groupId>-->
-<!--            <artifactId>graph-core</artifactId>-->
-<!--            <version>${graph.core}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.reactome.server.graph</groupId>-->
+        <!--            <artifactId>graph-core</artifactId>-->
+        <!--            <version>${graph.core}</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.reactome.server.graph</groupId>
@@ -248,11 +249,11 @@
             <version>${activation.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>javax.annotation</groupId>-->
+        <!--            <artifactId>javax.annotation-api</artifactId>-->
+        <!--            <version>1.3.2</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.reactome.server.utils</groupId>
@@ -292,7 +293,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.13.1</version>
+            <version>${jsoup.version}</version>
         </dependency>
 
         <!-- initializing:  java.lang.ClassNotFoundException: com.fasterxml.jackson.annotation.JsonKey-->
@@ -302,7 +303,7 @@
             <version>2.12.3</version>
         </dependency>
 
-        <!--Testing:  java.lang.NoClassDefFoundError: com/fasterxml/jackson/core/util/JacksonFeature-->
+        <!--Testing:  java.lang.NoClassDefFoundError: com/fasterxml/jackson/core/util/JacksonFeature, be able to run mvn test -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

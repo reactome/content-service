@@ -12,14 +12,16 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
-@SpringBootApplication(scanBasePackages = {"org.reactome.server"})
+// todo: check for necessity below
+//equivalent to <context:exclude-filter> in servlet.xml
 //@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-//        pattern = {"org.reactome.server.service.controller.graph.*", "org.reactome.server.service.controller.search.*"}))
+  //      pattern = {"org.reactome.server.service.controller.graph.*", "org.reactome.server.service.controller.search.*"}))
+//todo: check for necessity below
+@EnableAsync // @EnableAsync and @EnableScheduling  equivalent to <task:annotation-driven> in servlet.xml
+@EnableScheduling
 @EntityScan({"org.reactome.server.graph.domain.model","org.reactome.server.graph.domain.model"})
 @EnableNeo4jRepositories("org.reactome.server.graph.repository")
-//todo: check below
-@EnableAsync
-@EnableScheduling
+@SpringBootApplication(scanBasePackages = {"org.reactome.server"})
 public class ContentServiceApplication extends SpringBootServletInitializer {
 
     @Override
@@ -27,9 +29,7 @@ public class ContentServiceApplication extends SpringBootServletInitializer {
         return builder.sources(ContentServiceApplication.class);
     }
 
-
     public static void main(String[] args) {
-
         SpringApplication.run(ContentServiceApplication.class, args);
     }
 }

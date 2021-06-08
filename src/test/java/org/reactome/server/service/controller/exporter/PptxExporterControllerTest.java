@@ -16,8 +16,8 @@ public class PptxExporterControllerTest extends BaseTest {
         params.put("profile", "Modern");
         params.put("flgInteractors", true);
         //pathway
-        mockMvcGetResult("/exporter/diagram/R-HSA-68886.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
+        mockMvcGetResult("/exporter/diagram/R-HSA-68886.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation;charset=UTF-8", params);
         //reaction
-        mockMvcGetResult("/exporter/reaction/R-HSA-6789031.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", params);
+        mockMvcGetResult("/exporter/reaction/R-HSA-6789031.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation;charset=UTF-8", params);
     }
 }
