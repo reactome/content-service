@@ -90,7 +90,7 @@ public class WebConfig implements WebMvcConfigurer {
         return new PsicquicService();
     }
 
-    @Bean
+    @Bean(destroyMethod = "interrupt", name = "FileCheckerController")
     public TuplesFileCheckerController fileCheckerController() {
         TuplesFileCheckerController fileCheckerController = new TuplesFileCheckerController();
         fileCheckerController.setPathDirectory(tuplesFolder);
