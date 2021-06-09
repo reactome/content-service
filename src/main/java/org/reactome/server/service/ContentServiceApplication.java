@@ -5,21 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
-// todo: check for necessity below
-//equivalent to <context:exclude-filter> in servlet.xml
-//@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-  //      pattern = {"org.reactome.server.service.controller.graph.*", "org.reactome.server.service.controller.search.*"}))
-//todo: check for necessity below
-@EnableAsync // @EnableAsync and @EnableScheduling  equivalent to <task:annotation-driven> in servlet.xml
+@EnableAsync
+// @EnableAsync and @EnableScheduling  equivalent to <task:annotation-driven> in servlet.xml, leave it for now as it doesn't hurt
 @EnableScheduling
-@EntityScan({"org.reactome.server.graph.domain.model","org.reactome.server.graph.domain.model"})
+@EntityScan({"org.reactome.server.graph.domain.model", "org.reactome.server.graph.domain.model"})
 @EnableNeo4jRepositories("org.reactome.server.graph.repository")
 @SpringBootApplication(scanBasePackages = {"org.reactome.server"})
 public class ContentServiceApplication extends SpringBootServletInitializer {

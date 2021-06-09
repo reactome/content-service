@@ -40,7 +40,6 @@
     <properties>
         <graph.core>2.0.0-SNAPSHOT</graph.core>
         <search.core>1.4.4-SNAPSHOT</search.core>
-        <!-- interactors.core is in working progress       -->
         <interactors.core>1.1.0-SNAPSHOT</interactors.core>
         <diagram.exporter>1.4.0-SNAPSHOT</diagram.exporter>
         <fireworks.exporter>1.2.0-SNAPSHOT</fireworks.exporter>
@@ -49,14 +48,12 @@
         <event.pdf>1.1.0-SNAPSHOT</event.pdf>
         <reactome.utils.version>1.1.0-SNAPSHOT</reactome.utils.version>
 
-        <spring.version>5.3.5</spring.version>
         <servlet.version>4.0.1</servlet.version>
         <jsp.version>2.3.3</jsp.version>
         <jstl.version>1.2</jstl.version>
         <jackson.version>2.12.3</jackson.version>
         <swagger.version>3.0.0</swagger.version>
         <lang.version>3.12.0</lang.version>
-        <mail.version>1.6.2</mail.version>
         <activation.version>1.1.1</activation.version>
         <kryo.version>5.1.0</kryo.version>
         <tika.version>2.0.0-ALPHA</tika.version>
@@ -66,6 +63,8 @@
         <hamcrest.library.version>2.2</hamcrest.library.version>
         <json.path.version>2.5.0</json.path.version>
         <jsoup.version>1.13.1</jsoup.version>
+        <jackson.annotations.version>2.12.3</jackson.annotations.version>
+        <jackson.core>2.12.3</jackson.core>
 
         <jdk.version>11</jdk.version>
         <deploymentPath>/</deploymentPath>
@@ -155,6 +154,11 @@
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>event-pdf</artifactId>
             <version>${event.pdf}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reactome.server.utils</groupId>
+            <artifactId>reactome-utils</artifactId>
+            <version>${reactome.utils.version}</version>
         </dependency>
 
         <!-- Spring Boot -->
@@ -249,18 +253,6 @@
             <version>${activation.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>javax.annotation</groupId>-->
-        <!--            <artifactId>javax.annotation-api</artifactId>-->
-        <!--            <version>1.3.2</version>-->
-        <!--        </dependency>-->
-
-        <dependency>
-            <groupId>org.reactome.server.utils</groupId>
-            <artifactId>reactome-utils</artifactId>
-            <version>${reactome.utils.version}</version>
-        </dependency>
-
         <!-- Kryo serializer -->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
@@ -300,14 +292,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.12.3</version>
+            <version>${jackson.annotations.version}</version>
         </dependency>
 
         <!--Testing:  java.lang.NoClassDefFoundError: com/fasterxml/jackson/core/util/JacksonFeature, be able to run mvn test -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.12.3</version>
+            <version>${jackson.core}</version>
         </dependency>
 
     </dependencies>
