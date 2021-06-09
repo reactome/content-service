@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 // @EnableAsync and @EnableScheduling  equivalent to <task:annotation-driven> in servlet.xml, leave it for now as it doesn't hurt
 @EnableScheduling
-@EntityScan({"org.reactome.server.graph.domain.model", "org.reactome.server.graph.domain.model"})
+@EntityScan({"org.reactome.server.graph.domain.model"})
 @EnableNeo4jRepositories("org.reactome.server.graph.repository")
 @SpringBootApplication(scanBasePackages = {"org.reactome.server"})
 public class ContentServiceApplication extends SpringBootServletInitializer {
