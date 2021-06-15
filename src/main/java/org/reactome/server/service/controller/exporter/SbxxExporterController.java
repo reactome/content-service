@@ -128,7 +128,8 @@ public class SbxxExporterController {
         } catch (MissingSBXXException | IOException e) {
 //            SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
             SbmlConverterForRel converter = new SbmlConverterForRel(event.getStId(),
-                                                                    generalService.getDBInfo().getVersion());
+                                                                    generalService.getDBInfo().getVersion(),
+                                                                    advancedDatabaseObjectService);
             converter.setDBA(this.mysqlDba);
             converter.convert();
             String content = converter.toString();
