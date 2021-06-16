@@ -66,25 +66,13 @@ public class ServletConfig {
     }
 
     @Bean
-    public ServletRegistrationBean<ProxyServlet> downloadServletBean() {
-        ServletRegistrationBean<ProxyServlet> bean = new ServletRegistrationBean<>(new ProxyServlet(), "/download/current/*");
-        bean.setName("Download");
-        bean.setInitParameters(Map.of(
-                "proxyHost", this.proxyHost,
-                "proxyPort", "80",
-                "proxyPath", "/download/current/")
-        );
-        return bean;
-    }
-
-    @Bean
     public ServletRegistrationBean<ProxyServlet> contentServletBean() {
         ServletRegistrationBean<ProxyServlet> bean = new ServletRegistrationBean<>(new ProxyServlet(), "/content/*");
         bean.setName("Content");
         bean.setInitParameters(Map.of(
-                "proxyHost", "localhost",
-                "proxyPort", "8484",
-                "proxyPath", "/")
+                "proxyHost", this.proxyHost,
+                "proxyPort", "80",
+                "proxyPath", "/content")
         );
         return bean;
     }
