@@ -1,8 +1,11 @@
 package org.reactome.server.service.config;
 
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.reactome.server.service.utils.CustomRequestFilter;
 import org.reactome.server.utils.proxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -87,18 +90,14 @@ public class ServletConfig {
         return registration;
     }
 
-//    configuration in application.properties
-//    @Bean
-//    public FilterRegistrationBean<CharacterEncodingFilter> encodingFilterR() {
-//        System.out.println(" hi encoding filter");
-//        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-//        FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
-//        characterEncodingFilter.setForceEncoding(true);
-//        characterEncodingFilter.setEncoding("UTF-8");
-//        registrationBean.setFilter(characterEncodingFilter);
-//        registrationBean.setName("encodingFilter");
-//        registrationBean.addUrlPatterns("/*");
-//        System.out.println(" bye encoding filter");
-//        return registrationBean;
-//    }
+    //FileNotFoundException warning during embedded Tomcat startup and try to scan jars from classloader, disable the StandardJarScanner for manifest files
+    @Bean
+    public TomcatServletWebServerFactory tomcatFactory() {
+        return new TomcatServletWebServerFactory() {
+            @Override
+            protected void postProcessContext(Context context) {
+                ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
+            }
+        };
+    }
 }

@@ -1,6 +1,5 @@
 package org.reactome.server.service.utils;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reactome.server.graph.domain.annotations.ReactomeAllowedClasses;
 import org.reactome.server.graph.domain.annotations.ReactomeSchemaIgnore;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.annotation.Annotation;
@@ -40,9 +38,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
  * when the date is not provided in the maven command, add the release date to execute the
  * test properly.
  */
-@Disabled
 @SpringBootTest
-@AutoConfigureMockMvc
 public class NewObjectsTest {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("testLogger");
