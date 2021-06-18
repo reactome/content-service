@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -30,16 +29,17 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 
 /**
- * Help to make sure the new lasted created objects don't break any pages
+ * Help to make sure the new latest created objects don't break any pages
  * 1. test new objects with declared attributes
  * 2. test new Class exists or not in Graph core
  * <p>
  * Release date is needed for the query, it will be null and the test returns nothing
  * when the date is not provided in the maven command, add the release date to execute the
  * test properly.
+ *
+ * E.G.: mvn -Dtest=NewObjectsTest test -Drelease.date=2020-03-20 -P Your-maven-profile
  */
-@SpringBootTest
-public class NewObjectsTest {
+public class NewObjectsTest extends BaseTest{
 
     private static final Logger infoLogger = LoggerFactory.getLogger("testLogger");
 

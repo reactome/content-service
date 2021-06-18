@@ -30,7 +30,6 @@ public class BaseTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     protected MockMvc getMockMvc() {
         return mockMvc;
     }
