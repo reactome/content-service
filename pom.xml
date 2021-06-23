@@ -41,7 +41,7 @@
         <graph.core>2.0.0-SNAPSHOT</graph.core>
         <search.core>1.4.4-SNAPSHOT</search.core>
         <interactors.core>1.1.0-SNAPSHOT</interactors.core>
-        <diagram.exporter>1.4.0-SNAPSHOT</diagram.exporter>
+        <diagram.exporter>2.0.0-SNAPSHOT</diagram.exporter>
         <fireworks.exporter>1.2.0-SNAPSHOT</fireworks.exporter>
         <reaction.exporter>1.2.0-SNAPSHOT</reaction.exporter>
         <sbml.exporter>2.2.0-SNAPSHOT</sbml.exporter>
