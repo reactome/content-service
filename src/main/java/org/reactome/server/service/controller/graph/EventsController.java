@@ -2,7 +2,7 @@ package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.result.EventProjection;
 import org.reactome.server.graph.domain.result.EventProjectionWrapper;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.HierarchyService;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -49,12 +50,16 @@ public class EventsController {
     })
     @RequestMapping(value = "/event/{id}/ancestors", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<EventProjectionWrapper> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
+    public Collection<Collection<EventProjection>> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
                                                              @PathVariable String id) {
         Collection<EventProjectionWrapper> ancestors = eventsService.getEventAncestors(id);
         if (ancestors == null || ancestors.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
+        Collection<Collection<EventProjection>> ret = new ArrayList<>();
+        for (EventProjectionWrapper ancestor : ancestors) {
+            ret.add(ancestor.getEvents());
+        }
         infoLogger.info("Request for all Ancestors of Event with id: {}", id);
-        return ancestors;
+        return ret;
     }
 
     @ApiOperation(value = "The full event hierarchy for a given species", notes = "Events (pathways and reactions) in Reactome are organised in a hierarchical structure for every species. By following all 'hasEvent' relationships, this method retrieves the full event hierarchy for any given species. The result is a list of tree structures, one for each TopLevelPathway. Every event in these trees is represented by a PathwayBrowserNode. The latter contains the stable identifier, the name, the species, the url, the type, and the diagram of the particular event.")
