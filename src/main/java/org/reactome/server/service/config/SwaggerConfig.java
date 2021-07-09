@@ -9,7 +9,6 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.service.Tag;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 
@@ -17,13 +16,12 @@ import java.util.Collections;
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
-@EnableSwagger2
 @Configuration
-public class SwaggerConfig  {
+public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        Docket rtn = new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .select()
                 //Remove Basic Error Controller In SpringFox SwaggerUI
@@ -48,6 +46,30 @@ public class SwaggerConfig  {
                 .tags(new Tag("interactors", "Molecule interactors"))
                 .tags(new Tag("search", "Reactome Search"))
                 .apiInfo(apiInfo());
+
+        /*
+           TODO: need a better solution
+           Swagger UI freezing when expanding APIs with deeply nested data models,we use the directModelSubstitute to fix it in the
+           past. Reactome updates all softwares in 2021, in this case, the swagger UI has been updated to 3.0.0 and the code doesn't
+           work perfectly as before, it produces the Resolver error in the console and the swagger page.
+
+            --Resolver error at paths./data/pathways/top/{species}.get.responses.200.schema.items.$ref
+            --Could not resolve reference: Could not resolve pointer: /definitions/Error-ModelName{namespace='org.reactome.server.graph.domain.model', name='Pathway'} does not exist in document
+
+            FIXING: 1. add springfox.documentation.swagger.use-model-v3=false to service.properties
+                        a. this config also produce resolver error but won't print any error message in the console and the endpoints works like normal
+                    2. hide the error dialog in the swagger/custom.css
+
+           REFERENCE:  1.https://github.com/springfox/springfox/issues/3476
+                       2.https://github.com/swagger-api/swagger-ui/issues/6197
+                       3.
+         */
+
+//        Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
+//        for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
+//            rtn.directModelSubstitute(clazz, Void.class);
+//        }
+        return rtn;
     }
 
 

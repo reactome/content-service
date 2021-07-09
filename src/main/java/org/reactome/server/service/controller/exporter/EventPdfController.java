@@ -109,7 +109,8 @@ public class EventPdfController {
                 analysisResult = tokenUtils.getFromToken(token);
             }
 
-            response.addHeader("Content-Type", "application/pdf");
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + event.getStId() + "\"");
             eventExporter.export(args, analysisResult, response.getOutputStream());
 
         } catch (NotFoundException ex) {

@@ -94,6 +94,11 @@
     color: #ff6060;
 }
 
+/* hide errors at top of the page */
+.swagger-ui .errors-wrapper {
+    display: none !important;
+}
+
 @media only screen and (max-width: 1024px) {
     .swagger-ui .opblock .opblock-summary {
         display: block;
