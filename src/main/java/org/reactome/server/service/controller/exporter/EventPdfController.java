@@ -110,7 +110,7 @@ public class EventPdfController {
             }
 
             response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + event.getStId() + "\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + event.getStId() + "\".pdf");
             eventExporter.export(args, analysisResult, response.getOutputStream());
 
         } catch (NotFoundException ex) {
