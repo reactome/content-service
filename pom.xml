@@ -40,7 +40,7 @@
     <properties>
         <graph.core>2.0.0-SNAPSHOT</graph.core>
         <search.core>1.4.4-SNAPSHOT</search.core>
-        <interactors.core>1.1.0-SNAPSHOT</interactors.core>
+        <interactor.core>1.1.0-SNAPSHOT</interactor.core>
         <diagram.exporter>2.0.0-SNAPSHOT</diagram.exporter>
         <fireworks.exporter>1.2.0-SNAPSHOT</fireworks.exporter>
         <reaction.exporter>1.2.0-SNAPSHOT</reaction.exporter>
@@ -78,7 +78,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.reactome.server.graph</groupId>
             <artifactId>graph-core</artifactId>
@@ -106,7 +105,7 @@
         <dependency>
             <groupId>org.reactome.server.interactors</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>${interactors.core}</version>
+            <version>${interactor.core}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.xerial</groupId>
@@ -328,8 +327,8 @@
                 </dependency>
             </dependencies>
         </profile>
-
     </profiles>
+
     <build>
 
         <finalName>ContentService</finalName>
