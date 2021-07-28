@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.catalina.connector.ClientAbortException;
-import org.apache.commons.httpclient.HttpException;
+import org.apache.http.HttpException;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.neo4j.driver.exceptions.Neo4jException;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
