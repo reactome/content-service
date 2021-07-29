@@ -137,8 +137,9 @@ class SearchController {
 
     }
 
-    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format.", response = GroupedResult.class, produces = "application/json")
+    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format, pages count starting from 1.", response = GroupedResult.class, produces = "application/json")
     @ApiResponses({
+            @ApiResponse(code = 400, message = "One or more parameter is illegal", response = ErrorInfo.class),
             @ApiResponse(code = 404, message = "Entry not found. Targets inform if the term is our scope of annotation", response = ErrorInfo.class),
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
@@ -146,7 +147,7 @@ class SearchController {
     @RequestMapping(value = "/query/paginated", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
-                                   @ApiParam(value = "Page", defaultValue = "0", required = true) @RequestParam Integer page,
+                                   @ApiParam(value = "Page, should be strictly positive", defaultValue = "1", required = true) @RequestParam Integer page,
                                    @ApiParam(value = "Rows per page", defaultValue = "10", required = true) @RequestParam Integer rowCount,
                                    @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                    @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
@@ -155,6 +156,8 @@ class SearchController {
                                    @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
                                    @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
+        if (page <= 0) throw new BadRequestException("page should be greater than 0");
+        if (rowCount <= 0) throw new BadRequestException("rowCount should be greater than 0");
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
         SearchResult searchResult = searchService.getSearchResult(queryObject, rowCount, page, cluster);
