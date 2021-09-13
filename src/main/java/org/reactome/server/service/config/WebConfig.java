@@ -4,6 +4,7 @@ package org.reactome.server.service.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.Aspects;
+import org.gk.persistence.MySQLAdaptor;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
 import org.reactome.server.graph.aop.LazyFetchAspect;
 import org.reactome.server.interactors.service.PsicquicService;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +55,21 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${fireworks.json.folder}")
     String fireworksPath;
+
+    @Value("${mysql.host}")
+    String mysqlHost;
+
+    @Value("${mysql.port}")
+    Integer mysqlPort;
+
+    @Value("${mysql.database}")
+    String mysqlDatabase;
+
+    @Value("${mysql.user}")
+    String mysqlUser;
+
+    @Value("${mysql.password}")
+    String mysqlPassword;
 
 
     @Bean
@@ -158,5 +175,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    @Bean
+    public MySQLAdaptor mysqlDba(@Value("${mysql.host}") String mysqlHost,
+                                 @Value("${mysql.database}") String mysqlDatabase,
+                                 @Value("${mysql.user}") String mysqlUser,
+                                 @Value("${mysql.password}") String mysqlPassword,
+                                 @Value("${mysql.port}") Integer mysqlPort) throws SQLException {
+        return new MySQLAdaptor(mysqlHost, mysqlDatabase, mysqlUser, mysqlPassword, mysqlPort);
     }
 }
