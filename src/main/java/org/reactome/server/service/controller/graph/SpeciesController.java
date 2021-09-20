@@ -37,7 +37,7 @@ public class SpeciesController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/species/main", method = RequestMethod.GET)
+    @RequestMapping(value = "/species/main", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<Species> getSpecies() {
         infoLogger.info("Request for all main species performed");
@@ -49,7 +49,7 @@ public class SpeciesController {
             @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
     })
-    @RequestMapping(value = "/species/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/species/all", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public List<Species> getAllSpecies() {
         infoLogger.info("Request for all species performed");
