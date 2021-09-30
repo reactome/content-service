@@ -64,7 +64,7 @@ public class StaticInteractionsController {
                                               @ApiParam(value = "Number of results to be retrieved") @RequestParam(value = "pageSize", required = false, defaultValue = "-1") Integer pageSize) {
         infoLogger.info("Static interaction details query for accession {}", acc);
         Interactors interactors = interactions.getStaticProteinDetails(Collections.singletonList(acc), STATIC_RESOURCE_NAME, page, pageSize);
-        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasInteractorsInEntities() ) {
+        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasNoInteractorsInEntities() ) {
             throw new NotFoundException("No interactors found for accession: " + acc);
         }
         return interactors;
@@ -111,7 +111,7 @@ public class StaticInteractionsController {
             accs.add(id.trim());
         }
         Interactors interactors = interactions.getStaticProteinDetails(accs, STATIC_RESOURCE_NAME, page, pageSize);
-        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasInteractorsInEntities()) {
+        if (interactors == null || interactors.getEntities().isEmpty() || interactors.hasNoInteractorsInEntities()) {
             throw new NotFoundException("No interactors found for accession: " + proteins);
         }
         return interactors;
