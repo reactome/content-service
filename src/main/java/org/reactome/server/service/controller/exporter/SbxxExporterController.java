@@ -2,6 +2,8 @@ package org.reactome.server.service.controller.exporter;
 
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
+import org.gk.persistence.MySQLAdaptor;
+import org.reactome.sbml.rel.SbmlConverterForRel;
 import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
@@ -11,7 +13,6 @@ import org.reactome.server.service.exception.MissingSBXXException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.ExportManager;
 import org.reactome.server.tools.diagram.exporter.sbgn.SbgnConverter;
-import org.reactome.server.tools.sbml.converter.SbmlConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,10 @@ public class SbxxExporterController {
     private DatabaseObjectService databaseObjectService;
     private AdvancedDatabaseObjectService advancedDatabaseObjectService;
     private ExportManager exportManager;
+
+    // For the time being use the relational database to export layout information for SBML
+    // This should be updated to use JSON and Neo4j in the future
+    private MySQLAdaptor mysqlDba;
 
     @ApiOperation(value = "Exports a given pathway or reaction to SBGN")
     @ApiResponses({
@@ -110,7 +115,11 @@ public class SbxxExporterController {
             sbml = new FileInputStream(file);
             infoLogger.info("Exporting the event {} to SBML retrieved from previously generated file", event.getStId());
         } catch (MissingSBXXException | IOException e) {
-            SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
+            //SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
+            SbmlConverterForRel converter = new SbmlConverterForRel(event.getStId(),
+                    generalService.getDBInfo().getVersion(),
+                    advancedDatabaseObjectService);
+            converter.setDBA(this.mysqlDba);
             converter.convert();
             String content = converter.toString();
             sbml = exportManager.saveSBML(content, fileName);
@@ -118,6 +127,15 @@ public class SbxxExporterController {
             generalService.clearCache();
         }
         return sbml;
+    }
+
+    @Autowired
+    public void setMySQLDBA(MySQLAdaptor dba) {
+        this.mysqlDba = dba;
+        if (dba != null) {
+            infoLogger.info("Starting a dumb thread to keep MySQLAdaptor connected to avoid reconnection exception.");
+            dba.initDumbThreadForConnection(); // To keep the DBA running to avoid connection error
+        }
     }
 
     private Event getEvent(String id){
