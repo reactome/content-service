@@ -5,6 +5,11 @@
         As such, it is not possible to specify the allowed syntax with a DTD file or an XML schema.-->
 <configuration>
 
+    <!--Throwing a warning propertySetterException when application starts,
+        failed to set property [smtpPort] to value "mail.port_IS_UNDEFINED",
+        conversion to type [int] failed. fix by adding below to the file-->
+    <property resource="service.properties"/>
+
     <appender name="INFO_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
@@ -52,7 +57,7 @@
     </appender>
 
     <logger name="onlyEmailLogger" level="WARN">
-        <appender-ref ref="ONLY_EMAIL" />
+        <appender-ref ref="ONLY_EMAIL"/>
     </logger>
 
     <appender name="EMAIL" class="org.reactome.server.service.utils.ScheduledSMTPAppender">
@@ -77,14 +82,14 @@
     </appender>
 
     <logger name="errorLogger" level="WARN">
-        <appender-ref ref="EMAIL" />
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.neo4j" level="ERROR" /> <!-- Remove neo4j info logging. It prints user credentials -->
-    <logger name="org.springframework" level="ERROR" />
-    <logger name="org.reflections" level="WARN" />
-    <logger name="springfox.documentation" level="WARN" />
+    <logger name="org.neo4j" level="ERROR"/> <!-- Remove neo4j info logging. It prints user credentials -->
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="org.reflections" level="WARN"/>
+    <logger name="springfox.documentation" level="WARN"/>
 
     <logger name="threadLogger" level="${logging.level}" additivity="false">
         <appender-ref ref="INFO_STDOUT"/>
@@ -92,7 +97,7 @@
 
     <!--Root logger will log all messages to file that are not caught by other loggers-->
     <root>
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="STDERR" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDERR"/>
     </root>
 </configuration>

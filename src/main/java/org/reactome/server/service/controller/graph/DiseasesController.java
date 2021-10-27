@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "diseases", description = "Reactome Data: Disease related queries")
+@Api(tags = {"diseases"})
 @RequestMapping("/data")
 public class DiseasesController {
 
@@ -58,7 +58,7 @@ public class DiseasesController {
     @ResponseBody
     public String getDiseasesSummary() {
         infoLogger.info("Request for all diseases");
-        List<String> diseases = schemaService.getByClass(Disease.class).stream().map(d -> d.getId() + "\t" + d.getDatabaseName() + ":" + d.getIdentifier()).collect(Collectors.toList());
+        List<String> diseases = schemaService.getByClass(Disease.class).stream().map(d -> d.getDbId() + "\t" + d.getDatabaseName() + ":" + d.getIdentifier()).collect(Collectors.toList());
         return String.join("\n", diseases);
     }
 }

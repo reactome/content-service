@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "references", description = "Reactome xRefs: ReferenceEntity queries")
+@Api(tags = {"references"})
 @RequestMapping("/references")
 public class ReferenceEntityController {
 

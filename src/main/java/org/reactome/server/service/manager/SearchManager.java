@@ -46,7 +46,7 @@ public class SearchManager {
         try {
             String q = "" +
                     "MATCH path=(p:Pathway)-[:hasEvent*]->(rle:ReactionLikeEvent) " +
-                    "WHERE p.stId IN {toFlag} AND NONE(x IN NODES(path) WHERE (x:Pathway) AND x.hasDiagram) " +
+                    "WHERE p.stId IN $toFlag AND NONE(x IN NODES(path) WHERE (x:Pathway) AND x.hasDiagram) " +
                     "RETURN DISTINCT rle.stId AS identifier ";
             Map<String, Object> params = new HashMap<>();
             params.put("toFlag", toFlag);

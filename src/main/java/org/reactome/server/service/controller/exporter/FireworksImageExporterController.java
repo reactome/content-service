@@ -22,7 +22,7 @@ import java.util.List;
  * @author Pascual Lorente (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class FireworksImageExporterController {
 

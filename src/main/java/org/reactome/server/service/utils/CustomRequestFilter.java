@@ -1,5 +1,6 @@
 package org.reactome.server.service.utils;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -11,6 +12,7 @@ import java.io.IOException;
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
+@Component
 public class CustomRequestFilter extends OncePerRequestFilter {
 
     @Override

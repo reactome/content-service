@@ -20,7 +20,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "schema", description = "Reactome Data: Schema class queries")
+@Api(tags = {"schema"})
 @RequestMapping("/data")
 public class SchemaController {
 

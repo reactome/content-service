@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "discover", description = "Reactome Data: Search engines discovery schema")
+@Api(tags = {"discover"})
 @RequestMapping("/data")
 public class DiscoverController {
 

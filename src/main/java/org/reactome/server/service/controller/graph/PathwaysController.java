@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "pathways", description = "Reactome Data: Pathway related queries")
+@Api(tags = {"pathways"})
 @RequestMapping("/data")
 public class PathwaysController {
 

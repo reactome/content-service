@@ -34,6 +34,13 @@
 
 <script src="swagger/swagger-ui-bundle.js"> </script>
 <script src="swagger/swagger-ui-standalone-preset.js"> </script>
+
+<%--<script src="swagger-ui/swagger-ui-bundle.js"> </script>--%>
+<%--<script src="swagger-ui/swagger-ui.js"> </script>--%>
+<%--<script src="swagger-ui/swagger-ui-standalone-preset.js"> </script>--%>
+<%--<link href="swagger-ui/custom.css" rel="stylesheet" type="text/css">--%>
+<%--<link href="swagger-ui/swagger-ui.css" rel="stylesheet" type="text/css">--%>
+
 <script>
     window.onload = function() {
 

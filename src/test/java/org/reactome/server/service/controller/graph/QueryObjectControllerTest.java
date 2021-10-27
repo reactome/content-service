@@ -1,26 +1,20 @@
 package org.reactome.server.service.controller.graph;
 
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class QueryObjectControllerTest extends BaseTest {
 
     @Test
     public void findById() throws Exception {
-        mockMvcGetResult("/data/query/8956320", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/query/R-HSA-69620", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void findByIdAttributeName() throws Exception {
-        mockMvcGetResult("/data/query/8956320/displayName", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/query/8956320/displayName", "text/plain;charset=UTF-8");
     }
 
     @Test
@@ -52,6 +46,6 @@ public class QueryObjectControllerTest extends BaseTest {
 
     @Test
     public void findByIdNoRelationsAttributeName() throws Exception {
-        mockMvcGetResult("/data/query/abridged/R-HSA-163200/displayName", "text/plain;charset=ISO-8859-1");
+        mockMvcGetResult("/data/query/abridged/R-HSA-163200/displayName", "text/plain;charset=UTF-8");
     }
 }

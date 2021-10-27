@@ -19,7 +19,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "participants", description = "Reactome Data: Queries related to participants")
+@Api(tags = {"participants"})
 @RequestMapping("/data")
 public class ParticipantsController {
 

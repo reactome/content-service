@@ -5,11 +5,18 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>2.0.2</version>
+    <version>2.1.0-SNAPSHOT</version>
     <name>content-service</name>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.3</version>
+    </parent>
+
     <description>
-        The Reactome Content Service provides a series of methods via a RESTFul API to allow programmatic access to Reactome content
+        The Reactome Content Service provides a series of methods via a RESTFul API to allow programmatic access to
+        Reactome content
     </description>
     <url>https://github.com/reactome-pwp/content-service</url>
     <organization>
@@ -28,59 +35,55 @@
             <id>fkorn</id>
             <name>Florian Korninger</name>
         </developer>
-        <developer>
-            <id>amundo</id>
-            <name>Antonio Mundo</name>
-        </developer>
     </developers>
 
     <properties>
+        <graph.core>2.0.0-SNAPSHOT</graph.core>
+        <search.core>1.4.4-SNAPSHOT</search.core>
+        <interactor.core>1.1.0-SNAPSHOT</interactor.core>
+        <diagram.exporter>2.0.0-SNAPSHOT</diagram.exporter>
+        <fireworks.exporter>1.2.0-SNAPSHOT</fireworks.exporter>
+        <reaction.exporter>1.2.0-SNAPSHOT</reaction.exporter>
+        <sbml.exporter>2.2.0-SNAPSHOT</sbml.exporter>
+        <event.pdf>1.1.0-SNAPSHOT</event.pdf>
+        <reactome.utils.version>1.1.0-SNAPSHOT</reactome.utils.version>
+
+        <servlet.version>4.0.1</servlet.version>
+        <jsp.version>2.3.3</jsp.version>
+        <jstl.version>1.2</jstl.version>
+        <jackson.version>2.12.3</jackson.version>
+        <swagger.version>3.0.0</swagger.version>
+        <lang.version>3.12.0</lang.version>
+        <activation.version>1.1.1</activation.version>
+        <kryo.version>5.1.0</kryo.version>
+        <tika.version>2.0.0</tika.version>
+        <junit.version>5.8.0-M1</junit.version>
+        <jackrabbit.version>3.4.3</jackrabbit.version>
+        <pmd.version>3.14.0</pmd.version>
+        <hamcrest.library.version>2.2</hamcrest.library.version>
+        <json.path.version>2.5.0</json.path.version>
+        <jsoup.version>1.13.1</jsoup.version>
+        <jackson.annotations.version>2.12.3</jackson.annotations.version>
+        <jackson.core>2.12.3</jackson.core>
+
+        <jdk.version>11</jdk.version>
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <graph.core>1.1.26-SNAPSHOT</graph.core>
-        <search.core>1.4.3</search.core>
-        <interactors.core>1.0.15-SNAPSHOT</interactors.core>
-        <diagram.exporter>1.3.19-SNAPSHOT</diagram.exporter>
-        <fireworks.exporter>1.1.8</fireworks.exporter>
-        <reaction.exporter>1.1.5-SNAPSHOT</reaction.exporter>
-        <sbml.exporter>2.1.1</sbml.exporter>
-        <event.pdf>1.0.9-SNAPSHOT</event.pdf>
-        <spring.version>4.3.10.RELEASE</spring.version>
-        <servlet.version>4.0.0-b01</servlet.version>
-        <jsp.version>2.1</jsp.version>
-        <jstl.version>1.2</jstl.version>
-        <jackson.version>2.9.4</jackson.version>
-        <swagger.version>2.7.0</swagger.version>
-        <lang.version>3.6</lang.version>
-        <mail.version>1.6.0</mail.version>
-        <activation.version>1.1.1</activation.version>
-        <kryo.version>2.22</kryo.version>
-        <tika.version>1.12</tika.version>
-        <reactome.utils.version>1.0.8</reactome.utils.version>
-
-        <tomcat.version>2.2</tomcat.version>
-        <maven.compiler.version>3.5.1</maven.compiler.version>
-        <maven.resources.version>3.0.1</maven.resources.version>
-        <jdk.version>1.8</jdk.version>
-        <maven.site.version>3.4</maven.site.version>
-        <jackrabbit.version>2.10</jackrabbit.version>
-        <maven.javadoc.version>2.10.3</maven.javadoc.version>
-        <maven.info.report.version>2.8.1</maven.info.report.version>
-        <pmd.version>3.6</pmd.version>
-
-        <hamcrest.library.version>2.2</hamcrest.library.version>
-        <json.path.version>2.4.0</json.path.version>
+        <maven.compiler.version>3.8.1</maven.compiler.version>
+        <maven.resources.version>3.2.0</maven.resources.version>
+        <maven.site.version>3.9.1</maven.site.version>
+        <maven.javadoc.version>3.2.0</maven.javadoc.version>
+        <maven.info.report.version>3.1.1</maven.info.report.version>
+        <maven.surefire.version>3.0.0-M5</maven.surefire.version>
     </properties>
 
     <dependencies>
-        <!--Graph Core-->
         <dependency>
             <groupId>org.reactome.server.graph</groupId>
             <artifactId>graph-core</artifactId>
             <version>${graph.core}</version>
         </dependency>
-        <!--Search Core-->
+
         <dependency>
             <groupId>org.reactome.server.search</groupId>
             <artifactId>search-core</artifactId>
@@ -90,11 +93,15 @@
         <dependency>
             <groupId>org.reactome.server.interactors</groupId>
             <artifactId>interactor-core</artifactId>
-            <version>${interactors.core}</version>
+            <version>${interactor.core}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.xerial</groupId>
                     <artifactId>sqlite-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -118,25 +125,65 @@
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>sbml-exporter</artifactId>
             <version>${sbml.exporter}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>event-pdf</artifactId>
             <version>${event.pdf}</version>
         </dependency>
+        <dependency>
+            <groupId>org.reactome.server.utils</groupId>
+            <artifactId>reactome-utils</artifactId>
+            <version>${reactome.utils.version}</version>
+        </dependency>
 
-        <!--Spring-->
+        <!-- Spring Boot -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
-        <!-- Enable Mailing Features -->
+
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--provides support for . jsp file rendering        -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!--Jsp Servlets -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -146,7 +193,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
             <version>${jsp.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -162,16 +209,13 @@
             <version>${jackson.version}</version>
         </dependency>
         <!-- Swagger for API Documentation -->
+        <!-- For the Spring Boot based projects, it's enough to add a single springfox-boot-starter dependency:-->
         <dependency>
             <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
+            <artifactId>springfox-boot-starter</artifactId>
             <version>${swagger.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
+
         <!-- Apache Tika - Apache Tika™ toolkit detects and extracts metadata and text from over a thousand different file types -->
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -185,38 +229,15 @@
             <artifactId>commons-lang3</artifactId>
             <version>${lang.version}</version>
         </dependency>
-        <!-- Mail Service -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>${mail.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>${mail.version}</version>
-        </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>${activation.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-catalina</artifactId>
-            <version>7.0.68</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.reactome.server.utils</groupId>
-            <artifactId>reactome-utils</artifactId>
-            <version>${reactome.utils.version}</version>
-        </dependency>
 
         <!-- Kryo serializer -->
         <dependency>
-            <groupId>com.esotericsoftware.kryo</groupId>
+            <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>${kryo.version}</version>
         </dependency>
@@ -235,15 +256,69 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JAVA html parser -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.13.1</version>
+            <version>${jsoup.version}</version>
         </dependency>
+
+        <!-- initializing:  java.lang.ClassNotFoundException: com.fasterxml.jackson.annotation.JsonKey-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.annotations.version}</version>
+        </dependency>
+
+        <!--Testing:  java.lang.NoClassDefFoundError: com/fasterxml/jackson/core/util/JacksonFeature, be able to run mvn test -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.core}</version>
+        </dependency>
+
     </dependencies>
 
+    <profiles>
+        <!-- Adding logging library when packaging to production -->
+        <profile>
+            <id>Reactome-Server</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-log4j2</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.1.10</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <build>
+
         <finalName>ContentService</finalName>
         <resources>
             <resource>
@@ -258,16 +333,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.version}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>${tomcat.version}</version>
-                <configuration>
-                    <path>${deploymentPath}</path>
-                    <port>8686</port>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -290,46 +355,17 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+            </plugin>
+
         </plugins>
     </build>
 
     <!--This configuration is needed so that javadoc is included in maven site-->
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.version}</version>
-                <configuration>
-                    <quiet>true</quiet>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>javadoc</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>${maven.info.report.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${pmd.version}</version>
-                <configuration>
-                    <skipEmptyReport>false</skipEmptyReport>
-                    <linkXRef>false</linkXRef>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <targetJdk>${jdk.version}</targetJdk>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <repositories>
         <!-- MAVEN central -->
         <repository>

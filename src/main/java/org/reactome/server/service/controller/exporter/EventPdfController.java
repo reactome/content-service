@@ -28,7 +28,7 @@ import java.net.URL;
  * @author Lorente-Arencibia, Pascual (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class EventPdfController {
 
@@ -109,7 +109,8 @@ public class EventPdfController {
                 analysisResult = tokenUtils.getFromToken(token);
             }
 
-            response.addHeader("Content-Type", "application/pdf");
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + event.getStId() + "\".pdf");
             eventExporter.export(args, analysisResult, response.getOutputStream());
 
         } catch (NotFoundException ex) {

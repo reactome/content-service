@@ -3,7 +3,10 @@ package org.reactome.server.service.utils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.shaded.org.objenesis.strategy.StdInstantiatorStrategy;
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import com.googlecode.concurrenttrees.radix.node.util.AtomicReferenceArrayListAdapter;
+import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -24,7 +27,7 @@ public class TupleManager {
         this.pathDirectory = pathDirectory;
     }
 
-    public Object readToken(String token){
+    public Object readToken(String token) {
         try {
             return read(pathDirectory + "/" + token + ".bin");
         } catch (FileNotFoundException | ClassCastException e) {
@@ -32,17 +35,18 @@ public class TupleManager {
         }
     }
 
-    public void saveToken(String token, Object object){
+    public void saveToken(String token, Object object) {
         long start = System.currentTimeMillis();
         try {
             String fileName = pathDirectory + "/" + token + ".bin";
-
             Kryo kryo = new Kryo();
-            kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+            kryo.setRegistrationRequired(false);
+            kryo.setReferences(true);
+            kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+            kryo.register(AtomicReferenceArrayListAdapter.class, new FieldSerializer<>(kryo, AtomicReferenceArrayListAdapter.class));
             OutputStream file = new FileOutputStream(fileName);
             Output output = new Output(file);
             kryo.writeClassAndObject(output, object);
-
             output.close();
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
@@ -58,9 +62,12 @@ public class TupleManager {
         return rtn;
     }
 
-    private Object read(InputStream file){
+    private Object read(InputStream file) {
         Kryo kryo = new Kryo();
-        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+        kryo.setRegistrationRequired(false);
+        kryo.setReferences(true);
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        kryo.register(AtomicReferenceArrayListAdapter.class, new FieldSerializer<>(kryo, AtomicReferenceArrayListAdapter.class));
         Input input = new Input(file);
         Object obj = kryo.readClassAndObject(input);
         input.close();

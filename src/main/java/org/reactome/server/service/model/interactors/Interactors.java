@@ -42,7 +42,7 @@ public class Interactors {
         this.entities = entities;
     }
 
-    public boolean hasInteractorsInEntities() {
+    public boolean hasNoInteractorsInEntities() {
         int count = 0;
         for (InteractorEntity list : getEntities()) {
             count += list.getCount();
