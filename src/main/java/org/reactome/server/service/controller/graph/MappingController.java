@@ -18,7 +18,7 @@ import java.util.Collection;
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "mapping", description = "Reactome Data: Mapping related queries")
+@Api(tags = {"mapping"})
 @RequestMapping("/data")
 public class MappingController {
 

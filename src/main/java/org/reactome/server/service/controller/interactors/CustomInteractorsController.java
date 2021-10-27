@@ -19,7 +19,7 @@ import java.io.IOException;
  * @author Guilherme S Viteri <gviteri@ebi.ac.uk>
  */
 @SuppressWarnings("unused")
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags = {"interactors"})
 @RequestMapping(value = "/interactors/upload/tuple")
 @RestController
 public class CustomInteractorsController {
@@ -41,6 +41,7 @@ public class CustomInteractorsController {
             @ApiResponse(code = 422, message = "Unprocessable Entity", response = ErrorInfo.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
     })
+    //todo : name and file parameters are rendered as not required duo to the multipart/form-data
     @RequestMapping(value = "/form", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     @ResponseBody
     public TupleResult postFile(@ApiParam(name = "name", required = true, value = "Name which identifies the sample")

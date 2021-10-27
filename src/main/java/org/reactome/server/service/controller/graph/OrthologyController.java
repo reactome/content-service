@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "orthology", description = "Reactome Data: Orthology related queries")
+@Api(tags = {"orthology"})
 @RequestMapping("/data")
 public class OrthologyController {
 

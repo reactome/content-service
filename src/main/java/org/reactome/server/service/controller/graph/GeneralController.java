@@ -22,7 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "database", description = "Reactome Data: Database info queries")
+@Api(tags = {"database"})
 @RequestMapping("/data")
 public class GeneralController {
 

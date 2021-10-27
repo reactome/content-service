@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.http.HttpException;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
-import org.neo4j.ogm.drivers.http.request.HttpRequestException;
-import org.neo4j.ogm.exception.ConnectionException;
+import org.neo4j.driver.exceptions.Neo4jException;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
 import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
@@ -231,9 +231,9 @@ class GlobalExceptionHandler {
     // Neo4j
     //================================================================================
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(ConnectionException.class)
+    @ExceptionHandler(Neo4jException.class)
     @ResponseBody
-    ResponseEntity<String> handleNeo4jConnectionException(HttpServletRequest request, ConnectionException e) {
+    ResponseEntity<String> handleNeo4jConnectionException(HttpServletRequest request, Neo4jException e) {
         logger.error("Neo4j ConnectionException was caught for request: " + request.getRequestURL(), e);
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, e.getMessage());
     }
@@ -375,9 +375,9 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(HttpRequestException.class)
+    @ExceptionHandler(HttpException.class)
     @ResponseBody
-    ResponseEntity<String> handleHttpRequestException(HttpServletRequest request, HttpRequestException e) {
+    ResponseEntity<String> handleHttpRequestException(HttpServletRequest request, HttpException e) {
         logger.warn("HttpRequestException was caught for request: " + request.getRequestURL());
         return toJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, "Cannot connect to Neo4j Server. Please contact Reactome at help@reactome.org.");
     }

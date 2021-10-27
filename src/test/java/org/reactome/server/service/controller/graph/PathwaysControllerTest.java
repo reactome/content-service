@@ -1,22 +1,16 @@
 package org.reactome.server.service.controller.graph;
 
 import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class PathwaysControllerTest extends BaseTest {
 
     @Test
@@ -37,7 +31,7 @@ public class PathwaysControllerTest extends BaseTest {
         MvcResult mvcResult = this.getMockMvc().perform(
                 get("/data/pathway/R-HSA-69618/containedEvents/stId"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
                 .andExpect(content().string(containsString("R-HSA-141444")))
                 .andReturn();
 

@@ -1,19 +1,13 @@
 package org.reactome.server.service.controller.exporter;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.reactome.server.service.utils.BaseTest;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.junit.jupiter.api.Test;
+import org.reactome.server.service.utils.BaseTest;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class ImageExporterControllerTest extends BaseTest {
 
     @Test
@@ -27,9 +21,9 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("diagramProfile", "Modern");
         params.put("resource", "total");
         //pathway
-        mockMvcGetResult("/exporter/diagram/166520.png", "image/png", params);
+        mockMvcGetResult("/exporter/diagram/166520.png", "image/png;charset=UTF-8", params);
         //reaction
-        mockMvcGetResult("/exporter/diagram/6789031.png", "image/png", params);
+        mockMvcGetResult("/exporter/diagram/6789031.png", "image/png;charset=UTF-8", params);
     }
 
     @Test
@@ -39,6 +33,6 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("flgInteractors", true);
         params.put("resource", "total");
 
-        mockMvcGetResult("/exporter/reaction/70272.jpg", "image/jpg", params);
+        mockMvcGetResult("/exporter/reaction/70272.jpg", "image/jpg;;charset=UTF-8", params);
     }
 }

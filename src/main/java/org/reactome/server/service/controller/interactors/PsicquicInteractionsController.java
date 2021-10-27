@@ -26,7 +26,7 @@ import java.util.List;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags = {"interactors"})
 @RequestMapping("/interactors/psicquic")
 @RestController
 public class PsicquicInteractionsController {

@@ -22,7 +22,7 @@ import java.util.Set;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags = {"interactors"})
 @RequestMapping(value = "/interactors/token")
 @RestController
 public class TokenController {

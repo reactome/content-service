@@ -1,18 +1,12 @@
 package org.reactome.server.service.controller.exporter;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class FireworksImageExporterControllerTest extends BaseTest {
 
     @Test
@@ -27,7 +21,7 @@ public class FireworksImageExporterControllerTest extends BaseTest {
         params.put("expColumn", "2");
         params.put("coverage", false);
 
-        mockMvcGetResult("/exporter/fireworks/9606.svg", "image/svg+xml;", params);
-        mockMvcGetResult("/exporter/fireworks/9606.png", "image/png;", params);
+        mockMvcGetResult("/exporter/fireworks/9606.svg", "image/svg+xml;charset=UTF-8;", params);
+        mockMvcGetResult("/exporter/fireworks/9606.png", "image/png;charset=UTF-8;", params);
     }
 }

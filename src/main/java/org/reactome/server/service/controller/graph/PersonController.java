@@ -2,9 +2,9 @@ package org.reactome.server.service.controller.graph;
 
 import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.model.Person;
 import org.reactome.server.graph.domain.model.Publication;
+import org.reactome.server.graph.domain.result.SimpleEventProjection;
 import org.reactome.server.graph.service.PersonService;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.ErrorInfo;
@@ -26,7 +26,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = "person", description = "Reactome Data: Person queries")
+@Api(tags = {"person"})
 @RequestMapping("/data")
 public class PersonController {
 
@@ -135,8 +135,8 @@ public class PersonController {
     })
     @RequestMapping(value = "/person/{id}/authoredPathways", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<Pathway> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
-        Collection<Pathway> pathways = personService.getAuthoredPathways(id);
+    public Collection<SimpleEventProjection> getAuthoredPathways(@ApiParam(value = "Person identifier: Can be OrcidId or DbId", defaultValue = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+        Collection<SimpleEventProjection> pathways = personService.getAuthoredPathways(id);
         infoLogger.info("Request for all authored pathways of person with id: {}", id);
         return pathways;
     }

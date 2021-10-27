@@ -35,6 +35,8 @@ import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -64,7 +66,7 @@ public class CustomInteractorManager {
             String token = DigestUtils.md5DigestAsHex(raw.getBytes());
             TupleResult result = (TupleResult) tupleManager.readToken(token);
             if (result == null) {
-                InputStream is = IOUtils.toInputStream(file);
+                InputStream is = IOUtils.toInputStream(file, Charset.defaultCharset());
                 //We only parse the data the first time it is sent
                 result = ParserUtils.getUserDataContainer(name, filename, is);
                 result.getSummary().setToken(token);
@@ -89,7 +91,7 @@ public class CustomInteractorManager {
                 }
 
                 try {
-                    return getUserDataContainer(name, file.getOriginalFilename(), IOUtils.toString(file.getInputStream()));
+                    return getUserDataContainer(name, file.getOriginalFilename(), IOUtils.toString(file.getInputStream(),  StandardCharsets.UTF_8));
                 } catch (IOException e) {
                     throw new UnprocessableEntityException();
                 }
@@ -142,7 +144,7 @@ public class CustomInteractorManager {
             }
 
             try {
-                return getUserDataContainer(name, filename, IOUtils.toString(is));
+                return getUserDataContainer(name, filename, IOUtils.toString(is,  StandardCharsets.UTF_8));
             } catch (IOException e) {
                 throw new UnprocessableEntityException();
             }
@@ -172,7 +174,7 @@ public class CustomInteractorManager {
      * REMARKED: Copied from Analysis project.
      */
     private void doTrustToCertificates() throws NoSuchAlgorithmException, KeyManagementException {
-        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        Security.addProvider(Security.getProvider("SunJSSE"));
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() {

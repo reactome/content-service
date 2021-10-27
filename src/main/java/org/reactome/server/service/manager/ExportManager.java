@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
@@ -208,7 +209,7 @@ public class ExportManager {
             String diagram = result.getDiagramStId();
             try {
                 File aux = new File(diagramJsonFolder + "/" + diagram + ".json");
-                String json = IOUtils.toString(new FileInputStream(aux), Charset.defaultCharset());
+                String json = IOUtils.toString(new FileInputStream(aux), StandardCharsets.UTF_8);
                 return DiagramFactory.getDiagram(json);
             } catch (IOException | DeserializationException e) {
                 errorLogger.error(e.getMessage(), e);

@@ -37,13 +37,13 @@
 
 .swagger-ui .opblock-body pre {
     /* result div */
-    max-height: 400px;
-    hyphens: none;
-    -webkit-hyphens: none;
-    -ms-hyphens: none;
-    background-color: #fcf6db;
-    border: 1px solid #e5e0c6;
-    color: #333;
+    max-height: 400px !important;
+    hyphens: none !important;
+    -webkit-hyphens: none!important;
+    -ms-hyphens: none!important;
+    background-color: #fcf6db!important;
+    border: 1px solid #e5e0c6!important;
+    color: #333!important;
 }
 
 .swagger-ui .opblock-body pre span {
@@ -92,6 +92,11 @@
 .swagger-ui .btn.cancel:active {
     border-color: #ff6060;
     color: #ff6060;
+}
+
+/* hide errors at top of the page */
+.swagger-ui .errors-wrapper {
+    display: none !important;
 }
 
 @media only screen and (max-width: 1024px) {

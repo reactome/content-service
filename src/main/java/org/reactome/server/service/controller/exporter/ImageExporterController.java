@@ -37,7 +37,7 @@ import java.util.List;
  * @author Lorente-Arencibia, Pascual (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class ImageExporterController {
 
@@ -71,7 +71,6 @@ public class ImageExporterController {
                             @PathVariable String identifier,
                              @ApiParam(value = "File extension (defines the image format)", required = true, defaultValue = "png", allowableValues = "png,jpg,jpeg,svg,gif")
                             @PathVariable String ext,
-
                              @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
                             @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
                              @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")

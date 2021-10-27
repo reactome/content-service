@@ -37,7 +37,7 @@ import java.util.*;
  */
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class PptxExporterController {
 
@@ -197,7 +197,7 @@ public class PptxExporterController {
 
         String query = "" +
                 "MATCH (d:DatabaseObject) " +
-                "WHERE d.stId IN {identifiers} " +
+                "WHERE d.stId IN $identifiers " +
                 "RETURN d.dbId ";
         Map<String, Object> params = new HashMap<>();
         params.put("identifiers", aux);

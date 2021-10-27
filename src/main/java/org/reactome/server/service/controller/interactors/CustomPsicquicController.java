@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = "interactors", description = "Molecule interactors")
+@Api(tags = {"interactors"})
 @RequestMapping(value = "/interactors/upload/psicquic")
 @RestController
 public class CustomPsicquicController {

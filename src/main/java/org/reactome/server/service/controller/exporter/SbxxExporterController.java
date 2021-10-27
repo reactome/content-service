@@ -1,14 +1,6 @@
 package org.reactome.server.service.controller.exporter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.gk.persistence.MySQLAdaptor;
 import org.reactome.sbml.rel.SbmlConverterForRel;
@@ -28,19 +20,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 
 /**
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @RestController
-@Api(tags = "exporter", description = "Reactome Data: Format Exporter")
+@Api(tags = {"exporter"})
 @RequestMapping("/exporter")
 public class SbxxExporterController {
 
@@ -53,7 +42,7 @@ public class SbxxExporterController {
     private DatabaseObjectService databaseObjectService;
     private AdvancedDatabaseObjectService advancedDatabaseObjectService;
     private ExportManager exportManager;
-    
+
     // For the time being use the relational database to export layout information for SBML
     // This should be updated to use JSON and Neo4j in the future
     private MySQLAdaptor mysqlDba;
@@ -66,8 +55,8 @@ public class SbxxExporterController {
     })
     @RequestMapping(value = "/event/{identifier}.sbgn", method = RequestMethod.GET)
     public synchronized void eventSBGN(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-5205682")
-                                      @PathVariable String identifier,
-                                      HttpServletResponse response) throws Exception {
+                                       @PathVariable String identifier,
+                                       HttpServletResponse response) throws Exception {
         Event event = getEvent(identifier);
         String fileName = event.getStId() + SBGN_FILE_EXTENSION;
         response.setContentType("application/sbgn+xml");
@@ -107,8 +96,8 @@ public class SbxxExporterController {
     })
     @RequestMapping(value = "/event/{identifier}.sbml", method = RequestMethod.GET)
     public synchronized void eventSBML(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-68616")
-                                      @PathVariable String identifier,
-                                      HttpServletResponse response) throws Exception {
+                                       @PathVariable String identifier,
+                                       HttpServletResponse response) throws Exception {
         Event event = getEvent(identifier);
         String fileName = event.getStId() + SBML_FILE_EXTENSION;
         response.setContentType("application/sbml+xml");
@@ -126,10 +115,10 @@ public class SbxxExporterController {
             sbml = new FileInputStream(file);
             infoLogger.info("Exporting the event {} to SBML retrieved from previously generated file", event.getStId());
         } catch (MissingSBXXException | IOException e) {
-//            SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
+            //SbmlConverter converter = new SbmlConverter(event, generalService.getDBInfo().getVersion(), advancedDatabaseObjectService);
             SbmlConverterForRel converter = new SbmlConverterForRel(event.getStId(),
-                                                                    generalService.getDBInfo().getVersion(),
-                                                                    advancedDatabaseObjectService);
+                    generalService.getDBInfo().getVersion(),
+                    advancedDatabaseObjectService);
             converter.setDBA(this.mysqlDba);
             converter.convert();
             String content = converter.toString();
@@ -139,7 +128,7 @@ public class SbxxExporterController {
         }
         return sbml;
     }
-    
+
     @Autowired
     public void setMySQLDBA(MySQLAdaptor dba) {
         this.mysqlDba = dba;
@@ -149,7 +138,7 @@ public class SbxxExporterController {
         }
     }
 
-    private Event getEvent(String id){
+    private Event getEvent(String id) {
         Event event;
         try {
             event = databaseObjectService.findById(id);
@@ -169,7 +158,6 @@ public class SbxxExporterController {
     public void setDatabaseObjectService(DatabaseObjectService databaseObjectService) {
         this.databaseObjectService = databaseObjectService;
     }
-
 
 
     @Autowired

@@ -1,25 +1,19 @@
 package org.reactome.server.service.controller.interactors;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"file:src/test/resources/mvc-dispatcher-servlet-test.xml"})
-@WebAppConfiguration
+
 public class CustomInteractorsControllerTest extends BaseTest {
 
     @Test
@@ -66,7 +60,7 @@ public class CustomInteractorsControllerTest extends BaseTest {
         files.add(extendFileTest);
         files.add(tsvFileTest);
 
-        MockMultipartHttpServletRequestBuilder requestBuilder = fileUpload("/interactors/upload/tuple/form");
+        MockMultipartHttpServletRequestBuilder requestBuilder = multipart("/interactors/upload/tuple/form");
 
         for (MockMultipartFile file : files) {
             requestBuilder.file(file);
@@ -83,14 +77,12 @@ public class CustomInteractorsControllerTest extends BaseTest {
     @Test
     public void postFileContent() throws Exception {
         String content = "uniprotkb:Q9UBU9\tuniprotkb:P78406\t-\t-\tuniprotkb:NXF1(gene name)\tuniprotkb:RAE1(gene name)\tpsi-mi:\"MI:0004\"(affinity chromatography technology)\t-\tpubmed:10668806\ttaxid:9606(Homo sapiens)\ttaxid:9606(Homo sapiens)\tpsi-mi:\"MI:0915\"(physical association)\tpsi-mi:\"MI:0463\"(biogrid)\tbiogrid:718103\tmentha-score:0.569";
-
         mockMvcPostResult("/interactors/upload/tuple/content", content, "name", "CSTest");
     }
 
     @Test
     public void postUrl() throws Exception {
-        String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q9UBU9";
-
+        String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q12030";
         mockMvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");
     }
 }
