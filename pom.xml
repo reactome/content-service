@@ -5,7 +5,7 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.1.0</version>
     <name>content-service</name>
 
     <parent>
@@ -38,15 +38,15 @@
     </developers>
 
     <properties>
-        <graph.core>2.0.0-SNAPSHOT</graph.core>
-        <search.core>1.4.4-SNAPSHOT</search.core>
-        <interactor.core>1.1.0-SNAPSHOT</interactor.core>
-        <diagram.exporter>2.0.0-SNAPSHOT</diagram.exporter>
-        <fireworks.exporter>1.2.0-SNAPSHOT</fireworks.exporter>
-        <reaction.exporter>1.2.0-SNAPSHOT</reaction.exporter>
-        <sbml.exporter>2.2.0-SNAPSHOT</sbml.exporter>
-        <event.pdf>1.1.0-SNAPSHOT</event.pdf>
-        <reactome.utils.version>1.1.0-SNAPSHOT</reactome.utils.version>
+        <graph.core>2.0.0</graph.core>
+        <search.core>1.4.4</search.core>
+        <interactor.core>1.1.0</interactor.core>
+        <diagram.exporter>2.0.0</diagram.exporter>
+        <fireworks.exporter>1.2.0</fireworks.exporter>
+        <reaction.exporter>1.2.0</reaction.exporter>
+        <sbml.exporter>2.2.0</sbml.exporter>
+        <event.pdf>1.1.0</event.pdf>
+        <reactome.utils.version>1.1.0</reactome.utils.version>
 
         <servlet.version>4.0.1</servlet.version>
         <jsp.version>2.3.3</jsp.version>
