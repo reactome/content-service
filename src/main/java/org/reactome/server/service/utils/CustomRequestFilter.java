@@ -20,7 +20,9 @@ public class CustomRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         //CORS headers to be added to the response
-        response.addHeader("Access-Control-Allow-Origin", "*");
+        if (response.getHeader("Access-Control-Allow-Origin") == null) {
+            response.addHeader("Access-Control-Allow-Origin", "*");
+        }
         if (request.getHeader("Access-Control-Request-Method") != null && "OPTIONS".equals(request.getMethod())) {
             // CORS "pre-flight" request
             response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
