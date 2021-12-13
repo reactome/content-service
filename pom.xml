@@ -65,6 +65,7 @@
         <jsoup.version>1.13.1</jsoup.version>
         <jackson.annotations.version>2.12.3</jackson.annotations.version>
         <jackson.core>2.12.3</jackson.core>
+        <log4j2.version>2.15.0</log4j2.version>
 
         <jdk.version>11</jdk.version>
         <deploymentPath>/</deploymentPath>
