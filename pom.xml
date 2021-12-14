@@ -297,7 +297,7 @@
          https://stackoverflow.com/questions/59629214/caused-by-org-apache-logging-log4j-loggingexception-log4j-slf4j-impl-cannot-be
          -->
         <profile>
-            <id>Reactome-Server-UPGRADE</id>
+            <id>Reactome-Server</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
