@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
@@ -52,15 +52,12 @@ public class EventsController {
     @RequestMapping(value = "/event/{id}/ancestors", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<Collection<EventProjection>> getEventAncestors(@ApiParam(value = "The event for which the ancestors are requested", defaultValue = "R-HSA-5673001", required = true)
-                                                             @PathVariable String id) {
+                                                                     @PathVariable String id) {
         Collection<EventProjectionWrapper> ancestors = eventsService.getEventAncestors(id);
-        if (ancestors == null || ancestors.isEmpty()) throw new NotFoundException("No ancestors found for given event: " + id);
-        Collection<Collection<EventProjection>> ret = new ArrayList<>();
-        for (EventProjectionWrapper ancestor : ancestors) {
-            ret.add(ancestor.getEvents());
-        }
+        if (ancestors == null || ancestors.isEmpty())
+            throw new NotFoundException("No ancestors found for given event: " + id);
         infoLogger.info("Request for all Ancestors of Event with id: {}", id);
-        return ret;
+        return ancestors.stream().map(EventProjectionWrapper::getEvents).collect(Collectors.toList());
     }
 
     @ApiOperation(value = "The full event hierarchy for a given species", notes = "Events (pathways and reactions) in Reactome are organised in a hierarchical structure for every species. By following all 'hasEvent' relationships, this method retrieves the full event hierarchy for any given species. The result is a list of tree structures, one for each TopLevelPathway. Every event in these trees is represented by a PathwayBrowserNode. The latter contains the stable identifier, the name, the species, the url, the type, and the diagram of the particular event.")
@@ -71,9 +68,10 @@ public class EventsController {
     })
     @RequestMapping(value = "/eventsHierarchy/{species}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Collection<PathwayBrowserNode> getEventHierarchy(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606",required = true) @PathVariable String species, HttpServletResponse response)  {
+    public Collection<PathwayBrowserNode> getEventHierarchy(@ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606", required = true) @PathVariable String species, HttpServletResponse response) {
         Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species);
-        if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty()) throw new NotFoundException("No event hierarchy found for given species: " + species);
+        if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty())
+            throw new NotFoundException("No event hierarchy found for given species: " + species);
         response.setHeader("Content-Disposition", "inline; swaggerDownload=\"attachment\"; filename=\"" + species + ".json\"");
         infoLogger.info("Request for full event hierarchy");
         return pathwayBrowserNodes;

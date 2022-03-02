@@ -59,9 +59,7 @@ public class SearchManager {
 
     @SuppressWarnings("Duplicates")
     public FireworksOccurrencesResult getFireworksOccurrencesResult(Species species, String query) throws SolrSearcherException {
-        List<String> speciess = new ArrayList<>();
-        speciess.add(species.getDisplayName());
-        Query queryObject = new Query.Builder(query).forSpecies(speciess).build();
+        Query queryObject = new Query.Builder(query).forSpecies(List.of(species.getDisplayName())).build();
 
         FireworksOccurrencesResult occ = searchService.fireworksFlagging(queryObject);
 

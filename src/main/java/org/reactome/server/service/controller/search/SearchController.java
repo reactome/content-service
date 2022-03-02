@@ -321,7 +321,7 @@ class SearchController {
 
     /**
      * A simple mechanism to check whether the identifiers submitted by the users are valid. This is meant to offer
-     * better HttpStatus codes depending on the paramenters (more accurate error messages)
+     * better HttpStatus codes depending on the parameters (more accurate error messages)
      *
      * @param diagram a valid identifier to a diagrammed pathway (does not accept null)
      * @param object  a valid identifier to any object in Reactome (accepts null)
