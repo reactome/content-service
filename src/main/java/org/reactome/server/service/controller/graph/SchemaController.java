@@ -4,7 +4,10 @@ import io.swagger.annotations.*;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
 import org.reactome.server.graph.domain.result.SimpleReferenceObject;
+import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.graph.service.SchemaService;
+import org.reactome.server.graph.service.helper.SchemaNode;
+import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NotFoundException;
 import org.slf4j.Logger;
@@ -25,9 +28,12 @@ import java.util.Collection;
 public class SchemaController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
+    private SchemaNode cacheSchema;
 
     @Autowired
     private SchemaService schemaService;
+    @Autowired
+    private GeneralService generalService;
 
     @ApiOperation(value = "A list of entries corresponding to a given schema class", notes = "This method retrieves the list of entries in Reactome that belong to the specified schema class. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity. Additionally, paging is required, while a maximum of 25 entries can be returned per request.")
     @ApiResponses({
@@ -113,5 +119,16 @@ public class SchemaController {
             if (count == null || count == 0) throw new NotFoundException("No entries have been found for species: " + species);
             return count;
         }
+    }
+
+    @RequestMapping(value = "/schema/json", method = RequestMethod.GET)
+    public SchemaNode getSchemaModel() {
+        if (cacheSchema == null) {
+            try {
+                cacheSchema = DatabaseObjectUtils.getGraphModelTree(generalService.getSchemaClassCounts());
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        return cacheSchema;
     }
 }
