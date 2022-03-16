@@ -111,7 +111,7 @@ public class SchemaController {
     @ResponseBody
     public Long countEntries(@ApiParam(value = "Schema class name", defaultValue = "Pathway",required = true) @PathVariable String className,
                              @ApiParam(value = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", defaultValue = "9606") @RequestParam(required = false) String species) throws ClassNotFoundException {
-        infoLogger.info("Request for counf of objects of class: {}", className , species);
+        infoLogger.info("Request for count of objects of class: {}, species: {}", className , species);
         if (species == null) {
             return schemaService.countEntries(className);
         } else {
@@ -121,7 +121,7 @@ public class SchemaController {
         }
     }
 
-    @RequestMapping(value = "/schema/json", method = RequestMethod.GET)
+    @RequestMapping(value = "/schema/model", method = RequestMethod.GET, produces = {"application/json"})
     public SchemaNode getSchemaModel() {
         if (cacheSchema == null) {
             try {
