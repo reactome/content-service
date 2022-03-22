@@ -1,6 +1,9 @@
 package org.reactome.server.service.controller.graph;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.schema.SchemaDataSet;
 import org.reactome.server.graph.service.DatabaseObjectService;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = {"discover"})
+@Tag(name = "discover")
 @RequestMapping("/data")
 public class DiscoverController {
 
@@ -32,15 +35,15 @@ public class DiscoverController {
     private GeneralService generalService;
 
 
-    @ApiOperation(value = "The schema.org for an Event in Reactome knowledgebase", notes = "For each event (reaction or pathway) this method generates a json file representing the dataset object as defined by schema.org (http). This is mainly used by search engines in order to index the data")
+    @Operation(summary = "The schema.org for an Event in Reactome knowledgebase", description ="For each event (reaction or pathway) this method generates a json file representing the dataset object as defined by schema.org (http). This is mainly used by search engines in order to index the data")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Identifier does not match with any event", response = ErrorInfo.class),
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "404", description = "Identifier does not match with any event"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/discover/{identifier}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public SchemaDataSet eventDiscovery(@ApiParam(value = "An event identifier", defaultValue = "R-HSA-446203",required = true) @PathVariable String identifier) throws ClassNotFoundException {
+    public SchemaDataSet eventDiscovery(@Parameter(description = "An event identifier", example = "R-HSA-446203",required = true) @PathVariable String identifier) throws ClassNotFoundException {
         SchemaDataSet dataSet;
         try {
             Event event = databaseObjectService.findById(identifier);

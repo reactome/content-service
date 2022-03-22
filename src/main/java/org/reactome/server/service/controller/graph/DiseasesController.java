@@ -1,13 +1,11 @@
 package org.reactome.server.service.controller.graph;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.reactome.server.graph.domain.model.DatabaseObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.Disease;
 import org.reactome.server.graph.service.SchemaService;
-import org.reactome.server.service.exception.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = {"diseases"})
+@Tag(name = "diseases")
 @RequestMapping("/data")
 public class DiseasesController {
 
@@ -34,13 +32,10 @@ public class DiseasesController {
     @Autowired
     private SchemaService schemaService;
 
-    @ApiOperation(
-            value = "The list of disease objects",  notes = "It retrieves the list of diseases annotated in Reactome",
-            response = DatabaseObject.class, responseContainer = "List"
-    )
+    @Operation(summary = "The list of disease objects", description = "It retrieves the list of diseases annotated in Reactome")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -49,10 +44,10 @@ public class DiseasesController {
         return schemaService.getByClass(Disease.class);
     }
 
-    @ApiOperation(value = "The list of diseases DOID",  notes = "It retrieves the list of disease DOIDs annotated in Reactome")
+    @Operation(summary = "The list of diseases DOID", description = "It retrieves the list of disease DOIDs annotated in Reactome")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @RequestMapping(value = "/diseases/doid", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody

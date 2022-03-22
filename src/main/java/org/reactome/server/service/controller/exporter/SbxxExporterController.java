@@ -1,6 +1,11 @@
 package org.reactome.server.service.controller.exporter;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.io.IOUtils;
 import org.gk.persistence.MySQLAdaptor;
 import org.reactome.sbml.rel.SbmlConverterForRel;
@@ -20,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -29,7 +33,7 @@ import java.io.*;
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @RestController
-@Api(tags = {"exporter"})
+@Tag(name = "exporter")
 @RequestMapping("/exporter")
 public class SbxxExporterController {
 
@@ -47,14 +51,14 @@ public class SbxxExporterController {
     // This should be updated to use JSON and Neo4j in the future
     private MySQLAdaptor mysqlDba;
 
-    @ApiOperation(value = "Exports a given pathway or reaction to SBGN")
+    @Operation(summary = "Exports a given pathway or reaction to SBGN")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Identifier not found"),
-            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway or reaction"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+            @ApiResponse(responseCode = "404", description = "Identifier not found"),
+            @ApiResponse(responseCode = "422", description = "Identifier does not correspond to a pathway or reaction"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/event/{identifier}.sbgn", method = RequestMethod.GET)
-    public synchronized void eventSBGN(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-5205682")
+    public synchronized void eventSBGN(@Parameter(description = "DbId or StId of the requested pathway or reaction", required = true, example = "R-HSA-5205682")
                                        @PathVariable String identifier,
                                        HttpServletResponse response) throws Exception {
         Event event = getEvent(identifier);
@@ -82,20 +86,20 @@ public class SbxxExporterController {
     }
 
 
-    @ApiIgnore //Only kept here to keep backwards compatibility with the previous URI (ATTENTION: to ".xml")
+    @Hidden //Only kept here to keep backwards compatibility with the previous URI (ATTENTION: to ".xml")
     @RequestMapping(value = "/sbml/{identifier}.xml", method = RequestMethod.GET)
     public synchronized void eventSBMLOld(@PathVariable String identifier, HttpServletResponse response) throws Exception {
         eventSBML(identifier, response);
     }
 
-    @ApiOperation(value = "Exports a given pathway or reaction to SBML")
+    @Operation(summary = "Exports a given pathway or reaction to SBML")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Identifier not found"),
-            @ApiResponse(code = 422, message = "Identifier does not correspond to a pathway or reaction"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+            @ApiResponse(responseCode = "404", description = "Identifier not found"),
+            @ApiResponse(responseCode = "422", description = "Identifier does not correspond to a pathway or reaction"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/event/{identifier}.sbml", method = RequestMethod.GET)
-    public synchronized void eventSBML(@ApiParam(value = "DbId or StId of the requested pathway or reaction", required = true, defaultValue = "R-HSA-68616")
+    public synchronized void eventSBML(@Parameter(description = "DbId or StId of the requested pathway or reaction", required = true, example = "R-HSA-68616")
                                        @PathVariable String identifier,
                                        HttpServletResponse response) throws Exception {
         Event event = getEvent(identifier);

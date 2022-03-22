@@ -1,16 +1,17 @@
 package org.reactome.server.service.config;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.tags.Tag;
+import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reflections.Reflections;
+import org.springdoc.core.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.Tag;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
@@ -20,69 +21,48 @@ import java.util.Collections;
 public class SwaggerConfig {
 
     @Bean
-    public Docket api() {
-        Docket rtn = new Docket(DocumentationType.SWAGGER_2)
-                .useDefaultResponseMessages(false)
-                .select()
-                //Remove Basic Error Controller In SpringFox SwaggerUI
-                .apis(RequestHandlerSelectors.basePackage("org.reactome.server"))
-                .paths(PathSelectors.any())
-                .build()
-                .tags(new Tag("exporter", "Reactome Data: Format Exporter"))
-                .tags(new Tag("discover", "Reactome Data: Search engines discovery schema"))
-                .tags(new Tag("diseases", "Reactome Data: Disease related queries"))
-                .tags(new Tag("events", "Reactome Data: Queries related to events"))
-                .tags(new Tag("database", "Reactome Data: Database info queries"))
-                .tags(new Tag("mapping", "Reactome Data: Mapping related queries"))
-                .tags(new Tag("orthology", "Reactome Data: Orthology related queries"))
-                .tags(new Tag("participants", "Reactome Data: Queries related to participants"))
-                .tags(new Tag("pathways", "Reactome Data: Pathway related queries"))
-                .tags(new Tag("person", "Reactome Data: Person queries"))
-                .tags(new Tag("entities", "Reactome Data: PhysicalEntity queries"))
-                .tags(new Tag("query", "Reactome Data: Common data retrieval"))
-                .tags(new Tag("references", "Reactome xRefs: ReferenceEntity queries"))
-                .tags(new Tag("schema", "Reactome Data: Schema class queries"))
-                .tags(new Tag("species", "Reactome Data: Species related queries"))
-                .tags(new Tag("interactors", "Molecule interactors"))
-                .tags(new Tag("search", "Reactome Search"))
-                .apiInfo(apiInfo());
+    public OpenAPI createRestApi() {
+        Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
+        SpringDocUtils config = SpringDocUtils.getConfig();
+        for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
+            config.replaceWithClass(clazz, Void.class);
+        }
 
-        /*
-           TODO: need a better solution
-           Swagger UI freezing when expanding APIs with deeply nested data models,we use the directModelSubstitute to fix it in the
-           past. Reactome updates all softwares in 2021, in this case, the swagger UI has been updated to 3.0.0 and the code doesn't
-           work perfectly as before, it produces the Resolver error in the console and the swagger page.
-
-            --Resolver error at paths./data/pathways/top/{species}.get.responses.200.schema.items.$ref
-            --Could not resolve reference: Could not resolve pointer: /definitions/Error-ModelName{namespace='org.reactome.server.graph.domain.model', name='Pathway'} does not exist in document
-
-            FIXING: 1. add springfox.documentation.swagger.use-model-v3=false to service.properties
-                        a. this config also produce resolver error but won't print any error message in the console and the endpoints works like normal
-                    2. hide the error dialog in the swagger/custom.css
-
-           REFERENCE:  1.https://github.com/springfox/springfox/issues/3476
-                       2.https://github.com/swagger-api/swagger-ui/issues/6197
-                       3.
-         */
-
-//        Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
-//        for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
-//            rtn.directModelSubstitute(clazz, Void.class);
-//        }
-        return rtn;
+        return new OpenAPI()
+                .tags(List.of(
+                        new Tag().name("exporter").description("Reactome Data: Format Exporter"),
+                        new Tag().name("discover").description("Reactome Data: Search engines discovery schema"),
+                        new Tag().name("diseases").description("Reactome Data: Disease related queries"),
+                        new Tag().name("events").description("Reactome Data: Queries related to events"),
+                        new Tag().name("database").description("Reactome Data: Database info queries"),
+                        new Tag().name("mapping").description("Reactome Data: Mapping related queries"),
+                        new Tag().name("orthology").description("Reactome Data: Orthology related queries"),
+                        new Tag().name("participants").description("Reactome Data: Queries related to participants"),
+                        new Tag().name("pathways").description("Reactome Data: Pathway related queries"),
+                        new Tag().name("person").description("Reactome Data: Person queries"),
+                        new Tag().name("entities").description("Reactome Data: PhysicalEntity queries"),
+                        new Tag().name("query").description("Reactome Data: Common data retrieval"),
+                        new Tag().name("references").description("Reactome xRefs: ReferenceEntity queries"),
+                        new Tag().name("schema").description("Reactome Data: Schema class queries"),
+                        new Tag().name("species").description("Reactome Data: Species related queries"),
+                        new Tag().name("interactors").description("Molecule interactors"),
+                        new Tag().name("search").description("Reactome Search"))
+                )
+                .info(new Info()
+                        .title("Content Service")
+                        .description("REST API for Reactome content")
+                        .version("1.2")
+                        .license(new License()
+                                .name("Creative Commons Attribution 4.0 International (CC BY 4.0) License")
+                                .url("https://creativecommons.org/licenses/by/4.0/")
+                        )
+                        .termsOfService("/license")
+                        .contact(new Contact()
+                                .name("Reactome")
+                                .email("help@reactome.org")
+                                .url("https://reactome.org")
+                        )
+                );
     }
 
-
-    private ApiInfo apiInfo() {
-        return new ApiInfo(
-                "Content Service",
-                "REST API for Reactome content",
-                "1.2",
-                "/license",
-                new Contact("Reactome", "https://reactome.org", "help@reactome.org"),
-                "Creative Commons Attribution 4.0 International (CC BY 4.0) License",
-                "https://creativecommons.org/licenses/by/4.0/",
-                Collections.emptyList()
-        );
-    }
 }

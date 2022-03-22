@@ -2,6 +2,7 @@ package org.reactome.server.service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.http.HttpException;
@@ -51,6 +52,7 @@ import java.security.cert.CertificateException;
  * @since 18.05.16.
  */
 @ControllerAdvice
+@Hidden
 @SuppressWarnings("unused")
 class GlobalExceptionHandler {
 

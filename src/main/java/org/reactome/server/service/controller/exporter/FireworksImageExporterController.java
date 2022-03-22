@@ -1,6 +1,12 @@
 package org.reactome.server.service.controller.exporter;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.batik.transcoder.TranscoderException;
 import org.reactome.server.graph.domain.model.Species;
 import org.reactome.server.graph.service.SpeciesService;
@@ -22,7 +28,7 @@ import java.util.List;
  * @author Pascual Lorente (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = {"exporter"})
+@Tag(name = "exporter")
 @RequestMapping("/exporter")
 public class FireworksImageExporterController {
 
@@ -31,51 +37,56 @@ public class FireworksImageExporterController {
     private SpeciesService speciesService;
     private SearchManager searchManager;
 
-    @ApiOperation(
-            value = "Exports a given pathway overview to the specified image format (png, jpg, jpeg, svg, gif)",
-            produces = "image/png, image/jpg, image/jpeg, image/svg+xml, image/gif"
+    @Operation(
+            summary = "Exports a given pathway overview to the specified image format (png, jpg, jpeg, svg, gif)"
     )
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Species does not match with any of the available."),
-            @ApiResponse(code = 500, message = "Could not deserialize pathways overview file."),
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(mediaType = "image/png"),
+                    @Content(mediaType = "image/jpg"),
+                    @Content(mediaType = "image/jpeg"),
+                    @Content(mediaType = "image/svg+xml"),
+                    @Content(mediaType = "image/gif"),
+            }),
+            @ApiResponse(responseCode = "404", description = "Species does not match with any of the available."),
+            @ApiResponse(responseCode = "500", description = "Could not deserialize pathways overview file."),
     })
-    @RequestMapping(value = "/fireworks/{species}.{ext:.*}", method = RequestMethod.GET)
-    public void diagramImage(@ApiParam(value = "Species identifier (it can be the taxonomy id, species name or dbId)", required = true, defaultValue = "9606")
-                            @PathVariable String species,
-                             @ApiParam(value = "File extension (defines the image format)", required = true, defaultValue = "svg", allowableValues = "png,jpg,jpeg,svg,gif")
-                            @PathVariable String ext,
+    @RequestMapping(value = "/fireworks/{species}.{ext:.*}", method = RequestMethod.GET, produces = {"image/png", "image/jpg", "image/jpeg", "image/svg+xml", "image/gif"})
+    public void diagramImage(@Parameter(description = "Species identifier (it can be the taxonomy id, species name or dbId)", required = true, example = "9606")
+                             @PathVariable String species,
+                             @Parameter(description = "File extension (defines the image format)", required = true, example = "svg", schema = @Schema(allowableValues = {"png", "jpg", "jpeg", "svg", "gif"}))
+                             @PathVariable String ext,
+                             @Parameter(description = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", example = "5")
+                             @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
+                             @Parameter(description = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
+                             @RequestParam(value = "flg", required = false) String flg,
+                             @Parameter(description = "Defines whether to take into account interactors for the flagging")
+                             @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
+                             @Parameter(description = "Highlight element(s) selection in the diagram. CSV line.")
+                             @RequestParam(value = "sel", required = false) List<String> sel,
+                             @Parameter(description = "Sets whether the name of the pathway is shown below", example = "true")
+                             @RequestParam(value = "title", required = false, defaultValue = "true") Boolean title,
+                             @Parameter(description = "Defines the image margin between [0 - 20] (Default 15)", example = "15")
+                             @RequestParam(value = "margin", defaultValue = "15", required = false) Integer margin,
 
-                             @ApiParam(value = "Result image quality between [1 - 10]. It defines the quality of the final image (Default 5)", defaultValue = "5")
-                            @RequestParam(value = "quality", required = false, defaultValue = "5") Integer quality,
-                             @ApiParam(value = "Gene name, protein or chemical identifier or Reactome identifier used to flag elements in the diagram")
-                            @RequestParam(value = "flg", required = false) String flg,
-                             @ApiParam(value = "Defines whether to take into account interactors for the flagging")
-                            @RequestParam(value = "flgInteractors", required = false, defaultValue = "true") Boolean flgInteractors,
-                             @ApiParam(value = "Highlight element(s) selection in the diagram. CSV line.")
-                            @RequestParam(value = "sel", required = false) List<String> sel,
-                             @ApiParam(value = "Sets whether the name of the pathway is shown below", defaultValue = "true")
-                            @RequestParam(value = "title", required = false, defaultValue = "true") Boolean title,
-                             @ApiParam(value = "Defines the image margin between [0 - 20] (Default 15)", defaultValue = "15")
-                            @RequestParam(value = "margin", defaultValue = "15", required = false) Integer margin,
+                             @Parameter(description = "Diagram Color Profile", example = "Copper",schema = @Schema(allowableValues = {"Copper", "Copper plus", "Barium Lithium", "Calcium Salts"}))
+                             @RequestParam(value = "diagramProfile", defaultValue = "Copper", required = false) String profile,
+                             @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given pathways overview", example = "MjAyMjAzMDkwODU0NTlfMTU2ND")
+                             @RequestParam(value = "token", required = false) String token,
+                             @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                             @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
+                             @Parameter(description = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
+                             @RequestParam(value = "expColumn", required = false) Integer expColumn,
+                             @Parameter(description = "Set to 'true' to overlay analysis coverage values")
+                             @RequestParam(value = "coverage", required = false, defaultValue = "false") Boolean coverage,
 
-                             @ApiParam(value = "Diagram Color Profile", defaultValue = "Copper", allowableValues = "Copper, Copper plus, Barium Lithium, Calcium Salts")
-                            @RequestParam(value = "diagramProfile", defaultValue = "Copper", required = false) String profile,
-                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given pathways overview")
-                            @RequestParam(value = "token", required = false) String token,
-                             @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
-                            @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
-                             @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
-                            @RequestParam(value = "expColumn", required = false) Integer expColumn,
-                             @ApiParam(value = "Set to 'true' to overlay analysis coverage values")
-                            @RequestParam(value = "coverage", required = false, defaultValue = "false") Boolean coverage,
-
-                            HttpServletResponse response) {
+                             HttpServletResponse response) {
 
         Species s = speciesService.getSpecies(species);
         if (s == null) throw new FireworksExporterException(String.format("'%s' is not a species", species));
 
         //NO PDF for the time being
-        if(ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
+        if (ext.equalsIgnoreCase("pdf")) throw new IllegalArgumentException("Unsupported file extension pdf");
 
         FireworkArgs args = new FireworkArgs(s.getDisplayName().replace(" ", "_"), ext);
         args.setSelected(sel);
@@ -99,7 +110,7 @@ public class FireworksImageExporterController {
         try {
             String type = ext.equalsIgnoreCase("svg") ? "svg+xml" : ext.toLowerCase();
             response.addHeader("Content-Type", "image/" + type);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + s.getDisplayName() + "." +  ext + "\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + s.getDisplayName() + "." + ext + "\"");
             fireworksExporter.render(args, response.getOutputStream());
         } catch (IOException | AnalysisServerError | TranscoderException e) {
             e.printStackTrace();
