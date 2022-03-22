@@ -1,14 +1,14 @@
 package org.reactome.server.service.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reflections.Reflections;
 import org.springdoc.core.SpringDocUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,11 +17,10 @@ import org.springframework.context.annotation.Configuration;
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
  */
 @Configuration
-@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI createRestApi() {
+    public OpenAPI createRestApi(@Value("${server.servlet.context-path}") String contextPath) {
         Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
         SpringDocUtils config = SpringDocUtils.getConfig();
         for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
@@ -29,6 +28,7 @@ public class SwaggerConfig {
         }
 
         return new OpenAPI()
+                .addServersItem(new Server().url(contextPath))
                 .info(new Info()
                         .title("Content Service")
                         .description("REST API for Reactome content")
