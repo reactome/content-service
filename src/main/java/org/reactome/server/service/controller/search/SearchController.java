@@ -1,6 +1,11 @@
 package org.reactome.server.service.controller.search;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reactome.server.graph.domain.model.Pathway;
@@ -13,7 +18,6 @@ import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
 import org.reactome.server.service.exception.BadRequestException;
-import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.NoResultsFoundException;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.SearchManager;
@@ -21,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -32,7 +35,7 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = {"search"})
+@Tag(name = "search", description = "Reactome Search")
 @RequestMapping("/search")
 class SearchController {
 
@@ -51,34 +54,34 @@ class SearchController {
         releaseNumber = generalService.getDBInfo().getVersion();
     }
 
-    @ApiOperation(value = "Spell-check suggestions for a given query", notes = "This method retrieves a list of spell-check suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
+    @Operation(summary = "Spell-check suggestions for a given query", description = "This method retrieves a list of spell-check suggestions for a given search term.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/spellcheck", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<String> spellcheckerSuggestions(@ApiParam(value = "Search term", defaultValue = "repoduction", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> spellcheckerSuggestions(@Parameter(description = "Search term", example = "repoduction", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for spellcheck suggestions for query {}", query);
         return searchService.getSpellcheckSuggestions(query);
     }
 
-    @ApiOperation(value = "Auto-suggestions for a given query", notes = "This method retrieves a list of suggestions for a given search term.", response = String.class, responseContainer = "List", produces = "application/json")
+    @Operation(summary = "Auto-suggestions for a given query", description = "This method retrieves a list of suggestions for a given search term.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/suggest", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public List<String> suggesterSuggestions(@ApiParam(value = "Search term", defaultValue = "platele", required = true) @RequestParam String query) throws SolrSearcherException {
+    public List<String> suggesterSuggestions(@Parameter(description = "Search term", example = "platele", required = true) @RequestParam String query) throws SolrSearcherException {
         infoLogger.info("Request for autocomplete suggestions for query {}", query);
         return searchService.getAutocompleteSuggestions(query);
     }
 
-    @ApiOperation(value = "A list of facets corresponding to the whole Reactome search data", notes = "This method retrieves faceting information on the whole Reactome search data.", response = FacetMapping.class, produces = "application/json")
+    @Operation(summary = "A list of facets corresponding to the whole Reactome search data", description = "This method retrieves faceting information on the whole Reactome search data.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/facet", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -87,40 +90,40 @@ class SearchController {
         return searchService.getTotalFacetingInformation();
     }
 
-    @ApiOperation(value = "A list of facets corresponding to a specific query", notes = "This method retrieves faceting information on a specific query", response = FacetMapping.class, produces = "application/json")
+    @Operation(summary = "A list of facets corresponding to a specific query", description = "This method retrieves faceting information on a specific query")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/facet_query", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public FacetMapping facet_type(@ApiParam(value = "Search term", defaultValue = "TP53", required = true) @RequestParam String query,
-                                   @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
-                                   @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
-                                   @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
-                                   @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
+    public FacetMapping facet_type(@Parameter(description = "Search term", example = "TP53", required = true) @RequestParam String query,
+                                   @Parameter(description = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                   @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                   @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                   @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).build();
         return searchService.getFacetingInformation(queryObject);
     }
 
-    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.", response = GroupedResult.class, produces = "application/json")
+    @Operation(summary = "Queries Solr against the Reactome knowledgebase", description = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Entry not found. Targets inform if the term is our scope of annotation", response = ErrorInfo.class),
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "404", description = "Entry not found. Targets inform if the term is our scope of annotation"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/query", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public GroupedResult getSearchResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
-                                         @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
-                                         @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
-                                         @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
-                                         @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
-                                         @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                         @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
-                                         @ApiParam(value = "Start row", defaultValue = "0") @RequestParam(value = "Start row", required = false, defaultValue = "0") Integer start,
-                                         @ApiParam(value = "Number of rows to include", defaultValue = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
+    public GroupedResult getSearchResult(@Parameter(description = "Search term", example = "Biological oxidations", required = true) @RequestParam String query,
+                                         @Parameter(description = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                         @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                         @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                         @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords,
+                                         @Parameter(description = "Cluster results", example = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
+                                         @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
+                                         @Parameter(description = "Start row", example = "0") @RequestParam(value = "Start row", required = false, defaultValue = "0") Integer start,
+                                         @Parameter(description = "Number of rows to include", example = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
@@ -137,24 +140,24 @@ class SearchController {
 
     }
 
-    @ApiOperation(value = "Queries Solr against the Reactome knowledgebase", notes = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format, pages count starting from 1.", response = GroupedResult.class, produces = "application/json")
+    @Operation(summary = "Queries Solr against the Reactome knowledgebase", description = "This method performs a Solr query on the Reactome knowledgebase. Results are in a paginated format, pages count starting from 1.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "One or more parameter is illegal", response = ErrorInfo.class),
-            @ApiResponse(code = 404, message = "Entry not found. Targets inform if the term is our scope of annotation", response = ErrorInfo.class),
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "400", description = "One or more parameter is illegal"),
+            @ApiResponse(responseCode = "404", description = "Entry not found. Targets inform if the term is our scope of annotation"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/query/paginated", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public GroupedResult getResult(@ApiParam(value = "Search term", defaultValue = "Biological oxidations", required = true) @RequestParam String query,
-                                   @ApiParam(value = "Page, should be strictly positive", defaultValue = "1", required = true) @RequestParam Integer page,
-                                   @ApiParam(value = "Rows per page", defaultValue = "10", required = true) @RequestParam Integer rowCount,
-                                   @ApiParam(value = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
-                                   @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
-                                   @ApiParam(value = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
-                                   @ApiParam(value = "Keywords") @RequestParam(required = false) List<String> keywords,
-                                   @ApiParam(value = "Cluster results", defaultValue = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
-                                   @ApiParam(value = "Query parser to use", defaultValue = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
+    public GroupedResult getResult(@Parameter(description = "Search term", example = "Biological oxidations", required = true) @RequestParam String query,
+                                   @Parameter(description = "Page, should be strictly positive", example = "1", required = true) @RequestParam Integer page,
+                                   @Parameter(description = "Rows per page", example = "10", required = true) @RequestParam Integer rowCount,
+                                   @Parameter(description = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
+                                   @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                   @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
+                                   @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords,
+                                   @Parameter(description = "Cluster results", example = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
+                                   @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
         if (page <= 0) throw new BadRequestException("page should be greater than 0");
         if (rowCount <= 0) throw new BadRequestException("rowCount should be greater than 0");
@@ -172,14 +175,14 @@ class SearchController {
         return result;
     }
 
-    @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
+    @Operation(summary = "Performs a Solr query (fireworks widget scoped) for a given QueryObject")
     @RequestMapping(value = "/fireworks", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public FireworksResult getFireworksResult(@ApiParam(defaultValue = "BRAF", required = true) @RequestParam String query,
-                                              @ApiParam(value = "Species name", defaultValue = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
-                                              @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
-                                              @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
-                                              @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows,
+    public FireworksResult getFireworksResult(@Parameter(example = "BRAF", required = true) @RequestParam String query,
+                                              @Parameter(description = "Species name", example = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
+                                              @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                              @Parameter(description = "Start row") @RequestParam(required = false) Integer start,
+                                              @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows,
                                               HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>();
@@ -196,10 +199,10 @@ class SearchController {
         return fireworksResult;
     }
 
-    @ApiOperation(value = "Performs a Solr query (fireworks widget scoped) for a given QueryObject", produces = "application/json")
+    @Operation(summary = "Performs a Solr query (fireworks widget scoped) for a given QueryObject")
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public FireworksOccurrencesResult fireworksFlagging(@ApiParam(defaultValue = "KNTC1", required = true) @RequestParam String query,
+    public FireworksOccurrencesResult fireworksFlagging(@Parameter(example = "KNTC1", required = true) @RequestParam String query,
                                                         @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
         Species sp = speciesService.getSpeciesByName(species);
@@ -211,14 +214,14 @@ class SearchController {
         return rtn;
     }
 
-    @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
+    @Operation(summary = "Performs a Solr query (diagram widget scoped) for a given QueryObject")
     @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DiagramResult getDiagramResult(@ApiParam(defaultValue = "R-HSA-8848021", required = true) @PathVariable String diagram,
-                                          @ApiParam(defaultValue = "MAD", required = true) @RequestParam String query,
-                                          @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types,
-                                          @ApiParam(value = "Start row") @RequestParam(required = false) Integer start,
-                                          @ApiParam(value = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+    public DiagramResult getDiagramResult(@Parameter(example = "R-HSA-8848021", required = true) @PathVariable String diagram,
+                                          @Parameter(example = "MAD", required = true) @RequestParam String query,
+                                          @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                          @Parameter(description = "Start row") @RequestParam(required = false) Integer start,
+                                          @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
         checkDiagramIdentifier(diagram);
         Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfRows(rows).build();
         DiagramResult rtn = searchService.getDiagrams(queryObject);
@@ -227,12 +230,12 @@ class SearchController {
         return rtn;
     }
 
-    @ApiOperation(value = "Performs a Solr query (diagram widget scoped) for a given QueryObject", produces = "application/json")
+    @Operation(summary = "Performs a Solr query (diagram widget scoped) for a given QueryObject")
     @RequestMapping(value = "/diagram/{diagram}/occurrences/{instance}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DiagramOccurrencesResult getDiagramOccurrences(@ApiParam(defaultValue = "R-HSA-68886", required = true) @PathVariable String diagram,
-                                                          @ApiParam(defaultValue = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @ApiParam(value = "Types to filter") @RequestParam(required = false) List<String> types) throws SolrSearcherException {
+    public DiagramOccurrencesResult getDiagramOccurrences(@Parameter(example = "R-HSA-68886", required = true) @PathVariable String diagram,
+                                                          @Parameter(example = "R-HSA-141433", required = true) @PathVariable String instance,
+                                                          @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types) throws SolrSearcherException {
         checkIdentifiers(diagram, instance);
         Query queryObject = new Query.Builder(instance).addFilterQuery(diagram).withTypes(types).build();
         DiagramOccurrencesResult rtn = searchService.getDiagramOccurrencesResult(queryObject);
@@ -241,12 +244,12 @@ class SearchController {
         return rtn;
     }
 
-    @ApiOperation(value = "A list of diagram entities plus pathways from the provided list containing the specified identifier", notes = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
+    @Operation(summary = "A list of diagram entities plus pathways from the provided list containing the specified identifier", description = "This method traverses the content and checks not only for the main identifier but also for all the cross-references to find the flag targets")
     @RequestMapping(value = "/diagram/{pathwayId}/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DiagramOccurrencesResult getEntitiesInDiagramForIdentifier(@ApiParam(value = "The pathway to find items to flag", defaultValue = "R-HSA-446203")
+    public DiagramOccurrencesResult getEntitiesInDiagramForIdentifier(@Parameter(description = "The pathway to find items to flag", example = "R-HSA-446203")
                                                                       @PathVariable String pathwayId,
-                                                                      @ApiParam(value = "The identifier for the elements to be flagged", defaultValue = "CTSA")
+                                                                      @Parameter(description = "The identifier for the elements to be flagged", example = "CTSA")
                                                                       @RequestParam String query) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
         DiagramOccurrencesResult rtn = searchManager.getDiagramOccurrencesResult(pathwayId, query);
@@ -256,19 +259,19 @@ class SearchController {
         return rtn;
     }
 
-    @ApiIgnore
-    @ApiOperation(value = "", response = DiagramSearchSummary.class, produces = "application/json")
+    @Hidden
+    @Operation
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Error in SolR", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
     })
     @RequestMapping(value = "/diagram/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DiagramSearchSummary diagramSearchSummary(@ApiParam(value = "Search term", defaultValue = "KIF", required = true)
+    public DiagramSearchSummary diagramSearchSummary(@Parameter(description = "Search term", example = "KIF", required = true)
                                                      @RequestParam String query,
-                                                     @ApiParam(value = "Species name", defaultValue = "Homo sapiens", required = true)
+                                                     @Parameter(description = "Species name", example = "Homo sapiens", required = true)
                                                      @RequestParam(required = false, defaultValue = "Homo sapiens") String species,
-                                                     @ApiParam(value = "Diagram", defaultValue = "R-HSA-8848021", required = true)
+                                                     @Parameter(description = "Diagram", example = "R-HSA-8848021", required = true)
                                                      @RequestParam String diagram) throws SolrSearcherException {
         infoLogger.info("Requested diagram summary for query {}", query);
         List<String> speciess = new ArrayList<>();

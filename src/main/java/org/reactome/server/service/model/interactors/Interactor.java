@@ -1,6 +1,6 @@
 package org.reactome.server.service.model.interactors;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.reactome.server.graph.domain.model.*;
 
 /**
@@ -11,34 +11,35 @@ import org.reactome.server.graph.domain.model.*;
 @SuppressWarnings("unused")
 public class Interactor {
 
-    @ApiModelProperty(value = "This is the interactor accession (or identifier).")
+    @Schema(description = "This is the interactor accession (or identifier).")
     private String acc;
 
-    @ApiModelProperty(value = "This is the Gene name of the given accession.")
+    @Schema(description = "This is the Gene name of the given accession.")
     private String alias;
 
-    @ApiModelProperty(value = "This is an auto increment counter which represents an unique number for the interaction.")
+    @Schema(description = "This is an auto increment counter which represents an unique number for the interaction.")
     private Long id = null;
 
-    @ApiModelProperty(value = "This is the Interactions evidences.")
+    @Schema(description = "This is the Interactions evidences.")
     private Integer evidences = null;
 
-    @ApiModelProperty(value = "This represents the confidence value (score) of an interaction.")
+    @Schema(description = "This represents the confidence value (score) of an interaction.")
     private Double score;
 
-    @ApiModelProperty(value = "This represents the URL for given accession.")
+    @Schema(description = "This represents the URL for given accession.")
     private String accURL;
 
-    @ApiModelProperty(value = "This represents the URL for the given interactions identifiers.")
+    @Schema(description = "This represents the URL for the given interactions identifiers.")
     private String evidencesURL;
 
-    public Interactor() {}
+    public Interactor() {
+    }
 
     public Interactor(Interaction interaction) {
         this.id = interaction.getDbId();
 
         ReferenceEntity re;
-        if(interaction instanceof UndirectedInteraction){
+        if (interaction instanceof UndirectedInteraction) {
             re = ((UndirectedInteraction) interaction).getInteractor().get(0);
         } else {
             re = ((DirectedInteraction) interaction).getTarget();
@@ -48,7 +49,7 @@ public class Interactor {
             String vi = ((ReferenceIsoform) re).getVariantIdentifier();
             this.acc = (vi != null && !vi.isEmpty()) ? vi : re.getIdentifier();
         } else {
-            this.acc =  re.getIdentifier();
+            this.acc = re.getIdentifier();
         }
         this.accURL = re.getUrl();
 
@@ -57,7 +58,7 @@ public class Interactor {
 
         this.score = interaction.getScore();
 
-        if(re instanceof ReferenceSequence){
+        if (re instanceof ReferenceSequence) {
             ReferenceSequence rs = (ReferenceSequence) re;
             if (rs.getGeneName() != null && !rs.getGeneName().isEmpty()) this.alias = rs.getGeneName().get(0);
         }

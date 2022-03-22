@@ -1,11 +1,14 @@
 package org.reactome.server.service.controller.interactors;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
 import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
 import org.reactome.server.interactors.model.PsicquicResource;
-import org.reactome.server.service.exception.ErrorInfo;
 import org.reactome.server.service.exception.PsicquicContentException;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
@@ -26,7 +29,7 @@ import java.util.List;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = {"interactors"})
+@Tag(name = "interactors", description = "Molecule interactors")
 @RequestMapping("/interactors/psicquic")
 @RestController
 public class PsicquicInteractionsController {
@@ -38,10 +41,10 @@ public class PsicquicInteractionsController {
     @Autowired
     private InteractionManager interactions;
 
-    @ApiOperation(value = "Retrieve a list of all Psicquic Registries services", response = PsicquicResource.class, produces = "application/json")
+    @Operation(summary = "Retrieve a list of all Psicquic Registries services")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/resources", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -60,28 +63,29 @@ public class PsicquicInteractionsController {
         return resources;
     }
 
-    @ApiOperation(value = "Retrieve clustered interaction, sorted by score, of a given accession by resource.", response = Interactors.class, produces = "application/json")
+    @Operation(summary = "Retrieve clustered interaction, sorted by score, of a given accession by resource.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/molecule/{resource}/{acc}/details", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Interactors getProteinDetailsByResource(@ApiParam(value = "PSICQUIC Resource", required = true, defaultValue = "MINT") @PathVariable String resource,
-                                                   @ApiParam(value = "Single Accession", required = true, defaultValue = "Q13501") @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+    public Interactors getProteinDetailsByResource(@Parameter(description = "PSICQUIC Resource", required = true, example = "MINT") @PathVariable String resource,
+                                                   @Parameter(description = "Single Accession", required = true, example = "Q13501") @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
         infoLogger.info("Psicquic details query for resource {} and accession {}", resource, acc);
         return interactions.getPsicquicProteinsDetails(Collections.singletonList(acc), resource);
     }
 
-    @ApiOperation(value = "Retrieve clustered interaction, sorted by score, of a given accession(s) by resource.", response = Interactors.class, produces = "application/json")
+    @Operation(summary = "Retrieve clustered interaction, sorted by score, of a given accession(s) by resource.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/molecules/{resource}/details", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public Interactors getProteinsDetailsByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+    public Interactors getProteinsDetailsByResource(@Parameter(description = "PSICQUIC Resource", required = true) @PathVariable String resource,
+                                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "<b>Accessions</b>", required = true)
+                                                    @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
         infoLogger.info("Psicquic details query for resource {} by POST", resource);
         // Split param and put into a Set to avoid duplicates
         Collection<String> accs = new HashSet<>();
@@ -91,28 +95,29 @@ public class PsicquicInteractionsController {
         return interactions.getPsicquicProteinsDetails(accs, resource, accs.size() < THRESHOLD ? 1 : 2, true);
     }
 
-    @ApiOperation(value = "Retrieve a summary of a given accession by resource", response = Interactors.class, produces = "application/json")
+    @Operation(summary = "Retrieve a summary of a given accession by resource")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/molecule/{resource}/{acc}/summary", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public Interactors getProteinSummaryByResource(@ApiParam(value = "PSICQUIC Resource", required = true, defaultValue = "MINT") @PathVariable String resource,
-                                                   @ApiParam(value = "Single Accession", required = true, defaultValue = "Q13501") @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+    public Interactors getProteinSummaryByResource(@Parameter(description = "PSICQUIC Resource", required = true, example = "MINT") @PathVariable String resource,
+                                                   @Parameter(description = "Single Accession", required = true, example = "Q13501") @PathVariable String acc) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
         infoLogger.info("Psicquic summary query for resource {} and accession {}", resource, acc);
         return interactions.getPsicquicProteinsSummary(Collections.singletonList(acc), resource);
     }
 
-    @ApiOperation(value = "Retrieve a summary of a given accession list by resource.", response = Interactors.class, produces = "application/json")
+    @Operation(summary = "Retrieve a summary of a given accession list by resource.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/molecules/{resource}/summary", method = RequestMethod.POST, consumes = "text/plain", produces = "application/json")
     @ResponseBody
-    public Interactors getProteinsSummaryByResource(@ApiParam(value = "PSICQUIC Resource", required = true) @PathVariable String resource,
-                                                    @ApiParam(value = "Accessions", required = true) @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
+    public Interactors getProteinsSummaryByResource(@Parameter(description = "PSICQUIC Resource", required = true) @PathVariable String resource,
+                                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "<b>Accessions</b>", required = true)
+                                                    @RequestBody String proteins) throws PsicquicQueryException, PsimiTabException, PsicquicRegistryClientException, PsicquicResourceNotFoundException {
         infoLogger.info("Psicquic summary query for resource {} by POST", resource);
         // Split param and put into a Set to avoid duplicates
         Collection<String> accs = new HashSet<>();

@@ -1,12 +1,12 @@
 package org.reactome.server.service.controller.graph;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.DBInfo;
 import org.reactome.server.graph.service.GeneralService;
-import org.reactome.server.service.exception.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -22,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = {"database"})
+@Tag(name = "database", description = "Reactome Data: Database info queries")
 @RequestMapping("/data")
 public class GeneralController {
 
@@ -31,31 +30,31 @@ public class GeneralController {
     @Autowired
     private GeneralService generalService;
 
-    @ApiOperation(value = "The name of current database")
+    @Operation(summary = "The name of current database")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/database/name", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
-    public String getDBName()  {
+    public String getDBName() {
         infoLogger.info("Request for DatabaseName");
         return generalService.getDBInfo().getName();
     }
 
-    @ApiOperation(value = "The version number of current database")
+    @Operation(summary = "The version number of current database")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/database/version", method = RequestMethod.GET, produces = "text/plain")
     @ResponseBody
-    public String getDBVersion()  {
+    public String getDBVersion() {
         infoLogger.info("Request for DatabaseVersion");
         return "" + generalService.getDBInfo().getVersion();
     }
 
-    @ApiIgnore
+    @Hidden
     @RequestMapping(value = "/database/info", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public DBInfo getChecksum() {

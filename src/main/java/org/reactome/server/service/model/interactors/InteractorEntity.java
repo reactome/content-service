@@ -1,6 +1,6 @@
 package org.reactome.server.service.model.interactors;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.reactome.server.graph.domain.model.Interaction;
 
 import java.util.ArrayList;
@@ -14,16 +14,17 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class InteractorEntity {
 
-    @ApiModelProperty(value = "This is the interactor accession (or identifier).")
+    @Schema(description = "This is the interactor accession (or identifier).")
     private String acc;
 
-    @ApiModelProperty(value = "This is the number of interactions for the given accession.")
+    @Schema(description = "This is the number of interactions for the given accession.")
     private Integer count;
 
-    @ApiModelProperty(value = "List of Interactors that interacts with the given accession.")
+    @Schema(description = "List of Interactors that interacts with the given accession.")
     private List<Interactor> interactors;
 
-    public InteractorEntity() { }
+    public InteractorEntity() {
+    }
 
     public InteractorEntity(String acc, List<Interaction> interactions) {
         this.acc = acc;

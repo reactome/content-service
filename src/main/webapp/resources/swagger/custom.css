@@ -24,11 +24,11 @@
 }
 
 .swagger-ui .info {
-    margin: 10px 0;
+    margin: 10px 0 !important;
 }
 
 .swagger-ui .info a {
-    color: #2F9EC2;
+    color: #2F9EC2 !important;
 }
 
 .swagger-ui .response p {
@@ -37,19 +37,15 @@
 
 .swagger-ui .opblock-body pre {
     /* result div */
-    max-height: 400px !important;
-    hyphens: none !important;
-    -webkit-hyphens: none!important;
-    -ms-hyphens: none!important;
-    background-color: #fcf6db!important;
-    border: 1px solid #e5e0c6!important;
-    color: #333!important;
+    max-height: 400px;
+    hyphens: none;
+    -webkit-hyphens: none;
+    -ms-hyphens: none;
+    background-color: #fcf6db;
+    border: 1px solid #e5e0c6;
+    color: #333;
 }
 
-.swagger-ui .opblock-body pre span {
-    /* swagger css forces color white as important. */
-    color: #333 !important;
-}
 
 .swagger-ui .response-col_description__inner span {
     background-color: #fcf6db;
@@ -57,7 +53,7 @@
 }
 
 .swagger-ui .info hgroup.main {
-    margin: 0;
+    margin: 0 !important;
 }
 
 .swagger-ui .tab li {
@@ -73,8 +69,8 @@
 
 /* in case we want to reduce padding */
 .swagger-ui .opblock-tag {
-    padding: 5px 0;
-    font-size: 20px;
+    padding: 5px 0 !important;
+    font-size: 20px !important;
 }
 
 .swagger-ui .btn:hover,
@@ -92,11 +88,6 @@
 .swagger-ui .btn.cancel:active {
     border-color: #ff6060;
     color: #ff6060;
-}
-
-/* hide errors at top of the page */
-.swagger-ui .errors-wrapper {
-    display: none !important;
 }
 
 @media only screen and (max-width: 1024px) {
@@ -124,7 +115,7 @@
     }
 
     .swagger-ui .opblock-tag small {
-        font-size: 12px;
+        font-size: 14px !important;
     }
 }
 
