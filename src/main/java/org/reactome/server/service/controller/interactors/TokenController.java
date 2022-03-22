@@ -1,6 +1,10 @@
 package org.reactome.server.service.controller.interactors;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.interactors.exception.CustomPsicquicInteractionClusterException;
 import org.reactome.server.interactors.model.Interaction;
 import org.reactome.server.service.exception.ErrorInfo;
@@ -22,7 +26,7 @@ import java.util.Set;
  */
 
 @SuppressWarnings("unused")
-@Api(tags = {"interactors"})
+@Tag(name = "interactors", description = "Molecule interactors")
 @RequestMapping(value = "/interactors/token")
 @RestController
 public class TokenController {
@@ -37,17 +41,17 @@ public class TokenController {
     @Autowired
     public InteractionManager interactionManager;
 
-    @ApiOperation(value = "Retrieve custom interactions associated with a token", response = Interactors.class, produces = "application/json")
+    @Operation(summary = "Retrieve custom interactions associated with a token")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Could not find the given token", response = ErrorInfo.class),
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "404", description = "Could not find the given token"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/{token}", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
-    public Interactors getInteractors(@ApiParam(value = "A token associated with a data submission", required = true)
+    public Interactors getInteractors(@Parameter(description = "A token associated with a data submission", required = true)
                                       @PathVariable String token,
-                                      @ApiParam(value = "Interactors accessions", required = true)
+                                      @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "<b>Interactors</b> Interactors accessions", required = true)
                                       @RequestBody String proteins) throws CustomPsicquicInteractionClusterException {
         infoLogger.info("Token {} query has been submitted", token);
         // Split param and put into a Set to avoid duplicates

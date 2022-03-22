@@ -1,6 +1,6 @@
 package org.reactome.server.service.model.interactors;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.reactome.server.graph.domain.model.Interaction;
 
 import java.util.ArrayList;
@@ -14,15 +14,16 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Interactors {
 
-    @ApiModelProperty(value = "This is the resource where interactors have been queried.")
+    @Schema(description = "This is the resource where interactors have been queried.")
     private String resource;
 
-    @ApiModelProperty(value = "This is the list of entities which have been requested.")
+    @Schema(description = "This is the list of entities which have been requested.")
     private List<InteractorEntity> entities = new ArrayList<>();
 
-    public Interactors() { }
+    public Interactors() {
+    }
 
-    public void add(String acc, List<Interaction> interactions){
+    public void add(String acc, List<Interaction> interactions) {
         entities.add(new InteractorEntity(acc, interactions));
     }
 

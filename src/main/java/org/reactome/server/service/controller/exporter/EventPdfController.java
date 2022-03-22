@@ -1,6 +1,12 @@
 package org.reactome.server.service.controller.exporter;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.analysis.core.result.AnalysisStoredResult;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
 import org.reactome.server.graph.domain.model.Event;
@@ -28,7 +34,7 @@ import java.net.URL;
  * @author Lorente-Arencibia, Pascual (plorente@ebi.ac.uk)
  */
 @RestController
-@Api(tags = {"exporter"})
+@Tag(name = "exporter", description = "Reactome Data: Format Exporter")
 @RequestMapping("/exporter")
 public class EventPdfController {
 
@@ -48,38 +54,38 @@ public class EventPdfController {
     private TokenUtils tokenUtils;
     private EventExporter eventExporter;
 
-    @ApiOperation(
-            value = "Exports the content of a given event (pathway or reaction) to a PDF document",
-            notes = "This method accepts identifiers for <a href=\"/content/schema/Event\" target=\"_blank\">Event class</a> instances." +
+    @Operation(
+            summary = "Exports the content of a given event (pathway or reaction) to a PDF document",
+            description = "This method accepts identifiers for <a href=\"/content/schema/Event\" target=\"_blank\">Event class</a> instances." +
                     "<br/>The generated document contains the details for the given event and, optionally, its children (see level parameter). These details include:" +
                     "<br/> - A diagram image" +
                     "<br/> - Summation" +
                     "<br/> - Literature references" +
                     "<br/> - Edit history" +
                     "<br/> - Other details: type, location, compartments, diseases" +
-                    "<br/><br/>Documents can also be overlaid with <a href='/dev/analysis' target=\"_blank\">pathway analysis results</a>",
-            produces = "application/pdf"
+                    "<br/><br/>Documents can also be overlaid with <a href='/dev/analysis' target=\"_blank\">pathway analysis results</a>"
     )
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Stable Identifier does not match with any of the available diagrams."),
-            @ApiResponse(code = 500, message = "Could not deserialize diagram file."),
-            @ApiResponse(code = 503, message = "Service was unable to export to Power Point.")
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/pdf")),
+            @ApiResponse(responseCode = "404", description = "Stable Identifier does not match with any of the available diagrams."),
+            @ApiResponse(responseCode = "500", description = "Could not deserialize diagram file."),
+            @ApiResponse(responseCode = "503", description = "Service was unable to export to Power Point.")
     })
-    @RequestMapping(value = "/document/event/{identifier}.pdf", method = RequestMethod.GET)
-    public void eventPdf(@ApiParam(value = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, defaultValue = "R-HSA-177929")
+    @RequestMapping(value = "/document/event/{identifier}.pdf", method = RequestMethod.GET, produces = "application/pdf")
+    public void eventPdf(@Parameter(description = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, example = "R-HSA-177929")
                          @PathVariable String identifier,
 
-                         @ApiParam(value = "Number of levels to explore down in the pathways hierarchy [0 - 1]", defaultValue = "1")
+                         @Parameter(description = "Number of levels to explore down in the pathways hierarchy [0 - 1]", example = "1")
                          @RequestParam(value = "level [0 - 1]", required = false, defaultValue = "1") Integer level,
-                         @ApiParam(value = "Diagram Color Profile", defaultValue = "Modern", allowableValues = "Modern, Standard")
+                         @Parameter(description = "Diagram Color Profile", example = "Modern", schema = @Schema(allowableValues = {"Modern", "Standard"}))
                          @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
-                         @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
+                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram", example = "MjAyMjAzMDkwODU0NTlfMTU2ND")
                          @RequestParam(value = "token", required = false) String token,
-                         @ApiParam(value = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
                          @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
-                         @ApiParam(value = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
+                         @Parameter(description = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
-                         @ApiParam(value = "Analysis  Color Profile", defaultValue = "Standard", allowableValues = "Standard, Strosobar, Copper%20Plus")
+                         @Parameter(description = "Analysis  Color Profile", example = "Standard",schema = @Schema(allowableValues = {"Standard", "Strosobar", "Copper%20Plus"}))
                          @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
 
                          HttpServletRequest request, HttpServletResponse response) throws IOException, InterruptedException {

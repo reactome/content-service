@@ -1,13 +1,11 @@
 package org.reactome.server.service.controller.graph;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.Species;
-import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
 import org.reactome.server.graph.service.SpeciesService;
-import org.reactome.server.service.exception.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @RestController
-@Api(tags = {"species"})
+@Tag(name = "species", description = "Reactome Data: Species related queries")
 @RequestMapping("/data")
 public class SpeciesController {
 
@@ -32,10 +30,10 @@ public class SpeciesController {
     @Autowired
     SpeciesService speciesService;
 
-    @ApiOperation(value = "The list of main species in Reactome", notes = "This method retrieves the list of main species in Reactome knowledgebase, sorted by name, but having 'Homo sapiens' as the first one. It should be mentioned that for Reactome, main species are considered those have either manually curated or computationally inferred pathways.", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @Operation(summary = "The list of main species in Reactome", description = "This method retrieves the list of main species in Reactome knowledgebase, sorted by name, but having 'Homo sapiens' as the first one. It should be mentioned that for Reactome, main species are considered those have either manually curated or computationally inferred pathways.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/species/main", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -44,10 +42,10 @@ public class SpeciesController {
         return speciesService.getSpecies();
     }
 
-    @ApiOperation(value = "The list of all species in Reactome", notes = "This method retrieves the list of all species in Reactome knowledgebase, sorted by name.", response = SimpleDatabaseObject.class, responseContainer = "List", produces = "application/json")
+    @Operation(summary = "The list of all species in Reactome", description = "This method retrieves the list of all species in Reactome knowledgebase, sorted by name.")
     @ApiResponses({
-            @ApiResponse(code = 406, message = "Not acceptable according to the accept headers sent in the request", response = ErrorInfo.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorInfo.class)
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/species/all", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody

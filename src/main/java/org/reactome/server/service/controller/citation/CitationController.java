@@ -2,7 +2,8 @@ package org.reactome.server.service.controller.citation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -47,7 +47,7 @@ import java.util.*;
  * @since 11.02.2
  */
 
-@ApiIgnore
+@Hidden
 @RestController
 @RequestMapping("/citation")
 public class CitationController {
@@ -69,16 +69,16 @@ public class CitationController {
 
     // end point for getting data for citing a pathway
     @GetMapping(value = "/pathway/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, String>> pathwayCitation(@ApiParam(value = "DbId or StId of the requested database object", required = true)
-                                                           @PathVariable String id,
-                                                           @RequestParam String dateAccessed) {
+    public ResponseEntity<Map<String, String>> pathwayCitation(@Parameter(description = "DbId or StId of the requested database object", required = true)
+                                                               @PathVariable String id,
+                                                               @RequestParam String dateAccessed) {
         PathwayCitation pathwayCitation = getPathwayCitationObject(id);
         Map<String, String> map = new HashMap<>();
         if (pathwayCitation == null) {
             return ResponseEntity.ok(map);
         }
-        map.put("pathwayCitation",pathwayCitation.pathwayCitation(dateAccessed));
-        map.put("imageCitation",pathwayCitation.imageCitation(dateAccessed));
+        map.put("pathwayCitation", pathwayCitation.pathwayCitation(dateAccessed));
+        map.put("imageCitation", pathwayCitation.imageCitation(dateAccessed));
 
         return ResponseEntity.ok(map);
     }
@@ -94,11 +94,11 @@ public class CitationController {
 
     // end point for getting data for citing any static citation, given the PMID
     @GetMapping(value = "/static/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> staticCitation(@ApiParam(value = "PMID of the requested citation", required = true)
+    public ResponseEntity<String> staticCitation(@Parameter(description = "PMID of the requested citation", required = true)
                                                  @PathVariable String id) {
         StaticCitation staticCitation = getStaticCitationObject(id);
-        if(staticCitation == null) {
-            return new ResponseEntity(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (staticCitation == null) {
+            return new ResponseEntity<>(STATIC_CITATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return ResponseEntity.ok(staticCitation.toText(null));
     }
@@ -222,7 +222,7 @@ public class CitationController {
                     String jsonResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
                     ObjectMapper objectMapper = new ObjectMapper();
 
-                    Map<String, Object> map = objectMapper.convertValue(objectMapper.readTree(jsonResponse).get("resultList").get("result").get(0), new TypeReference<Map<String, Object>>() {
+                    Map<String, Object> map = objectMapper.convertValue(objectMapper.readTree(jsonResponse).get("resultList").get("result").get(0), new TypeReference<>() {
                     });
                     Map<String, Object> journalInfo = map.containsKey("journalInfo") ? (Map<String, Object>) map.get("journalInfo") : null;
                     Map<String, Object> journal = journalInfo != null && journalInfo.containsKey("journal") ? (Map<String, Object>) journalInfo.get("journal") : null;
@@ -270,14 +270,16 @@ public class CitationController {
 
     // code taken from: https://www.javacodemonk.com/disable-ssl-certificate-check-resttemplate-e2c53583
     private SSLContext getAllSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
-        TrustManager[] trustAllCerts = new TrustManager[] {
+        TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
                     }
+
                     public void checkClientTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
+
                     public void checkServerTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
