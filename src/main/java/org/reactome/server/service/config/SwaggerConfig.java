@@ -8,9 +8,11 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reflections.Reflections;
 import org.springdoc.core.SpringDocUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import javax.servlet.ServletContext;
 
 /**
  * @author Guilherme S Viteri (gviteri@ebi.ac.uk)
@@ -19,8 +21,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
+    @Lazy
     @Bean
-    public OpenAPI createRestApi(@Value("${server.servlet.context-path}") String contextPath) {
+    public OpenAPI createRestApi(ServletContext context) {
         Reflections reflections = new Reflections(DatabaseObject.class.getPackage().getName());
         SpringDocUtils config = SpringDocUtils.getConfig();
         for (Class<?> clazz : reflections.getSubTypesOf(DatabaseObject.class)) {
@@ -28,7 +31,7 @@ public class SwaggerConfig {
         }
 
         return new OpenAPI()
-                .addServersItem(new Server().url(contextPath))
+                .addServersItem(new Server().url(context.getContextPath()))
                 .info(new Info()
                         .title("Content Service")
                         .description("REST API for Reactome content")
