@@ -70,7 +70,7 @@ public class EventsController {
     @RequestMapping(value = "/eventsHierarchy/{species}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Collection<PathwayBrowserNode> getEventHierarchy(@Parameter(description = "Allowed species filter: SpeciesName (eg: Homo sapiens) SpeciesTaxId (eg: 9606)", example = "9606", required = true) @PathVariable String species, HttpServletResponse response) {
-        Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species).stream().sorted().collect(Collectors.toList());
+        Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species);
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty())
             throw new NotFoundException("No event hierarchy found for given species: " + species);
         response.setHeader("Content-Disposition", "inline; swaggerDownload=\"attachment\"; filename=\"" + species + ".json\"");
