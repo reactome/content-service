@@ -75,6 +75,6 @@ public class EventsController {
             throw new NotFoundException("No event hierarchy found for given species: " + species);
         response.setHeader("Content-Disposition", "inline; swaggerDownload=\"attachment\"; filename=\"" + species + ".json\"");
         infoLogger.info("Request for full event hierarchy");
-        return pathwayBrowserNodes;
+        return pathwayBrowserNodes.stream().sorted().collect(Collectors.toList());
     }
 }
