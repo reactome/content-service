@@ -5,7 +5,7 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>2.1.1</version>
+    <version>2.1.2-SNAPSHOT</version>
     <name>content-service</name>
 
     <parent>
@@ -38,7 +38,7 @@
     </developers>
 
     <properties>
-        <graph.core>2.0.1</graph.core>
+        <graph.core>2.0.2-SNAPSHOT</graph.core>
         <search.core>1.4.5</search.core>
         <interactor.core>1.1.0</interactor.core>
         <diagram.exporter>2.0.3</diagram.exporter>
