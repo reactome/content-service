@@ -101,10 +101,12 @@ class SearchController {
                                    @Parameter(description = "Species name") @RequestParam(required = false) List<String> species, // default value isn't supported by Swagger.
                                    @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
                                    @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
-                                   @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords) throws SolrSearcherException {
+                                   @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords,
+                                   @Parameter(description = "Force filters<br>In case where applied filters yield to no results, filters are removed by default to grant results as much as possible. Set <b>Force filters</b> to true to avoid this behaviour")
+                                   @RequestParam(value = "Force filters", required = false, defaultValue = "false") Boolean forceFilters) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).build();
-        return searchService.getFacetingInformation(queryObject);
+        return searchService.getFacetingInformation(queryObject, forceFilters);
     }
 
     @Operation(summary = "Queries Solr against the Reactome knowledgebase", description = "This method performs a Solr query on the Reactome knowledgebase. Results can be provided in a paginated format.")
@@ -124,10 +126,12 @@ class SearchController {
                                          @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                          @Parameter(description = "Start row", example = "0") @RequestParam(value = "Start row", required = false, defaultValue = "0") Integer start,
                                          @Parameter(description = "Number of rows to include", example = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
+                                         @Parameter(description = "Force filters<br>In case where applied filters yield to no results, filters are removed by default to grant results as much as possible. Set <b>Force filters</b> to true to avoid this behaviour")
+                                         @RequestParam(value = "Force filters", required = false, defaultValue = "false") Boolean forceFilters,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
         Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
-        SearchResult searchResult = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster);
+        SearchResult searchResult = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster, forceFilters);
         GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
             Set<TargetResult> targets = null;
