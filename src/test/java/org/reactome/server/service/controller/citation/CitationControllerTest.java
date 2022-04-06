@@ -26,7 +26,7 @@ public class CitationControllerTest extends BaseTest {
     }
 
     @Test
-    public void staticCitation() throws Exception {
+    public void statiscpcCitation() throws Exception {
         mockMvcGetResult("/citation/static/29186351", "text/plain;charset=UTF-8", "dateAccessed", date);
     }
 
@@ -38,5 +38,11 @@ public class CitationControllerTest extends BaseTest {
         params.put("id", 29377902);
         params.put("dateAccessed", date);
         mockMvcGetResult("/citation/export", "application/x-bibtex;charset=UTF-8", params);
+    }
+
+    @Test
+    public void exportIdentifier() throws Exception {
+        String ext = "bib";
+        mockMvcGetResult("/citation/export/R-HSA-9694516", "application/x-bibtex;charset=UTF-8", "ext", ext);
     }
 }

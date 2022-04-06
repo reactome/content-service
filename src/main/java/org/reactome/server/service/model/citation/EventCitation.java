@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PathwayCitation extends Citation {
+public class EventCitation extends Citation {
     private String reactomeReleaseVersion;
     private static final String DEFAULT_AUTHOR_STRING = "The Reactome Consortium";
 
-    public PathwayCitation(String id, String title) {
+    public EventCitation(String id, String title) {
         super(id, title);
     }
 
@@ -130,11 +130,11 @@ public class PathwayCitation extends Citation {
 
     // converts citation to textual format
     public String toText(String dateOfAccess) {
-        return "Pathway Citation: " + pathwayCitation(dateOfAccess) + "\n" + "Image Citation: " + imageCitation(dateOfAccess);
+        return "Pathway Citation: " + eventCitation(dateOfAccess) + "\n" + "Image Citation: " + imageCitation(dateOfAccess);
     }
 
-    public String pathwayCitation(String dateOfAccess) {
-        String pathwayCitation;
+    public String eventCitation(String dateOfAccess) {
+        String eventCitation;
 
         // adding authors
         if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
@@ -147,14 +147,14 @@ public class PathwayCitation extends Citation {
                 authorCitation = String.join(" " + ",", authorDetails.subList(0,authorDetails.size() - 1)) + " & " + authorCitation;
             }
 
-            pathwayCitation = authorCitation;
+            eventCitation = authorCitation;
         } else {
-            pathwayCitation = DEFAULT_AUTHOR_STRING;
+            eventCitation = DEFAULT_AUTHOR_STRING;
         }
 
-        if (this.getYear() != null) pathwayCitation += " (" + this.getYear() + "). "; // setting year
-        pathwayCitation += commonCitation(dateOfAccess);
-        return pathwayCitation;
+        if (this.getYear() != null) eventCitation += " (" + this.getYear() + "). "; // setting year
+        eventCitation += commonCitation(dateOfAccess);
+        return eventCitation;
     }
 
     public String imageCitation(String dateOfAccess) {
