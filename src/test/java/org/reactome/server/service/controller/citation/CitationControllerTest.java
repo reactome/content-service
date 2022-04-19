@@ -26,7 +26,7 @@ public class CitationControllerTest extends BaseTest {
     }
 
     @Test
-    public void statiscpcCitation() throws Exception {
+    public void staticCitation() throws Exception {
         mockMvcGetResult("/citation/static/29186351", "text/plain;charset=UTF-8", "dateAccessed", date);
     }
 
