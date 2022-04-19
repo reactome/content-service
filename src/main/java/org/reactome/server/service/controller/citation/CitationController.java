@@ -241,7 +241,7 @@ public class CitationController {
     private StaticCitation getStaticCitationObject(String id) {
         try {
             HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
-                    .setParameter("query", "ext_id:" + id)
+                    .setParameter("query", "src:med ext_id:" + id)
                     .setParameter("format", "json")
                     .setParameter("resultType", "core")
                     .build());
