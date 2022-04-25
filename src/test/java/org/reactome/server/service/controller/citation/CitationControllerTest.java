@@ -39,4 +39,10 @@ public class CitationControllerTest extends BaseTest {
         params.put("dateAccessed", date);
         mockMvcGetResult("/citation/export", "application/x-bibtex;charset=UTF-8", params);
     }
+
+    @Test
+    public void exportIdentifier() throws Exception {
+        String ext = "bib";
+        mockMvcGetResult("/citation/export/R-HSA-9694516", "application/x-bibtex;charset=UTF-8", "ext", ext);
+    }
 }

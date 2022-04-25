@@ -12,14 +12,11 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.reactome.server.graph.domain.model.DatabaseObject;
-import org.reactome.server.graph.domain.model.InstanceEdit;
-import org.reactome.server.graph.domain.model.Pathway;
-import org.reactome.server.graph.domain.model.Person;
+import org.reactome.server.graph.domain.model.*;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.service.model.citation.Citation;
-import org.reactome.server.service.model.citation.PathwayCitation;
+import org.reactome.server.service.model.citation.EventCitation;
 import org.reactome.server.service.model.citation.StaticCitation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +33,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 
 /**
@@ -56,6 +57,7 @@ public class CitationController {
     private static final String STATIC_CITATION_ERROR = "Unable to fetch static citation";
     private static final String DOI_BASE_URL = "https://doi.org/";
     private static final String EUROPE_PMC_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
+    private static final String WHITESPACE = " ";
 
 
     private final AdvancedDatabaseObjectService advancedDatabaseObjectService;
@@ -72,13 +74,13 @@ public class CitationController {
     public ResponseEntity<Map<String, String>> pathwayCitation(@Parameter(description = "DbId or StId of the requested database object", required = true)
                                                                @PathVariable String id,
                                                                @RequestParam String dateAccessed) {
-        PathwayCitation pathwayCitation = getPathwayCitationObject(id);
+        EventCitation eventCitation = getEventCitationObject(id);
         Map<String, String> map = new HashMap<>();
-        if (pathwayCitation == null) {
+        if (eventCitation == null) {
             return ResponseEntity.ok(map);
         }
-        map.put("pathwayCitation", pathwayCitation.pathwayCitation(dateAccessed));
-        map.put("imageCitation", pathwayCitation.imageCitation(dateAccessed));
+        map.put("pathwayCitation", eventCitation.eventCitation(dateAccessed));
+        map.put("imageCitation", eventCitation.imageCitation(dateAccessed));
 
         return ResponseEntity.ok(map);
     }
@@ -103,7 +105,7 @@ public class CitationController {
         return ResponseEntity.ok(staticCitation.toText(null));
     }
 
-
+    // end point for exporting citation, use this endpoint on the citation pop-up window
     @GetMapping(value = "/export")
     public void export(@RequestParam Boolean isPathway,
                        @RequestParam String id,
@@ -112,10 +114,38 @@ public class CitationController {
                        HttpServletResponse response) throws IOException {
 
         Citation citation;
-
-        if (isPathway) citation = getPathwayCitationObject(id);
+        if (isPathway) citation = getEventCitationObject(id);
         else citation = getStaticCitationObject(id);
+        exportCitation(id, ext, response, dateAccessed, citation);
+    }
 
+    /* end point for exporting citation with identifier and ext only, use this to export bibtex on the Person detail page
+       Example: https://reactome.org/content/detail/person/0000-0002-7864-5971
+     */
+    @GetMapping(value = "/export/{id}")
+    public void exportIdentifier(@Parameter(description = "DbId or StId of the requested database object")
+                                 @PathVariable String id,
+                                 @Parameter(description = "Format in which you want to download the citation")
+                                 @RequestParam(name = "ext", required = false) String ext,
+                                 HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
+
+        LocalDate now = LocalDate.now();
+        String dayAndYear = now.format(DateTimeFormatter.ofPattern("dd yyyy"));
+        String month = now.getMonth().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.ENGLISH);
+        String dayOfWeek = now.getDayOfWeek().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.ENGLISH);
+        //format example: Tue Apr 05 2022
+        String dateAccessed = dayOfWeek.concat(WHITESPACE).concat(month).concat(WHITESPACE).concat(dayAndYear);
+
+        Citation citation = getEventCitationObject(id);
+        exportCitation(id, ext, response, dateAccessed, citation);
+    }
+
+    public void exportCitation(@PathVariable String id,
+                               @RequestParam(name = "ext", required = false)
+                               @Parameter(description = "Format in which you want to download the citation") String ext,
+                               HttpServletResponse response,
+                               String dateAccessed,
+                               Citation citation) throws IOException {
         if (citation != null) {
             String filename = "reactome_citation_" + id;
             String contentType = "text/plain";
@@ -149,24 +179,30 @@ public class CitationController {
         }
     }
 
-
-    private PathwayCitation getPathwayCitationObject(String id) {
+    private EventCitation getEventCitationObject(String id) {
         DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id);
-        PathwayCitation pathwayCitation = null;
-        if (databaseObject instanceof Pathway) {
-            Pathway p = (Pathway) databaseObject;
-            pathwayCitation = new PathwayCitation(id, p.getDisplayName());
-            pathwayCitation.setYear(p.getReleaseDate().substring(0, 4));
-            pathwayCitation.setMonth(p.getReleaseDate().substring(6, 7));
-            String doi = p.getDoi();
-            List<String> urls = new ArrayList<>();
-            if (doi != null && !doi.isEmpty()) {
-                pathwayCitation.setDoi(doi);
-                urls.add(DOI_BASE_URL + p.getDoi());
-            } else urls.add("https://reactome.org" + "/content/detail/" + id);
-            pathwayCitation.setUrls(urls);
+        EventCitation eventCitation = null;
+        if (databaseObject instanceof Event) {
+            Event event = (Event) databaseObject;
+            eventCitation = new EventCitation(id, event.getDisplayName());
+            eventCitation.setYear(event.getReleaseDate().substring(0, 4));
+            eventCitation.setMonth(event.getReleaseDate().substring(6, 7));
 
-            pathwayCitation.setReactomeReleaseVersion(generalService.getDBInfo().getVersion().toString());
+            List<String> urls = new ArrayList<>();
+            boolean hasDOI = false;
+            if (event instanceof Pathway) {
+                String doi = ((Pathway) event).getDoi();
+                if (doi != null && !doi.isEmpty()) {
+                    eventCitation.setDoi(doi);
+                    urls.add(DOI_BASE_URL + doi);
+                    hasDOI = true;
+                }
+            }
+
+            if (!hasDOI) urls.add("https://reactome.org" + "/content/detail/" + id);
+
+            eventCitation.setUrls(urls);
+            eventCitation.setReactomeReleaseVersion(generalService.getDBInfo().getVersion().toString());
 
             List<Map<String, String>> authors = null;
             List<InstanceEdit> instanceEdits = null;
@@ -176,13 +212,13 @@ public class CitationController {
             // this is because we have pathways with missing authors, creators and reviewers
             // in case none of these are available, the `authors` field will have a null value and
             // won't show up in the response at all
-            if (p.getAuthored() != null && !p.getAuthored().isEmpty()) {
-                instanceEdits = p.getAuthored();
-            } else if (p.getCreated() != null) {
+            if (event.getAuthored() != null && !event.getAuthored().isEmpty()) {
+                instanceEdits = event.getAuthored();
+            } else if (event.getCreated() != null) {
                 instanceEdits = new ArrayList<>();
-                instanceEdits.add(p.getCreated());
-            } else if (p.getReviewed() != null && !p.getReviewed().isEmpty()) {
-                instanceEdits = p.getReviewed();
+                instanceEdits.add(event.getCreated());
+            } else if (event.getReviewed() != null && !event.getReviewed().isEmpty()) {
+                instanceEdits = event.getReviewed();
             }
 
             if (instanceEdits != null) {
@@ -197,15 +233,15 @@ public class CitationController {
                     }
                 }
             }
-            pathwayCitation.setAuthors(authors);
+            eventCitation.setAuthors(authors);
         }
-        return pathwayCitation;
+        return eventCitation;
     }
 
     private StaticCitation getStaticCitationObject(String id) {
         try {
             HttpGet request = new HttpGet(new URIBuilder(EUROPE_PMC_URL)
-                    .setParameter("query", "ext_id:" + id)
+                    .setParameter("query", "src:med ext_id:" + id)
                     .setParameter("format", "json")
                     .setParameter("resultType", "core")
                     .build());
