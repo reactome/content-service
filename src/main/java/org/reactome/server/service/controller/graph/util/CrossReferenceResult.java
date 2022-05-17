@@ -1,5 +1,6 @@
 package org.reactome.server.service.controller.graph.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
 import org.reactome.server.graph.domain.result.CustomQuery;
@@ -14,6 +15,7 @@ public class CrossReferenceResult implements CustomQuery {
 
 
     public static CrossReferenceResult EMPTY = new CrossReferenceResult();
+
     static {
         EMPTY.setReference("NO MATCH");
         EMPTY.setPhysicalEntities(List.of());
@@ -47,6 +49,7 @@ public class CrossReferenceResult implements CustomQuery {
         this.crossReferences = crossReferences;
     }
 
+    @JsonIgnore
     public boolean isEmpty() {
         return this == EMPTY;
     }
