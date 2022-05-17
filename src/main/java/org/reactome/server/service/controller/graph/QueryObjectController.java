@@ -87,7 +87,7 @@ public class QueryObjectController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     @RequestMapping(value = "/query/ids", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
-    @ResponseBody //TODO: Swagger is not showing the defaultValue
+    @ResponseBody
     public Collection<DatabaseObject> findByIds(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "A comma separated list of identifiers",
