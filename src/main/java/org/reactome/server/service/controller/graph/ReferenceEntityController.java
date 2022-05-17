@@ -96,7 +96,7 @@ public class ReferenceEntityController {
             @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @RequestMapping(value = "/mapping/xrefs", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/mapping/xrefs", method = RequestMethod.POST, produces = "application/json", consumes = "text/plain")
     @ResponseBody
     @JsonInclude
     public Page<Map<String, Collection<CrossReferenceResult>>> getCrossReferencesForList(
@@ -111,7 +111,7 @@ public class ReferenceEntityController {
             @RequestBody String post
     ) {
         String[] identifiers = post.split(",|;|\\n|\\t");
-        PageImpl<Map<String, Collection<CrossReferenceResult>>> maps = new PageImpl<>(
+        return new PageImpl<>(
                 Arrays.stream(identifiers)
                         .skip((long) page * pageSize)
                         .limit(pageSize)
@@ -120,7 +120,6 @@ public class ReferenceEntityController {
                         .map(s -> Map.of(s, getCrossReferenceResults(s, dbFilter)))
                         .collect(Collectors.toList()),
                 PageRequest.of(page, pageSize), identifiers.length);
-        return maps;
     }
 
     private Collection<CrossReferenceResult> getCrossReferenceResults(String identifier, String dbFilter) {
