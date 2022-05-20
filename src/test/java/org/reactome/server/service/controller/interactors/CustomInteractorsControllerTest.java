@@ -82,7 +82,7 @@ public class CustomInteractorsControllerTest extends BaseTest {
 
     @Test
     public void postUrl() throws Exception {
-        String url = "http://mentha.uniroma2.it:9090/psicquic/webservices/current/search/query/Q12030";
+        String url = "http://www.ebi.ac.uk/Tools/webservices/psicquic/intact/webservices/current/search/query/Q12030";
         mockMvcPostResult("/interactors/upload/tuple/url", url, "name", "CSTest");
     }
 }

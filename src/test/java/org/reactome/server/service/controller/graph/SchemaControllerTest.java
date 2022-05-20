@@ -45,4 +45,9 @@ public class SchemaControllerTest extends BaseTest {
     public void countEntries() throws Exception {
         mockMvcGetResult("/data/schema/TopLevelPathway/count", "Application/json;Charset=UTF-8", "species", "9606");
     }
+
+    @Test
+    public void getSchemaModel() throws Exception{
+        mockMvcGetResult("/data/schema/model");
+    }
 }

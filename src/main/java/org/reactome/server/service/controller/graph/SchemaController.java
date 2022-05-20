@@ -128,6 +128,11 @@ public class SchemaController {
         }
     }
 
+    @Operation(summary = "A list of Reactome data model", description = "This method retrieves a full specification of all Reactome classes.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @RequestMapping(value = "/schema/model", method = RequestMethod.GET, produces = {"application/json"})
     public SchemaNode getSchemaModel() {
         if (cacheSchema == null) {
