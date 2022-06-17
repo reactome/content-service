@@ -207,7 +207,7 @@ public class ImageExporterController {
                               @Parameter(description = "Diagram Color Profile", example = "Modern", schema = @Schema(allowableValues = {"Modern", "Standard"}))
                               @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
 
-                              @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given reaction", example = "MjAyMjAzMDkwODU0NTlfMTU2ND")
+                              @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given reaction")
                               @RequestParam(value = "token", required = false) String token,
                               @Parameter(description = "Analysis  Color Profile", example = "Standard", schema = @Schema(allowableValues = {"Standard", "Strosobar, Copper%20Plus"}))
                               @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
