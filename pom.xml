@@ -41,7 +41,7 @@
         <graph.core>2.0.3</graph.core>
         <search.core>1.4.7</search.core>
         <interactor.core>1.1.0</interactor.core>
-        <diagram.exporter>2.0.4</diagram.exporter>
+        <diagram.exporter>2.0.5-SNAPSHOT</diagram.exporter>
         <fireworks.exporter>1.2.2</fireworks.exporter>
         <reaction.exporter>1.2.2</reaction.exporter>
         <sbml.exporter>2.2.2</sbml.exporter>
