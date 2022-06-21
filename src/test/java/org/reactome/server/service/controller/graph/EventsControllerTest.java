@@ -4,6 +4,8 @@ package org.reactome.server.service.controller.graph;
 import org.junit.jupiter.api.Test;
 import org.reactome.server.service.utils.BaseTest;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class EventsControllerTest extends BaseTest {
@@ -18,6 +20,10 @@ public class EventsControllerTest extends BaseTest {
 
     @Test
     public void getEventHierarchy() throws Exception {
-        mockMvcGetResult("/data/eventsHierarchy/9913", "application/json;Charset=UTF-8");
+        Map<String, Object> params = new HashMap<>();
+        params.put("pathwaysOnly", false);
+        params.put("resource", "TOTAL");
+        params.put("interactors", false);
+        mockMvcGetResult("/data/eventsHierarchy/9913", "application/json;Charset=UTF-8", params);
     }
 }
