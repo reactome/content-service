@@ -79,7 +79,7 @@ public class EventPdfController {
                          @RequestParam(value = "level [0 - 1]", required = false, defaultValue = "1") Integer level,
                          @Parameter(description = "Diagram Color Profile", example = "Modern", schema = @Schema(allowableValues = {"Modern", "Standard"}))
                          @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
-                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram", example = "MjAyMjAzMDkwODU0NTlfMTU2ND")
+                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
                          @RequestParam(value = "token", required = false) String token,
                          @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
                          @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,

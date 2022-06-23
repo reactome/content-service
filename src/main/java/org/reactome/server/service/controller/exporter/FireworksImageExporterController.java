@@ -71,7 +71,7 @@ public class FireworksImageExporterController {
 
                              @Parameter(description = "Diagram Color Profile", example = "Copper",schema = @Schema(allowableValues = {"Copper", "Copper plus", "Barium Lithium", "Calcium Salts"}))
                              @RequestParam(value = "diagramProfile", defaultValue = "Copper", required = false) String profile,
-                             @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given pathways overview", example = "MjAyMjAzMDkwODU0NTlfMTU2ND")
+                             @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given pathways overview")
                              @RequestParam(value = "token", required = false) String token,
                              @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
                              @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
