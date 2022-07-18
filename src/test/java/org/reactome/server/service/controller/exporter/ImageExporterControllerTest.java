@@ -33,6 +33,6 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("flgInteractors", true);
         params.put("resource", "total");
 
-        mockMvcGetResult("/exporter/reaction/70272.jpg", "image/jpg;;charset=UTF-8", params);
+        mockMvcGetResult("/exporter/reaction/8963915.jpg", "image/jpg;;charset=UTF-8", params);
     }
 }

@@ -56,7 +56,7 @@ public class BaseTest {
     public MvcResult mockMvcGetResult(String url, String contentType, Map<String, Object> params) throws Exception {
         if (contentType == null) {
             return this.mockMvc.perform(
-                    get(url))
+                            get(url))
                     .andExpect(status().isOk())
                     .andReturn();
         }
@@ -72,7 +72,7 @@ public class BaseTest {
                     .andReturn();
         } else {
             return this.mockMvc.perform(
-                    get(url))
+                            get(url))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andReturn();
@@ -106,7 +106,7 @@ public class BaseTest {
                     .andReturn();
         } else {
             return this.mockMvc.perform(
-                    get(url))
+                            get(url))
                     .andExpect(status().isNotFound())
                     .andReturn();
         }
@@ -127,7 +127,7 @@ public class BaseTest {
                     .andReturn();
         } else {
             return this.mockMvc.perform(
-                    get(url))
+                            get(url))
                     .andExpect(status().is5xxServerError())
                     .andReturn();
         }
@@ -165,24 +165,23 @@ public class BaseTest {
                     .andReturn();
         } else {
             return this.mockMvc.perform(
-                    post(url)
-                            .contentType(MediaType.TEXT_PLAIN)
-                            .content(content))
+                            post(url)
+                                    .contentType(MediaType.TEXT_PLAIN)
+                                    .content(content))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/json;charset=UTF-8"))
                     .andReturn();
         }
     }
 
-
     /**
      * post not found request testing of Spring MVC controllers
      */
     public MvcResult mvcPostResultNotFound(String url, String content) throws Exception {
         return this.mockMvc.perform(
-                post(url)
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content(content))
+                        post(url)
+                                .contentType(MediaType.TEXT_PLAIN)
+                                .content(content))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn();

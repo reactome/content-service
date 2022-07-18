@@ -60,7 +60,7 @@ public class WebConfig implements WebMvcConfigurer {
     String mysqlHost;
 
     @Value("${mysql.port}")
-    Integer mysqlPort;
+    String mysqlPort;
 
     @Value("${mysql.database}")
     String mysqlDatabase;
@@ -182,7 +182,7 @@ public class WebConfig implements WebMvcConfigurer {
                                  @Value("${mysql.database}") String mysqlDatabase,
                                  @Value("${mysql.user}") String mysqlUser,
                                  @Value("${mysql.password}") String mysqlPassword,
-                                 @Value("${mysql.port}") Integer mysqlPort) throws SQLException {
-        return new MySQLAdaptor(mysqlHost, mysqlDatabase, mysqlUser, mysqlPassword, mysqlPort);
+                                 @Value("${mysql.port}") String mysqlPort) throws SQLException {
+        return new MySQLAdaptor(mysqlHost, mysqlDatabase, mysqlUser, mysqlPassword, Integer.parseInt(mysqlPort));
     }
 }
