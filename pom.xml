@@ -62,7 +62,7 @@
         <pmd.version>3.14.0</pmd.version>
         <hamcrest.library.version>2.2</hamcrest.library.version>
         <json.path.version>2.5.0</json.path.version>
-        <jsoup.version>1.14.2</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <jackson.annotations.version>2.13.1</jackson.annotations.version>
         <jackson.core>2.13.1</jackson.core>
         <log4j2.version>2.17.1</log4j2.version>
