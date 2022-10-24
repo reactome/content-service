@@ -22,8 +22,8 @@ public class ImageExporterControllerTest extends BaseTest {
         params.put("resource", "total");
         //pathway
         mockMvcGetResult("/exporter/diagram/166520.png", "image/png;charset=UTF-8", params);
-        //reaction
-        mockMvcGetResult("/exporter/diagram/6789031.png", "image/png;charset=UTF-8", params);
+
+        mockMvcGetResult("/exporter/diagram/3928662.svg", "image/svg+xml;charset=UTF-8 ", params);
     }
 
     @Test
