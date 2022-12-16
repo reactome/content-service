@@ -39,8 +39,7 @@ Please refer to Maven Profile [Guideline](http://maven.apache.org/guides/introdu
         <mail.enable.auth>true</mail.enable.auth>
 
         <!-- Neo4J Configuration -->
-        <neo4j.host>localhost</neo4j.host>
-        <neo4j.port>7474</neo4j.port>
+        <neo4j.uri>bolt://localhost:7687</neo4j.uri>
         <neo4j.user>neo4j</neo4j.user>
         <neo4j.password>password</neo4j.password>
 
@@ -101,7 +100,7 @@ Please refer to Maven Profile [Guideline](http://maven.apache.org/guides/introdu
 
 ##### Running ContentService activating ```reactome``` profile.
 ```console
-mvn tomcat7:run -P reactome
+mvn spring-boot:run -P reactome
 ```
 
 Check if Tomcat has been initialised
