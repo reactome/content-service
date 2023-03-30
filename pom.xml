@@ -5,13 +5,13 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>2.1.8</version>
+    <version>2.1.8-SNAPSHOT</version>
     <name>content-service</name>
 
     <parent>
         <groupId>org.reactome.maven</groupId>
         <artifactId>reactome-parent</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
 
@@ -300,7 +300,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.version}</version>
+                <version>3.1.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

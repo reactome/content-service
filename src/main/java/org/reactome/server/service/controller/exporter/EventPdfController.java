@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,23 +73,23 @@ public class EventPdfController {
             @ApiResponse(responseCode = "503", description = "Service was unable to export to Power Point.")
     })
     @RequestMapping(value = "/document/event/{identifier}.pdf", method = RequestMethod.GET, produces = "application/pdf")
-    public void eventPdf(@Parameter(description = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, example = "R-HSA-177929")
+    public StreamingResponseBody eventPdf(@Parameter(description = "Event identifier (it can be a pathway with diagram, a subpathway or a reaction)", required = true, example = "R-HSA-177929")
                          @PathVariable String identifier,
 
-                         @Parameter(description = "Number of levels to explore down in the pathways hierarchy [0 - 1]", example = "1")
+                                          @Parameter(description = "Number of levels to explore down in the pathways hierarchy [0 - 1]", example = "1")
                          @RequestParam(value = "level [0 - 1]", required = false, defaultValue = "1") Integer level,
-                         @Parameter(description = "Diagram Color Profile", example = "Modern", schema = @Schema(allowableValues = {"Modern", "Standard"}))
+                                          @Parameter(description = "Diagram Color Profile", example = "Modern", schema = @Schema(allowableValues = {"Modern", "Standard"}))
                          @RequestParam(value = "diagramProfile", defaultValue = "Modern", required = false) String diagramProfile,
-                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
+                                          @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> token with the results to be overlaid on top of the given diagram")
                          @RequestParam(value = "token", required = false) String token,
-                         @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
+                                          @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
                          @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
-                         @Parameter(description = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
+                                          @Parameter(description = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
-                         @Parameter(description = "Analysis  Color Profile", example = "Standard",schema = @Schema(allowableValues = {"Standard", "Strosobar", "Copper%20Plus"}))
+                                          @Parameter(description = "Analysis  Color Profile", example = "Standard",schema = @Schema(allowableValues = {"Standard", "Strosobar", "Copper%20Plus"}))
                          @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
 
-                         HttpServletRequest request, HttpServletResponse response) throws IOException, InterruptedException {
+                                          HttpServletRequest request, HttpServletResponse response) throws IOException, InterruptedException {
 
         synchronized (REPORT_SEMAPHORE) {
             if (++REPORT_COUNT > ALLOWED_CONCURRENT_REPORTS) {
@@ -110,14 +111,13 @@ public class EventPdfController {
                     .setAnalysisProfile(analysisProfile)
                     .setExpressionColumn(expColumn);
 
-            AnalysisStoredResult analysisResult = null;
-            if (token != null) {
-                analysisResult = tokenUtils.getFromToken(token);
-            }
-
+            AnalysisStoredResult analysisResult = token != null ? tokenUtils.getFromToken(token) : null;
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + event.getStId() + "\".pdf");
-            eventExporter.export(args, analysisResult, response.getOutputStream());
+            return outputStream -> {
+                outputStream.flush();
+                eventExporter.export(args, analysisResult, outputStream);
+            };
 
         } catch (NotFoundException ex) {
             throw new NotFoundException(String.format("'%s' does not exist", identifier));
@@ -131,6 +131,7 @@ public class EventPdfController {
                 REPORT_SEMAPHORE.notify();
             }
         }
+        return null;
     }
 
     private int getLevel(int level) {
