@@ -5,13 +5,13 @@
     <artifactId>content-service</artifactId>
 
     <packaging>war</packaging>
-    <version>2.1.8</version>
+    <version>2.1.9</version>
     <name>content-service</name>
 
     <parent>
         <groupId>org.reactome.maven</groupId>
         <artifactId>reactome-parent</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
 
@@ -77,7 +77,6 @@
         <dependency>
             <groupId>org.reactome.server.tools</groupId>
             <artifactId>diagram-exporter</artifactId>
-            <version>2.0.8-SNAPSHOT</version>
         </dependency>
 
         <dependency>
