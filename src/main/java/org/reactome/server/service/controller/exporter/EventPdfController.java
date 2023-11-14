@@ -84,10 +84,13 @@ public class EventPdfController {
                          @RequestParam(value = "token", required = false) String token,
                          @Parameter(description = "The <a href=\"/dev/analysis\" target=\"_blank\">analysis</a> resource for which the results will be overlaid on top of the given pathways overview")
                          @RequestParam(value = "resource", required = false, defaultValue = "TOTAL") String resource,
+                         @Parameter(name = "importableOnly", description = "Filters resources to only includes importable ones")
+                         @RequestParam(required = false, defaultValue = "false") Boolean importableOnly,
                          @Parameter(description = "Expression column. When the token is associated to an expression analysis, this parameter allows specifying the expression column for the overlay")
                          @RequestParam(value = "expColumn", required = false) Integer expColumn,
-                         @Parameter(description = "Analysis  Color Profile", example = "Standard",schema = @Schema(allowableValues = {"Standard", "Strosobar", "Copper%20Plus"}))
+                         @Parameter(description = "Analysis  Color Profile", example = "Standard", schema = @Schema(allowableValues = {"Standard", "Strosobar", "Copper%20Plus"}))
                          @RequestParam(value = "analysisProfile", defaultValue = "Standard", required = false) String analysisProfile,
+
 
                          HttpServletRequest request, HttpServletResponse response) throws IOException, InterruptedException {
 
@@ -108,6 +111,7 @@ public class EventPdfController {
                     .setSpecies(event.getSpecies().get(0).getDbId())
                     .setMaxLevel(getLevel(level))
                     .setResource(resource)
+                    .setImportableOnly(importableOnly)
                     .setAnalysisProfile(analysisProfile)
                     .setExpressionColumn(expColumn);
 
