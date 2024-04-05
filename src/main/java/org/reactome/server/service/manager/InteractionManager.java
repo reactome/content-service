@@ -153,6 +153,7 @@ public class InteractionManager {
                 interactor.setAcc(interaction.getInteractorB().getAcc());
                 interactor.setScore(interaction.getIntactScore());
                 interactor.setAlias(interaction.getInteractorB().getAliasWithoutSpecies(true));
+                interactor.setType(interaction.getInteractorB().getType());
 
                 // Set Id as auto increment
                 interactor.setId(count++);

@@ -32,6 +32,9 @@ public class Interactor {
     @Schema(description = "This represents the URL for the given interactions identifiers.")
     private String evidencesURL;
 
+    @Schema(description = "This represents the type for given interaction")
+    private String type;
+
     public Interactor() {
     }
 
@@ -57,6 +60,9 @@ public class Interactor {
         this.evidencesURL = interaction.getUrl();
 
         this.score = interaction.getScore();
+
+        this.type = re.getMoleculeType();
+
 
         if (re instanceof ReferenceSequence) {
             ReferenceSequence rs = (ReferenceSequence) re;
@@ -118,5 +124,13 @@ public class Interactor {
 
     public void setEvidencesURL(String evidencesURL) {
         this.evidencesURL = evidencesURL;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
