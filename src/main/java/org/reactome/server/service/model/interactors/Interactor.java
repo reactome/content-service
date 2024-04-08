@@ -63,6 +63,8 @@ public class Interactor {
 
         this.type = re.getMoleculeType();
 
+        if (re.getName() != null && !re.getName().isEmpty()) this.alias = re.getName().get(0);
+
 
         if (re instanceof ReferenceSequence) {
             ReferenceSequence rs = (ReferenceSequence) re;
