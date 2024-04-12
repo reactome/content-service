@@ -214,11 +214,14 @@ public class CustomInteractorManager {
             Interactor interactorA = new Interactor();
             interactorA.setAcc(customInteraction.getInteractorIdA());
             interactorA.setAlias(customInteraction.getInteractorAliasA());
+            interactorA.setType(customInteraction.getInteractorTypeA());
+
 
             // create interactor B
             Interactor interactorB = new Interactor();
             interactorB.setAcc(customInteraction.getInteractorIdB());
             interactorB.setAlias(customInteraction.getInteractorAliasB());
+            interactorB.setType(customInteraction.getInteractorTypeB());
 
             // keep the search term, always in side A
             if (searchTerm.equals(interactorA.getAcc())) {
