@@ -19,7 +19,7 @@ public class TokenControllerTest extends BaseTest {
 
     @Test
     public void getInteractors() throws Exception {
-        String token = getTokenFromLastestPSIFile(tokenFolder);
+        String token = getTokenFromLatestPSIFile(tokenFolder);
 
         /*
           To test it, you will need a valid token, which can be generated when running the CustomPsicquicControllerTest.
@@ -31,7 +31,7 @@ public class TokenControllerTest extends BaseTest {
     }
 
     /* Get the newest file for a specific extension */
-    private String getTokenFromLastestPSIFile(String filePath) {
+    private String getTokenFromLatestPSIFile(String filePath) {
         String token;
         File dir = new File(filePath);
         FileFilter fileFilter = new WildcardFileFilter("PSI*");
