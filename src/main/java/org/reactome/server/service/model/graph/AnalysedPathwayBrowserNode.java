@@ -1,6 +1,5 @@
 package org.reactome.server.service.model.graph;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.reactome.server.analysis.core.model.PathwayNodeData;
 import org.reactome.server.analysis.core.model.resource.MainResource;
@@ -41,13 +40,13 @@ public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
         return reactions;
     }
 
-    public void initAnalysis(Map<String, PathwayNodeData> stIdToData, String resource, boolean includeInteractors) {
+    public void initAnalysis(Map<String, PathwayNodeData> stIdToData, String resource, boolean includeInteractors, boolean importableOnly) {
 
         PathwayNodeData analysisData = stIdToData.get(getStId());
         if (analysisData != null) {
             if (resource.equals("TOTAL")) {
-                this.entities = new EntityStatistics(analysisData, includeInteractors);
-                this.reactions = new ReactionStatistics(analysisData);
+                this.entities = new EntityStatistics(analysisData, includeInteractors, importableOnly);
+                this.reactions = new ReactionStatistics(analysisData, importableOnly);
             } else {
                 for (MainResource mr : analysisData.getResources()) {
                     if (mr.getName().equals(resource)) {
@@ -62,7 +61,7 @@ public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
         if (this.getChildren() != null) {
             this.setChildren(this.getChildren().stream()
                     .map(AnalysedPathwayBrowserNode::new)
-                    .peek(node -> node.initAnalysis(stIdToData, resource, includeInteractors))
+                    .peek(node -> node.initAnalysis(stIdToData, resource, includeInteractors, importableOnly))
                     .collect(Collectors.toSet())
             );
         }

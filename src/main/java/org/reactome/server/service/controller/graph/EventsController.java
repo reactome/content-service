@@ -92,6 +92,9 @@ public class EventsController {
                                                             @Parameter(name = "interactors", description = "Include interactors", example = "false")
                                                             @RequestParam(required = false, defaultValue = "false") Boolean interactors,
 
+                                                            @Parameter(name = "importableOnly", description = "Filters resources to only includes importable ones")
+                                                            @RequestParam(required = false, defaultValue = "false") Boolean importableOnly,
+
                                                             HttpServletResponse response) {
         Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species, pathwaysOnly);
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty())
@@ -104,7 +107,7 @@ public class EventsController {
             Map<String, PathwayNodeData> stIdToNodeData = result.getPathways().stream().collect(Collectors.toMap(PathwayNodeSummary::getStId, PathwayNodeSummary::getData));
             pathwayBrowserNodes = pathwayBrowserNodes.stream()
                     .map(AnalysedPathwayBrowserNode::new)
-                    .peek(node -> node.initAnalysis(stIdToNodeData, resource, interactors))
+                    .peek(node -> node.initAnalysis(stIdToNodeData, resource, interactors, importableOnly))
                     .collect(Collectors.toList());
         }
         return pathwayBrowserNodes;
