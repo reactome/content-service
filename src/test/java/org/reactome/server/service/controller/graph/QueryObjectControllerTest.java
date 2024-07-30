@@ -30,22 +30,22 @@ public class QueryObjectControllerTest extends BaseTest {
 
     @Test
     public void findEnhancedObjectById() throws Exception {
-        mockMvcGetResult("/data/query/enhanced/R-HSA-163200", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/query/enhanced/R-HSA-9612973", "application/json;charset=UTF-8");
     }
 
     //##################### API Ignored but still available for internal purposes #####################//
     @Test
     public void findMoreObjectById() throws Exception {
-        mockMvcGetResult("/data/query/R-HSA-163200/more", "application/json;charset=UTF-8");
+        mockMvcGetResult("/data/query/R-HSA-9612973/more", "application/json;charset=UTF-8");
     }
 
     @Test
     public void findByIdNoRelations() throws Exception {
-        mockMvcGetResult("/data/query/abridged/R-HSA-163200", "application/json;Charset=UTF-8");
+        mockMvcGetResult("/data/query/abridged/R-HSA-9612973", "application/json;Charset=UTF-8");
     }
 
     @Test
     public void findByIdNoRelationsAttributeName() throws Exception {
-        mockMvcGetResult("/data/query/abridged/R-HSA-163200/displayName", "text/plain;charset=UTF-8");
+        mockMvcGetResult("/data/query/abridged/R-HSA-9612973/displayName", "text/plain;charset=UTF-8");
     }
 }
