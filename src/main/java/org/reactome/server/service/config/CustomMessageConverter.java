@@ -15,7 +15,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Objects;
 
 /*
@@ -36,10 +35,7 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
     }
 
     public ObjectMapper getObjectMapper(HttpServletRequest request) {
-        request.getParameterMap().entrySet().stream().forEach( n -> System.out.println(n.getKey() + ": " + Arrays.toString(n.getValue())));
         boolean useJsog = Boolean.parseBoolean(request.getParameter("includeRef"));
-        System.out.println(request);
-        System.out.println(useJsog);
         return useJsog ? jsogObjectMapper : defaultObjectMapper;
     }
 
