@@ -19,7 +19,7 @@
         The Reactome Content Service provides a series of methods via a RESTFul API to allow programmatic access to
         Reactome content
     </description>
-    <url>https://github.com/reactome-pwp/content-service</url>
+    <url>https://github.com/reactome/content-service</url>
     <organization>
         <name>The European Bioinformatics Institute</name>
         <url>https://www.ebi.ac.uk/</url>
