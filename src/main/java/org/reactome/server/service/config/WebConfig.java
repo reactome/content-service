@@ -1,8 +1,6 @@
 package org.reactome.server.service.config;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.Aspects;
 import org.gk.persistence.MySQLAdaptor;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
@@ -14,6 +12,7 @@ import org.reactome.server.service.utils.TuplesFileCheckerController;
 import org.reactome.server.tools.diagram.exporter.raster.RasterExporter;
 import org.reactome.server.tools.event.exporter.EventExporter;
 import org.reactome.server.tools.fireworks.exporter.FireworksExporter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -70,6 +68,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${mysql.password}")
     String mysqlPassword;
+
+
+    private final CustomMessageConverter customMessageConverter;
+
+    @Autowired
+    public WebConfig(CustomMessageConverter customMessageConverter) {
+        this.customMessageConverter = customMessageConverter;
+    }
 
 
     @Bean
@@ -151,11 +157,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        // properties with null value, or what is considered empty, are not to be included.
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
+        // Note: comment out for now to make it work with JSOG object
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        // properties with null value, or what is considered empty, are not to be included.
+//        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+//        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
 
+        converters.add(customMessageConverter);
         List<MediaType> mediaTypes = new ArrayList<>();
         mediaTypes.add(MediaType.valueOf("text/plain; charset=UTF-8"));
         mediaTypes.add(MediaType.valueOf("application/json; charset=UTF-8"));
@@ -163,7 +171,7 @@ public class WebConfig implements WebMvcConfigurer {
         stringHttpMessageConverter.setWriteAcceptCharset(false);
         stringHttpMessageConverter.setSupportedMediaTypes(mediaTypes);
 
-        converters.add(mappingJackson2HttpMessageConverter);
+        // converters.add(mappingJackson2HttpMessageConverter);
         converters.add(stringHttpMessageConverter);
     }
 
