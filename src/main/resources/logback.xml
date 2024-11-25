@@ -18,7 +18,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>${logging.level}</level>
+            <level>@logging.level@</level>
         </filter>
         <encoder>
             <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
@@ -43,11 +43,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
 
-        <smtpHost>${mail.host}</smtpHost>
-        <smtpPort>${mail.port}</smtpPort>
-        <to>${mail.to}</to>
-        <from>${mail.from}</from>
-        <subject>${mail.subject}</subject>
+        <smtpHost>@mail.host@</smtpHost>
+        <smtpPort>@mail.port@</smtpPort>
+        <to>@cnf.mail.error.to@</to>
+        <from>@cnf.mail.error.from@</from>
+        <subject>@cnf.mail.error.subject@</subject>
 
         <maxMessages>1</maxMessages>
         <timeInterval>1</timeInterval>
@@ -68,11 +68,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
 
-        <smtpHost>${mail.host}</smtpHost>
-        <smtpPort>${mail.port}</smtpPort>
-        <subject>${cnf.mail.error.subject}</subject>
-        <from>${cnf.mail.error.from}</from>
-        <to>${cnf.mail.error.to}</to>
+        <smtpHost>@mail.host@</smtpHost>
+        <smtpPort>@mail.port@</smtpPort>
+        <subject>@cnf.mail.error.subject@</subject>
+        <from>@cnf.mail.error.from@</from>
+        <to>@cnf.mail.error.to@</to>
 
         <maxMessages>5</maxMessages>
         <timeInterval>1</timeInterval>
@@ -92,7 +92,7 @@
     <logger name="springfox.documentation" level="WARN"/>
     <logger name="com.itextpdf.io.exceptions.IOException" level="OFF"/>
 
-    <logger name="threadLogger" level="${logging.level}" additivity="false">
+    <logger name="threadLogger" level="@logging.level@" additivity="false">
         <appender-ref ref="INFO_STDOUT"/>
     </logger>
 

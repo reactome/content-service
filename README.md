@@ -11,7 +11,7 @@ The Content Service is the Reactome API to access the data. It is based on Sprin
 * :warning: Pre-Requirement (in the given order)
     1. Maven 3.X - [Installation Guide](http://maven.apache.org/install.html)
     2. Reactome Graph Database - [Installation Guide](https://reactome.org/dev/graph-database/)
-    3. Interactor Database - [Installation Guide](https://github.com/reactome-pwp/interactors-core)
+    3. Interactor Database - [Installation Guide](https://github.com/reactome/interactors-core)
     4. Search SolR Index - [search-indexer](http://github.com/reactome/search-indexer)
     5. Mail Server (if you don't have a valid SMTP Server, please refer to [FakeSMTP](http://nilhcem.com/FakeSMTP/index.html)
 
