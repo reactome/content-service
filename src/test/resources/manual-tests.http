@@ -1,0 +1,12 @@
+### GET entity in depth with normal view
+GET http://127.0.0.1:8686/data/entity/R-FLU-195925/in-depth
+    ?maxDepth=5
+    &attributes=species%2Ccompartment
+###
+
+### GET entity in depth with custom view
+GET http://127.0.0.1:8686/data/entity/R-FLU-195925/in-depth
+    ?maxDepth=5
+    &attributes=species%2Ccompartment
+    &view=nested-aggregated
+###
