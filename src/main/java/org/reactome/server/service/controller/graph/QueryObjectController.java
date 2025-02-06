@@ -135,9 +135,9 @@ public class QueryObjectController {
     @ResponseBody
     public DatabaseObject findEnhancedObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
                                                  @PathVariable String id) {
-        DatabaseObject databaseObject = isEnhancedTarget(id) ?
+        DatabaseObject databaseObject = needsIncomingRelationship(id) ?
                 advancedDatabaseObjectService.findEnhancedObjectById(id) :
-                advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
+                advancedDatabaseObjectService.findEnhancedObjectByIdOutgoing(id);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
         return databaseObject;
@@ -181,7 +181,7 @@ public class QueryObjectController {
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 
-    private boolean isEnhancedTarget(String id) {
+    private boolean needsIncomingRelationship(String id) {
         boolean rtn = false;
         try {
             if (DatabaseObjectUtils.isStId(id)) {
