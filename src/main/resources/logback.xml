@@ -12,7 +12,7 @@
 
     <appender name="INFO_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
+            <pattern>%d %-5level [@project.name@ - logback] [%thread] %logger{0}: %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -21,7 +21,7 @@
             <level>@logging.level@</level>
         </filter>
         <encoder>
-            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
+            <pattern>%d %-5level [@project.name@ - logback] [%thread] %logger{0}: %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -31,7 +31,7 @@
         </filter>
         <target>System.err</target>
         <encoder>
-            <pattern>%d %-5level: %msg%n</pattern>
+            <pattern>%d %-5level [@project.name@ - logback]: %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -88,6 +88,7 @@
 
     <logger name="org.neo4j" level="ERROR"/> <!-- Remove neo4j info logging. It prints user credentials -->
     <logger name="org.springframework" level="ERROR"/>
+    <logger name="org.springframework.data.neo4j.cypher" level="ERROR"/>
     <logger name="org.reflections" level="WARN"/>
     <logger name="springfox.documentation" level="WARN"/>
     <logger name="com.itextpdf.io.exceptions.IOException" level="OFF"/>
