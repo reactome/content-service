@@ -56,7 +56,6 @@
         <dependency>
             <groupId>org.reactome.server.search</groupId>
             <artifactId>search-core</artifactId>
-            <version>1.4.13-SNAPSHOT</version>
         </dependency>
 
         <!-- Interactors Core -->
