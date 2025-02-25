@@ -1,19 +1,17 @@
 package org.reactome.server.service.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.media.BooleanSchema;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 import org.reactome.server.graph.domain.model.DatabaseObject;
 import org.reflections.Reflections;
 import org.springdoc.core.SpringDocUtils;
 import org.springdoc.core.customizers.OpenApiCustomiser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -58,7 +56,6 @@ public class SwaggerConfig {
     }
 
     @Bean
-
     public OpenApiCustomiser addGlobalQueryParameters(
             Parameter viewParameter,
             Parameter includeRefParameter
