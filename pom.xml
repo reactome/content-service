@@ -1,12 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.reactome.server.service</groupId>
-    <artifactId>content-service</artifactId>
-
-    <packaging>war</packaging>
-    <version>2.1.11</version>
-    <name>content-service</name>
 
     <parent>
         <groupId>org.reactome.maven</groupId>
@@ -14,36 +8,79 @@
         <version>1.0.5</version>
     </parent>
 
+    <groupId>org.reactome.server.service</groupId>
+    <artifactId>content-service</artifactId>
+    <version>2.1.12-SNAPSHOT</version>
+    <packaging>war</packaging>
 
+    <name>content-service</name>
     <description>
         The Reactome Content Service provides a series of methods via a RESTFul API to allow programmatic access to
         Reactome content
     </description>
     <url>https://github.com/reactome/content-service</url>
+
     <organization>
-        <name>The European Bioinformatics Institute</name>
-        <url>https://www.ebi.ac.uk/</url>
+        <name>Reactome</name>
+        <url>https://reactome.org</url>
     </organization>
+    <licenses>
+        <license>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
             <id>gviteri</id>
             <name>Guilherme S Viteri</name>
-            <email>gviteri@ebi.ac.uk</email>
-            <organization>https://www.ebi.ac.uk/</organization>
+            <roles>
+                <role>alumni</role>
+            </roles>
+            <organization>The European Bioinformatics Institute</organization>
+            <organizationUrl>https://www.ebi.ac.uk/</organizationUrl>
         </developer>
         <developer>
             <id>fkorn</id>
             <name>Florian Korninger</name>
+            <roles>
+                <role>alumni</role>
+            </roles>
+            <organization>The European Bioinformatics Institute</organization>
+            <organizationUrl>https://www.ebi.ac.uk/</organizationUrl>
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:git://github.com/reactome/content-service.git</connection>
+        <developerConnection>scm:git:ssh://github.com:reactome/content-service.git</developerConnection>
+        <url>https://github.com/reactome/content-service/tree/master</url>
+    </scm>
+    <!-- Configures the distribution to nexus repository -->
+    <distributionManagement>
+        <!-- Sonatype Release repo -->
+        <repository>
+            <id>ossrh</id>
+            <name>Sonatype Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+
+        <!-- Sonatype SNAPSHOT repo -->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>Sonatype Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
-
         <deploymentPath>/</deploymentPath>
-
         <jackrabbit.version>3.4.3</jackrabbit.version>
 
+        <maven.release.version>3.3.1</maven.release.version>
+        <maven.gpg.version>3.2.7</maven.gpg.version>
+        <maven.javadoc.version>3.11.2</maven.javadoc.version>
+        <maven.tidy.version>1.3.0</maven.tidy.version>
+        <nexus-staging-maven-plugin>1.7.0</nexus-staging-maven-plugin>
     </properties>
 
     <dependencies>
@@ -336,6 +373,94 @@
                 <version>${maven.surefire.version}</version>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Nexus staging plugin for Sonatype deployment -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus-staging-maven-plugin}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <!-- Generate JavaDoc jar file -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Signs deployed jar, source jar, and JavaDoc jar with GPG -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <gpgExecutable>gpg</gpgExecutable> <!-- Explicitly specify the GPG executable -->
+                </configuration>
+            </plugin>
+
+            <!-- Allows "release" mvn goal to deploy a SNAPSHOT or version release to Sonatype -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven.release.version}</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>tidy-maven-plugin</artifactId>
+                <version>${maven.tidy.version}</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
