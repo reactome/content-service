@@ -3,6 +3,7 @@ package org.reactome.server.service.model.graph;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.reactome.server.analysis.core.model.PathwayNodeData;
 import org.reactome.server.analysis.core.model.resource.MainResource;
+import org.reactome.server.analysis.core.result.PathwayNodeSummary;
 import org.reactome.server.analysis.core.result.model.EntityStatistics;
 import org.reactome.server.analysis.core.result.model.ReactionStatistics;
 import org.reactome.server.graph.service.helper.PathwayBrowserNode;
@@ -10,10 +11,10 @@ import org.reactome.server.graph.service.helper.PathwayBrowserNode;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@JsonPropertyOrder({"stId", "name", "species", "type", "diagram", "entities", "reactions", "children"})
+@JsonPropertyOrder({"stId", "name", "species", "type", "diagram", "llp", "entities", "reactions", "children"})
 public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
 
-
+    protected Boolean llp;
     protected EntityStatistics entities;
     protected ReactionStatistics reactions;
 
@@ -32,6 +33,10 @@ public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
         this.setParent(node.getParent());
     }
 
+    public Boolean isLlp() {
+        return llp;
+    }
+
     public EntityStatistics getEntities() {
         return entities;
     }
@@ -40,22 +45,26 @@ public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
         return reactions;
     }
 
-    public void initAnalysis(Map<String, PathwayNodeData> stIdToData, String resource, boolean includeInteractors, boolean importableOnly) {
+    public void initAnalysis(Map<String, PathwayNodeSummary> stIdToData, String resource, boolean includeInteractors, boolean importableOnly) {
 
-        PathwayNodeData analysisData = stIdToData.get(getStId());
-        if (analysisData != null) {
-            if (resource.equals("TOTAL")) {
-                this.entities = new EntityStatistics(analysisData, includeInteractors, importableOnly);
-                this.reactions = new ReactionStatistics(analysisData, importableOnly);
-            } else {
-                for (MainResource mr : analysisData.getResources()) {
-                    if (mr.getName().equals(resource)) {
-                        this.entities = new EntityStatistics(mr, analysisData, includeInteractors);
-                        this.reactions = new ReactionStatistics(mr, analysisData);
-                        break;
-                    }
+        PathwayNodeSummary summary = stIdToData.get(getStId());
+        if (summary == null) return;
+        this.llp = summary.isLlp();
+        PathwayNodeData analysisData = summary.getData();
+        if (analysisData == null) return;
+
+        if (resource.equals("TOTAL")) {
+            this.entities = new EntityStatistics(analysisData, includeInteractors, importableOnly);
+            this.reactions = new ReactionStatistics(analysisData, importableOnly);
+        } else {
+            for (MainResource mr : analysisData.getResources()) {
+                if (mr.getName().equals(resource)) {
+                    this.entities = new EntityStatistics(mr, analysisData, includeInteractors);
+                    this.reactions = new ReactionStatistics(mr, analysisData);
+                    break;
                 }
             }
+
         }
 
         if (this.getChildren() != null) {

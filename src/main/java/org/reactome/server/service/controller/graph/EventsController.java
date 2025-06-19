@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -104,7 +105,7 @@ public class EventsController {
 
         if (token != null) {
             AnalysisStoredResult result = tokenUtils.getFromToken(token);
-            Map<String, PathwayNodeData> stIdToNodeData = result.getPathways().stream().collect(Collectors.toMap(PathwayNodeSummary::getStId, PathwayNodeSummary::getData));
+            Map<String, PathwayNodeSummary> stIdToNodeData = result.getPathways().stream().collect(Collectors.toMap(PathwayNodeSummary::getStId, Function.identity()));
             pathwayBrowserNodes = pathwayBrowserNodes.stream()
                     .map(AnalysedPathwayBrowserNode::new)
                     .peek(node -> node.initAnalysis(stIdToNodeData, resource, interactors, importableOnly))
