@@ -11,26 +11,17 @@ import org.reactome.server.graph.service.helper.PathwayBrowserNode;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@JsonPropertyOrder({"stId", "name", "species", "type", "diagram", "llp", "entities", "reactions", "children"})
-public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
+@JsonPropertyOrder({"stId", "name", "species", "type", "diagram", "llp", "totalEntity", "totalEntityAndInteractors", "entities", "reactions", "children"})
+public class AnalysedPathwayBrowserNode extends SizedPathwayBrowserNode {
 
     protected Boolean llp;
     protected EntityStatistics entities;
     protected ReactionStatistics reactions;
 
-    public AnalysedPathwayBrowserNode(PathwayBrowserNode node) {
-        this.setStId(node.getStId());
-        this.setName(node.getName());
-        this.setSpecies(node.getSpecies());
-        this.setUrl(node.getUrl());
-        this.setType(node.getType());
-        this.setDiagram(node.getDiagram());
-        this.setUnique(node.getUnique());
-        this.setOrder(node.getOrder());
-        this.setHighlighted(node.getHighlighted());
-        this.setClickable(node.isClickable());
-        this.setChildren(node.getChildren());
-        this.setParent(node.getParent());
+    public AnalysedPathwayBrowserNode(SizedPathwayBrowserNode node) {
+        super(node);
+        this.setTotalEntity(node.getTotalEntity());
+        this.setTotalEntityAndInteractors(node.getTotalEntityAndInteractors());
     }
 
     public Boolean isLlp() {
@@ -69,6 +60,7 @@ public class AnalysedPathwayBrowserNode extends PathwayBrowserNode {
 
         if (this.getChildren() != null) {
             this.setChildren(this.getChildren().stream()
+                    .map(node -> (SizedPathwayBrowserNode) node)
                     .map(AnalysedPathwayBrowserNode::new)
                     .peek(node -> node.initAnalysis(stIdToData, resource, includeInteractors, importableOnly))
                     .collect(Collectors.toSet())
