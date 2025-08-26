@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.reactome.server.graph.aop.LazyFetchAspect;
 import org.reactome.server.graph.domain.annotations.StoichiometryView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,13 +31,15 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
 
     private final ObjectMapper defaultObjectMapper;
     private final ObjectMapper jsogObjectMapper;
+    private final LazyFetchAspect lazyFetchAspect;
 
 
     @Autowired
-    public CustomMessageConverter(ObjectMapper defaultObjectMapper, @Qualifier("jsogObjectMapper") ObjectMapper jsogObjectMapper) {
+    public CustomMessageConverter(ObjectMapper defaultObjectMapper, @Qualifier("jsogObjectMapper") ObjectMapper jsogObjectMapper, LazyFetchAspect lazyFetchAspect) {
         super(defaultObjectMapper);
         this.defaultObjectMapper = defaultObjectMapper;
         this.jsogObjectMapper = jsogObjectMapper;
+        this.lazyFetchAspect = lazyFetchAspect;
     }
 
     private ObjectMapper getMapper(HttpServletRequest request) {
@@ -82,7 +85,9 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         ObjectWriter writer = this.getObjectWriter(request);
+        this.lazyFetchAspect.setEnableAOP(false);
         writer.writeValue(outputMessage.getBody(), object);
+        this.lazyFetchAspect.setEnableAOP(true);
     }
 
     // deserializing JSON
