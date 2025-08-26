@@ -243,10 +243,10 @@ class SearchController {
     public List<Entry> getContainingPathwaysOf(@Parameter(example = "227785", required = true) @PathVariable Long dbId,
                                                @Parameter(description = "Whether the result should consider interactors as part of a diagram") @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors,
                                                @Parameter(description = "Whether the result should exclude higher level diagrams containing pathways, themselves containing the targeted entity") @RequestParam(required = false, defaultValue = "false") Boolean directlyInDiagram,
+                                               @Parameter(description = "Species name to filter results for", example = "Homo sapiens") @RequestParam(required = false) String species,
                                                @Parameter(description = "Fields to include in the response. If empty, retrieves all field available (not recommended)") @RequestParam(required = false) List<SolrConverter.Field> fields
     ) throws SolrSearcherException {
-        System.out.println("fields = " + fields);
-        List<Entry> containingPathwaysOf = this.searchService.getContainingPathwaysOf(dbId, includeInteractors, directlyInDiagram, fields);
+        List<Entry> containingPathwaysOf = this.searchService.getContainingPathwaysOf(dbId, includeInteractors, directlyInDiagram, species, fields);
         if (containingPathwaysOf.isEmpty()) {
             throw new NotFoundException("No pathways found for dbId: " + dbId);
         }
