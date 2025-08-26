@@ -2,6 +2,7 @@ package org.reactome.server.service.controller.graph;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import org.reactome.server.analysis.core.model.SpeciesNodeFactory;
 import org.reactome.server.analysis.core.result.AnalysisStoredResult;
 import org.reactome.server.analysis.core.result.PathwayNodeSummary;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
+import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.Species;
 import org.reactome.server.graph.domain.result.EventProjection;
 import org.reactome.server.graph.domain.result.EventProjectionWrapper;
@@ -31,10 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -160,5 +159,26 @@ public class EventsController {
         map.put(keyFunction.apply(node), node);
         Map<K, N> finalMap = map;
         childrenFunction.apply(node).forEach(child -> buildMapFromTree(finalMap, child, keyFunction, childrenFunction));
+    }
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Identifier does not match with any in current data"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/event/{id}/in-depth", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Event getEventInDepth(
+            @Parameter(description = "The complex for which subunits are requested", example = "R-HSA-9612973", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Specify the depth needed for the given entity. If negative, fetches everything. If not, fetches the specified amount of nesting", examples = {@ExampleObject("-1"), @ExampleObject("1"), @ExampleObject("10")})
+            @RequestParam(defaultValue = "1") int maxDepth,
+            @Parameter(description = "Specify the attributes to load for each level of the entity", example = "species,compartment")
+            @RequestParam(defaultValue = "species,compartment")
+            String attributes
+    ) {
+        Optional<Event> event = this.eventsService.getEventInDepth(id, maxDepth, List.of(attributes.split(",")));
+        if (event.isEmpty()) throw new NotFoundException("No event found for given identifier: " + id);
+        return event.get();
     }
 }
