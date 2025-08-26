@@ -187,12 +187,7 @@ public class QueryObjectController {
             summary.setReferenceEntity(sourceRef);
 
             physicalEntities.forEach(entity -> accessors.forEach(accessor -> mergeProperty(summary, entity, accessor)));
-
-            if (physicalEntities.size() == 1) summary.setDisplayName(physicalEntities.get(0).getDisplayName());
-            else summary.setDisplayName(databaseObject.getDisplayName());
             summary.setStId(databaseObject.getStId());
-
-
             return summary;
         }
 
