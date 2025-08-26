@@ -17,6 +17,7 @@ import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.search.domain.*;
 import org.reactome.server.search.exception.SolrSearcherException;
 import org.reactome.server.search.service.SearchService;
+import org.reactome.server.search.solr.SolrConverter;
 import org.reactome.server.service.exception.BadRequestException;
 import org.reactome.server.service.exception.NoResultsFoundException;
 import org.reactome.server.service.exception.NotFoundException;
@@ -102,10 +103,14 @@ class SearchController {
                                    @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
                                    @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                    @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords,
+
+                                   @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                   @RequestParam(required = false, defaultValue = "PHYSICAL_ENTITY") Query.Scope scope,
+
                                    @Parameter(description = "Force filters<br>In case where applied filters yield to no results, filters are removed by default to grant results as much as possible. Set <b>Force filters</b> to true to avoid this behaviour")
                                    @RequestParam(value = "Force filters", required = false, defaultValue = "false") Boolean forceFilters) throws SolrSearcherException {
         infoLogger.info("Request for faceting information for query: {}", query);
-        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).build();
         return searchService.getFacetingInformation(queryObject, forceFilters);
     }
 
@@ -126,11 +131,15 @@ class SearchController {
                                          @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                          @Parameter(description = "Start row", example = "0") @RequestParam(value = "Start row", required = false, defaultValue = "0") Integer start,
                                          @Parameter(description = "Number of rows to include", example = "10") @RequestParam(required = false, defaultValue = "10") Integer rows,
+
+                                         @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                         @RequestParam(required = false, defaultValue = "PHYSICAL_ENTITY") Query.Scope scope,
+
                                          @Parameter(description = "Force filters<br>In case where applied filters yield to no results, filters are removed by default to grant results as much as possible. Set <b>Force filters</b> to true to avoid this behaviour")
                                          @RequestParam(value = "Force filters", required = false, defaultValue = "false") Boolean forceFilters,
                                          HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
         SearchResult searchResult = searchService.getSearchResult(queryObject, PRE_DETERMINED, PRE_DETERMINED, cluster, forceFilters);
         GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
@@ -161,12 +170,16 @@ class SearchController {
                                    @Parameter(description = "Compartments to filter") @RequestParam(required = false) List<String> compartments,
                                    @Parameter(description = "Keywords") @RequestParam(required = false) List<String> keywords,
                                    @Parameter(description = "Cluster results", example = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
+
+                                   @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                   @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+
                                    @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
         if (page <= 0) throw new BadRequestException("page should be greater than 0");
         if (rowCount <= 0) throw new BadRequestException("rowCount should be greater than 0");
         infoLogger.info("Search request for query: {}", query);
-        Query queryObject = new Query.Builder(query).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).forSpecies(species).withTypes(types).inCompartments(compartments).withKeywords(keywords).withReportInfo(getReportInformation(request)).withParserType(parserType).build();
         SearchResult searchResult = searchService.getSearchResult(queryObject, rowCount, page, cluster);
         GroupedResult result = searchResult != null ? searchResult.getGroupedResult() : null;
         if (result == null || result.getResults() == null || result.getResults().isEmpty()) {
@@ -186,12 +199,17 @@ class SearchController {
                                               @Parameter(description = "Species name", example = "Homo sapiens") @RequestParam(required = false, defaultValue = "Homo sapiens") String species, // default value isn't supported by Swagger.
                                               @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
                                               @Parameter(description = "Start row") @RequestParam(required = false) Integer start,
+
+                                              @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                              @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                              @Parameter(description = "Whether the result should consider interactors as part of a diagram")
+                                              @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors,
                                               @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows,
                                               HttpServletRequest request) throws SolrSearcherException {
         infoLogger.info("Fireworks request for query: {}", query);
         List<String> speciess = new ArrayList<>();
         speciess.add(species);
-        Query queryObject = new Query.Builder(query).forSpecies(speciess).withTypes(types).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).forSpecies(speciess).withTypes(types).start(start).numberOfRows(rows).withReportInfo(getReportInformation(request)).includeInteractors(includeInteractors).build();
         FireworksResult fireworksResult = searchService.getFireworks(queryObject);
         if (fireworksResult == null || fireworksResult.getFound() == 0) {
             Set<TargetResult> targets = null;
@@ -207,7 +225,8 @@ class SearchController {
     @RequestMapping(value = "/fireworks/flag", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public FireworksOccurrencesResult fireworksFlagging(@Parameter(example = "KNTC1", required = true) @RequestParam String query,
-                                                        @RequestParam(required = false, defaultValue = "Homo sapiens") String species) throws SolrSearcherException {
+                                                        @RequestParam(required = false, defaultValue = "Homo sapiens") String species
+    ) throws SolrSearcherException {
         infoLogger.info("Fireworks Flagging request for query: {}", query);
         Species sp = speciesService.getSpeciesByName(species);
         if (sp == null) throw new BadRequestException("No species found for '" + species + "'");
@@ -218,6 +237,22 @@ class SearchController {
         return rtn;
     }
 
+    @Operation(summary = "Find the different pathways containing a specific entity determined by its dbId. Can customise the output using fields")
+    @RequestMapping(value = "/pathways/of/{dbId}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<Entry> getContainingPathwaysOf(@Parameter(example = "227785", required = true) @PathVariable Long dbId,
+                                               @Parameter(description = "Whether the result should consider interactors as part of a diagram") @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors,
+                                               @Parameter(description = "Whether the result should exclude higher level diagrams containing pathways, themselves containing the targeted entity") @RequestParam(required = false, defaultValue = "false") Boolean directlyInDiagram,
+                                               @Parameter(description = "Fields to include in the response. If empty, retrieves all field available (not recommended)") @RequestParam(required = false) List<SolrConverter.Field> fields
+    ) throws SolrSearcherException {
+        System.out.println("fields = " + fields);
+        List<Entry> containingPathwaysOf = this.searchService.getContainingPathwaysOf(dbId, includeInteractors, directlyInDiagram, fields);
+        if (containingPathwaysOf.isEmpty()) {
+            throw new NotFoundException("No pathways found for dbId: " + dbId);
+        }
+        return containingPathwaysOf;
+    }
+
     @Operation(summary = "Performs a Solr query (diagram widget scoped) for a given QueryObject")
     @RequestMapping(value = "/diagram/{diagram}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -225,9 +260,17 @@ class SearchController {
                                           @Parameter(example = "MAD", required = true) @RequestParam String query,
                                           @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
                                           @Parameter(description = "Start row") @RequestParam(required = false) Integer start,
-                                          @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows) throws SolrSearcherException {
+                                          @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows,
+
+                                          @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                          @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                          @Parameter(description = "Whether the result should consider interactors as part of a diagram")
+                                          @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors
+
+
+    ) throws SolrSearcherException {
         checkDiagramIdentifier(diagram);
-        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).withTypes(types).start(start).numberOfRows(rows).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).addFilterQuery(diagram).withTypes(types).start(start).numberOfRows(rows).includeInteractors(includeInteractors).build();
         DiagramResult rtn = searchService.getDiagrams(queryObject);
         if (rtn == null || rtn.getFound() == 0)
             throw new NotFoundException(String.format("No entries found for '%s' in diagram '%s'", query, diagram));
@@ -239,9 +282,11 @@ class SearchController {
     @ResponseBody
     public DiagramOccurrencesResult getDiagramOccurrences(@Parameter(example = "R-HSA-68886", required = true) @PathVariable String diagram,
                                                           @Parameter(example = "R-HSA-141433", required = true) @PathVariable String instance,
-                                                          @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types) throws SolrSearcherException {
+                                                          @Parameter(description = "Types to filter") @RequestParam(required = false) List<String> types,
+                                                          @Parameter(description = "Whether the result should consider interactors as part of a diagram")
+                                                          @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors) throws SolrSearcherException {
         checkIdentifiers(diagram, instance);
-        Query queryObject = new Query.Builder(instance).addFilterQuery(diagram).withTypes(types).build();
+        Query queryObject = new Query.Builder(instance).addFilterQuery(diagram).withTypes(types).includeInteractors(includeInteractors).build();
         DiagramOccurrencesResult rtn = searchService.getDiagramOccurrencesResult(queryObject);
         if (rtn == null)
             throw new NotFoundException(String.format("No occurrences of '%s' found in '%s'", instance, diagram));
@@ -254,9 +299,11 @@ class SearchController {
     public DiagramOccurrencesResult getEntitiesInDiagramForIdentifier(@Parameter(description = "The pathway to find items to flag", example = "R-HSA-446203")
                                                                       @PathVariable String pathwayId,
                                                                       @Parameter(description = "The identifier for the elements to be flagged", example = "CTSA")
-                                                                      @RequestParam String query) throws SolrSearcherException {
+                                                                      @RequestParam String query,
+                                                                      @Parameter(description = "Whether the result should consider interactors as part of a diagram")
+                                                                      @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors) throws SolrSearcherException {
         checkDiagramIdentifier(pathwayId);
-        DiagramOccurrencesResult rtn = searchManager.getDiagramOccurrencesResult(pathwayId, query);
+        DiagramOccurrencesResult rtn = searchManager.getDiagramOccurrencesResult(pathwayId, query, includeInteractors);
         infoLogger.info("Request for all entities in diagram with identifier: {}", query);
         if (rtn.isEmpty())
             throw new NotFoundException("No entities with identifier '" + query + "' found for " + pathwayId);
@@ -276,11 +323,16 @@ class SearchController {
                                                      @Parameter(description = "Species name", example = "Homo sapiens", required = true)
                                                      @RequestParam(required = false, defaultValue = "Homo sapiens") String species,
                                                      @Parameter(description = "Diagram", example = "R-HSA-8848021", required = true)
-                                                     @RequestParam String diagram) throws SolrSearcherException {
+                                                     @RequestParam String diagram,
+                                                     @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
+                                                     @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                                     @Parameter(description = "Whether the result should consider interactors as part of a diagram")
+                                                     @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors
+    ) throws SolrSearcherException {
         infoLogger.info("Requested diagram summary for query {}", query);
         List<String> speciess = new ArrayList<>();
         speciess.add(species);
-        Query queryObject = new Query.Builder(query).addFilterQuery(diagram).forSpecies(speciess).build();
+        Query queryObject = new Query.Builder(query).withScope(scope).addFilterQuery(diagram).forSpecies(speciess).includeInteractors(includeInteractors).build();
         return searchService.getDiagramSearchSummary(queryObject);
     }
 
