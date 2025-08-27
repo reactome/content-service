@@ -149,6 +149,7 @@ public class QueryObjectController {
                     accessor(PhysicalEntity::getCompartment, SummaryEntity::setCompartment, PhysicalEntity.class),
                     accessor(PhysicalEntity::getComponentOf, SummaryEntity::setComponentOf, PhysicalEntity.class),
                     accessor(PhysicalEntity::getMemberOf, SummaryEntity::setMemberOf, PhysicalEntity.class),
+                    accessor(PhysicalEntity::getCandidateOf, SummaryEntity::setCandidateOf, PhysicalEntity.class),
                     accessor(PhysicalEntity::getIsRequired, SummaryEntity::setIsRequired, PhysicalEntity.class),
                     accessor(PhysicalEntity::getInferredFrom, SummaryEntity::setInferredFrom, PhysicalEntity.class),
                     accessor(PhysicalEntity::getInferredTo, SummaryEntity::setInferredTo, PhysicalEntity.class),
@@ -168,17 +169,15 @@ public class QueryObjectController {
                     accessor(EntityWithAccessionedSequence::getReferenceType, SummaryEntity::getReferenceType, SummaryEntity::setReferenceType, EntityWithAccessionedSequence.class)
             );
 
+            databaseObject.preventLazyLoading(true);
             ReferenceEntity sourceRef = (ReferenceEntity) databaseObject;
             List<PhysicalEntity> physicalEntities = sourceRef.getPhysicalEntity();
             if (physicalEntities.isEmpty()) return databaseObject;
-            databaseObject.preventLazyLoading = true;
             Comparator<PhysicalEntity> comparator = Comparator.comparingInt((PhysicalEntity pe) -> pe instanceof EntityWithAccessionedSequence ? ((EntityWithAccessionedSequence) pe).getModifiedResidues().size() : 0)
                     .thenComparingLong(PhysicalEntity::getDbId);
             physicalEntities.sort(comparator);
-            physicalEntities.forEach(pe -> pe.preventLazyLoading = true);
 
             final SummaryEntity summary = new SummaryEntity();
-            summary.preventLazyLoading = true;
             summary.setDisplayName(databaseObject.getDisplayName());
             summary.setStId(databaseObject.getStId());
             summary.setDbId(databaseObject.getDbId());

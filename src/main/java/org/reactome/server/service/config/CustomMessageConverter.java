@@ -85,9 +85,7 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         ObjectWriter writer = this.getObjectWriter(request);
-        this.lazyFetchAspect.setEnableAOP(false);
         writer.writeValue(outputMessage.getBody(), object);
-        this.lazyFetchAspect.setEnableAOP(true);
     }
 
     // deserializing JSON
