@@ -8,7 +8,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.reactome.server.graph.domain.model.*;
+import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.domain.model.ReferenceEntity;
 import org.reactome.server.graph.exception.CustomQueryException;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
@@ -18,17 +19,17 @@ import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.exception.NotFoundTextPlainException;
 import org.reactome.server.service.model.graph.SummaryEntity;
-import org.reactome.server.service.utils.GetterSetterMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.reactome.server.service.utils.GetterSetterMap.accessor;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -134,63 +135,19 @@ public class QueryObjectController {
     @Operation(summary = "More information on an entry in Reactome knowledgebase", description = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
     @RequestMapping(value = "/query/enhanced/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject findEnhancedObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
-                                                 @PathVariable String id) {
-        DatabaseObject databaseObject = needsIncomingRelationship(id) ?
+    public DatabaseObject findEnhancedObjectById(
+            @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Whether incoming relationships should be fetched", example = "true")
+            @RequestParam(defaultValue = "true") boolean fetchIncomingRelationships
+    ) {
+        DatabaseObject databaseObject = fetchIncomingRelationships && needsIncomingRelationship(id) ?
                 advancedDatabaseObjectService.findEnhancedObjectById(id) :
                 advancedDatabaseObjectService.findEnhancedObjectByIdOutgoing(id);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
-        if (databaseObject instanceof ReferenceEntity) {
-
-            List<GetterSetterMap.Accessor<?, ? extends PhysicalEntity, SummaryEntity>> accessors = List.of(
-                    accessor(PhysicalEntity::getDisease, SummaryEntity::setDisease, PhysicalEntity.class),
-//                    accessor(PhysicalEntity::getName, SummaryEntity::setName, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getCrossReference, SummaryEntity::setCrossReference, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getCompartment, SummaryEntity::setCompartment, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getComponentOf, SummaryEntity::setComponentOf, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getMemberOf, SummaryEntity::setMemberOf, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getCandidateOf, SummaryEntity::setCandidateOf, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getIsRequired, SummaryEntity::setIsRequired, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getInferredFrom, SummaryEntity::setInferredFrom, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getInferredTo, SummaryEntity::setInferredTo, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getInputFor, SummaryEntity::setInputFor, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getOutputFor, SummaryEntity::setOutputFor, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getCatalystActivities, SummaryEntity::setCatalystActivities, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getLiteratureReference, SummaryEntity::setLiteratureReference, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getPositivelyRegulates, SummaryEntity::setPositivelyRegulates, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getNegativelyRegulates, SummaryEntity::setNegativelyRegulates, PhysicalEntity.class),
-//                    accessor(PhysicalEntity::getSummation, SummaryEntity::setSummation, PhysicalEntity.class),
-                    accessor(PhysicalEntity::getMarkingReferences, SummaryEntity::setMarkingReferences, PhysicalEntity.class),
-
-                    accessor(GenomeEncodedEntity::getSpecies, SummaryEntity::getSpecies, SummaryEntity::setSpecies, GenomeEncodedEntity.class),
-                    accessor(SimpleEntity::getSpecies, SummaryEntity::getSpecies, SummaryEntity::setSpecies, SimpleEntity.class),
-                    accessor(SimpleEntity::getReferenceType, SummaryEntity::getReferenceType, SummaryEntity::setReferenceType, SimpleEntity.class),
-//                    accessor(EntityWithAccessionedSequence::getHasModifiedResidue, SummaryEntity::getHasModifiedResidue, SummaryEntity::setHasModifiedResidue, EntityWithAccessionedSequence.class),
-                    accessor(EntityWithAccessionedSequence::getReferenceType, SummaryEntity::getReferenceType, SummaryEntity::setReferenceType, EntityWithAccessionedSequence.class)
-            );
-
-            databaseObject.preventLazyLoading(true);
-            ReferenceEntity sourceRef = (ReferenceEntity) databaseObject;
-            List<PhysicalEntity> physicalEntities = sourceRef.getPhysicalEntity();
-            if (physicalEntities.isEmpty()) return databaseObject;
-            Comparator<PhysicalEntity> comparator = Comparator.comparingInt((PhysicalEntity pe) -> pe instanceof EntityWithAccessionedSequence ? ((EntityWithAccessionedSequence) pe).getModifiedResidues().size() : 0)
-                    .thenComparingLong(PhysicalEntity::getDbId);
-            physicalEntities.sort(comparator);
-
-            final SummaryEntity summary = new SummaryEntity();
-            summary.setDisplayName(databaseObject.getDisplayName());
-            summary.setStId(databaseObject.getStId());
-            summary.setDbId(databaseObject.getDbId());
-            summary.setName(sourceRef.getName());
-            summary.setSummarisedEntities(physicalEntities);
-            summary.setReferenceEntity(sourceRef);
-
-            physicalEntities.forEach(entity -> accessors.forEach(accessor -> mergeProperty(summary, entity, accessor)));
-            summary.setStId(databaseObject.getStId());
-            return summary;
-        }
 
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
+        if (databaseObject instanceof ReferenceEntity) return new SummaryEntity((ReferenceEntity) databaseObject);
         return databaseObject;
     }
 
@@ -202,7 +159,7 @@ public class QueryObjectController {
     @ResponseBody
     public DatabaseObject findMoreObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
                                              @PathVariable String id) {
-        return findEnhancedObjectById(id);
+        return findEnhancedObjectById(id, true);
     }
 
     @Hidden
@@ -244,39 +201,5 @@ public class QueryObjectController {
             }
         } catch (CustomQueryException | NullPointerException | NumberFormatException e) { /* Nothing here */ }
         return rtn;
-    }
-
-
-    // Unsafe, but unavoidable: cast to generic with helper method
-    @SuppressWarnings("unchecked")
-    private static <T, S, R> void mergeProperty(T target, S source, GetterSetterMap.Accessor<?, ? extends S, T> acc) {
-        if (acc.sourceClass.isAssignableFrom(source.getClass())) {
-            Object sourceValue = getPropertyValue(source, (GetterSetterMap.Accessor<R, S, T>) acc);
-            if (sourceValue == null) return;
-            if (sourceValue instanceof Collection) {
-                if (((Collection<?>) sourceValue).isEmpty()) return;
-                mergeSingleList(target, source, (GetterSetterMap.Accessor<Collection<R>, S, T>) acc);
-            } else {
-                mergeSingleProperty(target, source, (GetterSetterMap.Accessor<R, S, T>) acc);
-            }
-        }
-    }
-
-    private static <R, S, T> R getPropertyValue(S source, GetterSetterMap.Accessor<R, S, T> acc) {
-        return acc.sourceGetter.apply(source);
-    }
-
-    private static <T, S, V> void mergeSingleProperty(T target, S source, GetterSetterMap.Accessor<V, S, T> acc) {
-        acc.setter.accept(target, acc.sourceGetter.apply(source));
-    }
-
-    private static <T, S, E> void mergeSingleList(T target, S source, GetterSetterMap.Accessor<Collection<E>, S, T> acc) {
-        Collection<E> sourceList = acc.sourceGetter.apply(source);
-        if (sourceList == null) return;
-        Collection<E> targetList = acc.targetGetter.apply(target);
-        if (targetList == null) targetList = new LinkedHashSet<>();
-        Set<E> result = targetList instanceof Set ? (Set<E>) targetList : new LinkedHashSet<>(targetList);
-        result.addAll(sourceList);
-        acc.setter.accept(target, new ArrayList<>(result));
     }
 }
