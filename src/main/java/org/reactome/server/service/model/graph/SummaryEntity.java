@@ -30,6 +30,35 @@ public class SummaryEntity extends PhysicalEntity {
     private ReferenceDatabase referenceDatabase;
     private List<DatabaseIdentifier> crossReference;
 
+    // Sequence specific
+    private String checksum;
+    private List<String> comment;
+    private List<String> description;
+    private List<String> geneName;
+    private Boolean isSequenceChanged;
+    private List<String> keyword;
+    private List<String> secondaryIdentifier;
+    private Integer sequenceLength;
+    private Taxon species;
+
+    // GeneProduct specific
+    private List<String> chain;
+    private List<ReferenceDNASequence> referenceGene;
+    private List<ReferenceRNASequence> referenceTranscript;
+
+    // Isoform specific
+    private String variantIdentifier;
+    private List<ReferenceGeneProduct> isoformParent;
+
+
+    // Summarised properties
+    private String referenceType;
+    private ReferenceEntity referenceEntity;
+
+    // EWAS specific
+    private Integer endCoordinate;
+    private Integer startCoordinate;
+    private SortedSet<HasModifiedResidue> hasModifiedResidue;
 
     public SummaryEntity(ReferenceEntity referenceEntity) {
         referenceEntity.preventLazyLoading(true);
@@ -47,22 +76,36 @@ public class SummaryEntity extends PhysicalEntity {
         this.otherIdentifier = referenceEntity.getOtherIdentifier();
         this.crossReference = referenceEntity.getCrossReference();
 
+        if (referenceEntity instanceof ReferenceSequence) {
+            ReferenceSequence sequence = (ReferenceSequence) referenceEntity;
+            this.geneName = sequence.getGeneName();
+            this.secondaryIdentifier = sequence.getSecondaryIdentifier();
+            this.checksum = sequence.getChecksum();
+            this.comment = sequence.getComment();
+            this.description = sequence.getDescription();
+            this.keyword = sequence.getKeyword();
+            this.sequenceLength = sequence.getSequenceLength();
+            this.species = sequence.getSpecies();
+            this.isSequenceChanged = sequence.getIsSequenceChanged();
+        }
+        if (referenceEntity instanceof ReferenceGeneProduct) {
+            ReferenceGeneProduct geneProduct = (ReferenceGeneProduct) referenceEntity;
+            this.chain = geneProduct.getChain();
+            this.referenceGene = geneProduct.getReferenceGene();
+            this.referenceTranscript = geneProduct.getReferenceTranscript();
+        }
+        if (referenceEntity instanceof ReferenceIsoform) {
+            ReferenceIsoform isoform = (ReferenceIsoform) referenceEntity;
+            this.variantIdentifier = isoform.getVariantIdentifier();
+            this.isoformParent = isoform.getIsoformParent();
+        }
+
         List<PhysicalEntity> physicalEntities = referenceEntity.getPhysicalEntity();
         physicalEntities.sort(comparator);
         this.summarisedEntities = physicalEntities;
 
         physicalEntities.forEach(entity -> accessors.forEach(accessor -> mergeProperty(this, entity, accessor)));
     }
-
-    // Summarised properties
-    private String referenceType;
-    private ReferenceEntity referenceEntity;
-    private Taxon species;
-
-    // EWAS specific
-    private Integer endCoordinate;
-    private Integer startCoordinate;
-    private SortedSet<HasModifiedResidue> hasModifiedResidue;
 
     @ReactomeSchemaIgnore
     @JsonView(StoichiometryView.Nested.class)
