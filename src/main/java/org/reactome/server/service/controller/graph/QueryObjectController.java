@@ -139,15 +139,17 @@ public class QueryObjectController {
             @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
             @PathVariable String id,
             @Parameter(description = "Whether incoming relationships should be fetched", example = "true")
-            @RequestParam(defaultValue = "true") boolean fetchIncomingRelationships
+            @RequestParam(defaultValue = "true") boolean fetchIncomingRelationships,
+            @Parameter(description = "Whether ReferenceEntity should be summarising its physical entities", example = "false")
+            @RequestParam(defaultValue = "false") boolean summariseReferenceEntity
     ) {
         DatabaseObject databaseObject = fetchIncomingRelationships && needsIncomingRelationship(id) ?
-                advancedDatabaseObjectService.findEnhancedObjectById(id) :
-                advancedDatabaseObjectService.findEnhancedObjectByIdOutgoing(id);    //similar to findById
+                advancedDatabaseObjectService.findEnhancedObjectById(id, summariseReferenceEntity) :
+                advancedDatabaseObjectService.findEnhancedObjectByIdOutgoing(id, summariseReferenceEntity);    //similar to findById
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
 
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
-        if (databaseObject instanceof ReferenceEntity) return new SummaryEntity((ReferenceEntity) databaseObject);
+        if (summariseReferenceEntity && databaseObject instanceof ReferenceEntity) return new SummaryEntity((ReferenceEntity) databaseObject);
         return databaseObject;
     }
 
@@ -159,7 +161,7 @@ public class QueryObjectController {
     @ResponseBody
     public DatabaseObject findMoreObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
                                              @PathVariable String id) {
-        return findEnhancedObjectById(id, true);
+        return findEnhancedObjectById(id, true, false);
     }
 
     @Hidden
