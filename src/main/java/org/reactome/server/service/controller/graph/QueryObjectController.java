@@ -136,6 +136,19 @@ public class QueryObjectController {
     @Operation(summary = "More information on an entry in Reactome knowledgebase", description = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
     @RequestMapping(value = "/query/enhanced/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
+    public DatabaseObject findOldEnhancedObjectById(
+            @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
+            @PathVariable String id
+    ) {
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findOldEnhancedObjectById(id, !needsIncomingRelationship(id));
+        if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+        infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
+        return databaseObject;
+    }
+
+    @Operation(summary = "More information on an entry in Reactome knowledgebase", description = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
+    @RequestMapping(value = "/query/enhanced/v2/{id}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
     public DatabaseObject findEnhancedObjectById(
             @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
             @PathVariable String id,
