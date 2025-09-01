@@ -172,7 +172,7 @@ class SearchController {
                                    @Parameter(description = "Cluster results", example = "true") @RequestParam(required = false, defaultValue = "true") Boolean cluster,
 
                                    @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
-                                   @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                   @RequestParam(required = false, defaultValue = "PHYSICAL_ENTITY") Query.Scope scope,
 
                                    @Parameter(description = "Query parser to use", example = "STD") @RequestParam(required = false, defaultValue = "STD") ParserType parserType,
                                    HttpServletRequest request) throws SolrSearcherException {
@@ -201,7 +201,7 @@ class SearchController {
                                               @Parameter(description = "Start row") @RequestParam(required = false) Integer start,
 
                                               @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
-                                              @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                              @RequestParam(required = false, defaultValue = "PHYSICAL_ENTITY") Query.Scope scope,
                                               @Parameter(description = "Whether the result should consider interactors as part of a diagram")
                                               @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors,
                                               @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows,
@@ -263,7 +263,7 @@ class SearchController {
                                           @Parameter(description = "Number of rows to include") @RequestParam(required = false) Integer rows,
 
                                           @Parameter(description = "Scope of the query. Can be either REFERENCE_ENTITY to group Physical Entities having a reference entity (Proteins, Genes, etc.) into a single ReferenceEntity, and keep those which don't (Complexes, Sets, etc.) as Physical Entity. PHYSICAL_ENTITY to remove the grouping by reference entity. BOTH to include both types")
-                                          @RequestParam(required = false, defaultValue = "REFERENCE_ENTITY") Query.Scope scope,
+                                          @RequestParam(required = false, defaultValue = "PHYSICAL_ENTITY") Query.Scope scope,
                                           @Parameter(description = "Whether the result should consider interactors as part of a diagram")
                                           @RequestParam(required = false, defaultValue = "false") Boolean includeInteractors
 
