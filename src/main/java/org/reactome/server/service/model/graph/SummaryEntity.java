@@ -150,7 +150,7 @@ public class SummaryEntity extends PhysicalEntity {
 
     private static final List<GetterSetterMap.Accessor<?, ? extends PhysicalEntity, SummaryEntity>> accessors = List.of(
             accessor(PhysicalEntity::getDisease, SummaryEntity::setDisease, PhysicalEntity.class),
-//                    accessor(PhysicalEntity::getName, SummaryEntity::setName, PhysicalEntity.class),
+//            accessor(PhysicalEntity::getName, SummaryEntity::setName, PhysicalEntity.class),
             accessor(PhysicalEntity::getCrossReference, SummaryEntity::setCrossReference, PhysicalEntity.class),
             accessor(PhysicalEntity::getCompartment, SummaryEntity::setCompartment, PhysicalEntity.class),
             accessor(PhysicalEntity::getComponentOf, SummaryEntity::setComponentOf, PhysicalEntity.class),
@@ -165,13 +165,13 @@ public class SummaryEntity extends PhysicalEntity {
             accessor(PhysicalEntity::getLiteratureReference, SummaryEntity::setLiteratureReference, PhysicalEntity.class),
             accessor(PhysicalEntity::getPositivelyRegulates, SummaryEntity::setPositivelyRegulates, PhysicalEntity.class),
             accessor(PhysicalEntity::getNegativelyRegulates, SummaryEntity::setNegativelyRegulates, PhysicalEntity.class),
-//                    accessor(PhysicalEntity::getSummation, SummaryEntity::setSummation, PhysicalEntity.class),
+//            accessor(PhysicalEntity::getSummation, SummaryEntity::setSummation, PhysicalEntity.class),
             accessor(PhysicalEntity::getMarkingReferences, SummaryEntity::setMarkingReferences, PhysicalEntity.class),
 
             accessor(GenomeEncodedEntity::getSpecies, SummaryEntity::getSpecies, SummaryEntity::setSpecies, GenomeEncodedEntity.class),
             accessor(SimpleEntity::getSpecies, SummaryEntity::getSpecies, SummaryEntity::setSpecies, SimpleEntity.class),
             accessor(SimpleEntity::getReferenceType, SummaryEntity::getReferenceType, SummaryEntity::setReferenceType, SimpleEntity.class),
-//                    accessor(EntityWithAccessionedSequence::getHasModifiedResidue, SummaryEntity::getHasModifiedResidue, SummaryEntity::setHasModifiedResidue, EntityWithAccessionedSequence.class),
+//            accessor(EntityWithAccessionedSequence::getHasModifiedResidue, SummaryEntity::getHasModifiedResidue, SummaryEntity::setHasModifiedResidue, EntityWithAccessionedSequence.class),
             accessor(EntityWithAccessionedSequence::getReferenceType, SummaryEntity::getReferenceType, SummaryEntity::setReferenceType, EntityWithAccessionedSequence.class)
     );
 

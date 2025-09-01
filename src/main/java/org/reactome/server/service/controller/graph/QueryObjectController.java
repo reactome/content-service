@@ -13,6 +13,7 @@ import org.reactome.server.graph.domain.model.ReferenceEntity;
 import org.reactome.server.graph.exception.CustomQueryException;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.helper.EnhancedQueryOptions;
 import org.reactome.server.graph.service.helper.RelationshipDirection;
 import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
@@ -141,15 +142,25 @@ public class QueryObjectController {
             @Parameter(description = "Whether incoming relationships should be fetched", example = "true")
             @RequestParam(defaultValue = "true") boolean fetchIncomingRelationships,
             @Parameter(description = "Whether ReferenceEntity should be summarising its physical entities", example = "false")
-            @RequestParam(defaultValue = "false") boolean summariseReferenceEntity
+            @RequestParam(defaultValue = "false") boolean summariseReferenceEntity,
+            @Parameter(description = "Whether disease specific data should be fetched", example = "true")
+            @RequestParam(defaultValue = "true") boolean includeDisease
     ) {
-        DatabaseObject databaseObject = fetchIncomingRelationships && needsIncomingRelationship(id) ?
-                advancedDatabaseObjectService.findEnhancedObjectById(id, summariseReferenceEntity) :
-                advancedDatabaseObjectService.findEnhancedObjectByIdOutgoing(id, summariseReferenceEntity);    //similar to findById
+        EnhancedQueryOptions options = new EnhancedQueryOptions(
+                summariseReferenceEntity,
+                includeDisease,
+                !(fetchIncomingRelationships && needsIncomingRelationship(id))
+        );
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id, options);
+        if (databaseObject == null && !includeDisease) {
+            options.setIncludeDisease(true);
+            databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id, options);
+        }
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
 
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
-        if (summariseReferenceEntity && databaseObject instanceof ReferenceEntity) return new SummaryEntity((ReferenceEntity) databaseObject);
+        if (summariseReferenceEntity && databaseObject instanceof ReferenceEntity)
+            return new SummaryEntity((ReferenceEntity) databaseObject);
         return databaseObject;
     }
 
@@ -161,7 +172,7 @@ public class QueryObjectController {
     @ResponseBody
     public DatabaseObject findMoreObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
                                              @PathVariable String id) {
-        return findEnhancedObjectById(id, true, false);
+        return findEnhancedObjectById(id, true, false, false);
     }
 
     @Hidden
