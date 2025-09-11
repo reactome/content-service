@@ -126,7 +126,7 @@ public class CitationController {
     public void exportIdentifier(@Parameter(description = "DbId or StId of the requested database object")
                                  @PathVariable String id,
                                  @Parameter(description = "Format in which you want to download the citation")
-                                 @RequestParam(name = "ext", required = false) String ext,
+                                 @RequestParam(name = "ext", required = false, defaultValue = "txt") String ext,
                                  HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
 
         LocalDate now = LocalDate.now();
@@ -141,7 +141,7 @@ public class CitationController {
     }
 
     public void exportCitation(@PathVariable String id,
-                               @RequestParam(name = "ext", required = false)
+                               @RequestParam(name = "ext", required = false, defaultValue = "txt")
                                @Parameter(description = "Format in which you want to download the citation") String ext,
                                HttpServletResponse response,
                                String dateAccessed,
