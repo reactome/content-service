@@ -3,6 +3,7 @@ package org.reactome.server.service.config;
 
 import org.aspectj.lang.Aspects;
 import org.gk.persistence.MySQLAdaptor;
+import org.reactome.server.analysis.core.data.AnalysisData;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
 import org.reactome.server.graph.aop.LazyFetchAspect;
 import org.reactome.server.interactors.service.PsicquicService;
@@ -38,6 +39,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${analysis.token}")
     String analysisToken;
+
+    @Value("${analysis.data.file}")
+    String analysisDataFile;
 
     @Value("${diagram.json.folder}")
     String diagramPath;
@@ -192,5 +196,12 @@ public class WebConfig implements WebMvcConfigurer {
                                  @Value("${mysql.password}") String mysqlPassword,
                                  @Value("${mysql.port}") String mysqlPort) throws SQLException {
         return new MySQLAdaptor(mysqlHost, mysqlDatabase, mysqlUser, mysqlPassword, Integer.parseInt(mysqlPort));
+    }
+
+    @Bean(destroyMethod = "interrupt")
+    public AnalysisData analysisData() {
+        AnalysisData analysisData = new AnalysisData();
+        analysisData.setFileName(analysisDataFile);
+        return analysisData;
     }
 }

@@ -9,14 +9,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.domain.model.ReferenceEntity;
 import org.reactome.server.graph.exception.CustomQueryException;
 import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.graph.service.DatabaseObjectService;
+import org.reactome.server.graph.service.helper.EnhancedQueryOptions;
 import org.reactome.server.graph.service.helper.RelationshipDirection;
 import org.reactome.server.graph.service.util.DatabaseObjectUtils;
 import org.reactome.server.service.controller.graph.util.ControllerUtils;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.exception.NotFoundTextPlainException;
+import org.reactome.server.service.model.graph.SummaryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,13 +136,44 @@ public class QueryObjectController {
     @Operation(summary = "More information on an entry in Reactome knowledgebase", description = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
     @RequestMapping(value = "/query/enhanced/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public DatabaseObject findEnhancedObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
-                                                 @PathVariable String id) {
-        DatabaseObject databaseObject = isEnhancedTarget(id) ?
-                advancedDatabaseObjectService.findEnhancedObjectById(id) :
-                advancedDatabaseObjectService.findById(id, RelationshipDirection.OUTGOING);    //similar to findById
+    public DatabaseObject findOldEnhancedObjectById(
+            @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
+            @PathVariable String id
+    ) {
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findOldEnhancedObjectById(id, !needsIncomingRelationship(id));
         if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
+        return databaseObject;
+    }
+
+    @Operation(summary = "More information on an entry in Reactome knowledgebase", description = "Based on the given identifier, i.e. stable id or database id, this method queries for an entry in Reactome knowledgebase providing more information. In particular, the retrieved database object has all its properties and direct relationships (relationships of depth 1) filled, while it also includes any second level relationships regarding regulations and catalysts.")
+    @RequestMapping(value = "/query/enhanced/v2/{id}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public DatabaseObject findEnhancedObjectById(
+            @Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Whether incoming relationships should be fetched", example = "true")
+            @RequestParam(defaultValue = "true") boolean fetchIncomingRelationships,
+            @Parameter(description = "Whether ReferenceEntity should be summarising its physical entities", example = "false")
+            @RequestParam(defaultValue = "false") boolean summariseReferenceEntity,
+            @Parameter(description = "Whether disease specific data should be fetched", example = "true")
+            @RequestParam(defaultValue = "true") boolean includeDisease
+    ) {
+        EnhancedQueryOptions options = new EnhancedQueryOptions(
+                summariseReferenceEntity,
+                includeDisease,
+                !(fetchIncomingRelationships && needsIncomingRelationship(id))
+        );
+        DatabaseObject databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id, options);
+        if (databaseObject == null && !includeDisease) {
+            options.setIncludeDisease(true);
+            databaseObject = advancedDatabaseObjectService.findEnhancedObjectById(id, options);
+        }
+        if (databaseObject == null) throw new NotFoundException("Id: " + id + " has not been found in the System");
+
+        infoLogger.info("Request for enhanced DatabaseObject for id: {}", id);
+        if (summariseReferenceEntity && databaseObject instanceof ReferenceEntity)
+            return new SummaryEntity((ReferenceEntity) databaseObject);
         return databaseObject;
     }
 
@@ -151,7 +185,7 @@ public class QueryObjectController {
     @ResponseBody
     public DatabaseObject findMoreObjectById(@Parameter(description = "DbId or StId of the requested database object", example = "R-HSA-60140", required = true)
                                              @PathVariable String id) {
-        return findEnhancedObjectById(id);
+        return findEnhancedObjectById(id, true, false, false);
     }
 
     @Hidden
@@ -181,11 +215,11 @@ public class QueryObjectController {
         return ControllerUtils.getProperty(databaseObject, attributeName);
     }
 
-    private boolean isEnhancedTarget(String id) {
+    private boolean needsIncomingRelationship(String id) {
         boolean rtn = false;
         try {
             if (DatabaseObjectUtils.isStId(id)) {
-                rtn = !id.startsWith("R-ALL-");
+                rtn = !id.startsWith("R-ALL-") && !id.startsWith("chebi:"); // Chemicals shouldn't fetch incoming relationships
             } else {
                 String query = "MATCH (n:DatabaseObject{dbId:$id}) " +
                         "RETURN NOT ((n:Species) OR (n:Summation) OR (n:Person) OR (n:Compartment) OR (n:SimpleEntity))";
@@ -194,5 +228,4 @@ public class QueryObjectController {
         } catch (CustomQueryException | NullPointerException | NumberFormatException e) { /* Nothing here */ }
         return rtn;
     }
-
 }

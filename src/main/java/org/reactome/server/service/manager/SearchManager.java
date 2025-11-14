@@ -24,9 +24,9 @@ public class SearchManager {
     private SearchService searchService;
     private AdvancedDatabaseObjectService ados;
 
-    public DiagramOccurrencesResult getDiagramOccurrencesResult(String pathway, String query) throws SolrSearcherException {
+    public DiagramOccurrencesResult getDiagramOccurrencesResult(String pathway, String query, Boolean includeInteractors) throws SolrSearcherException {
         DiagramOccurrencesResult rtn = new DiagramOccurrencesResult();
-        Query queryObject = new Query.Builder(query).addFilterQuery(pathway).build();
+        Query queryObject = new Query.Builder(query).addFilterQuery(pathway).includeInteractors(includeInteractors).build();
         List<DiagramOccurrencesResult> diagramOccurrencesList = searchService.getDiagramFlagging(queryObject);
         for (DiagramOccurrencesResult diagramOccurrencesResult : diagramOccurrencesList) {
             if (diagramOccurrencesResult.getInDiagram()) {
@@ -39,7 +39,7 @@ public class SearchManager {
     }
 
     public Collection<String> getDiagramFlagging(String pathway, String query, Boolean includeInteractors) throws SolrSearcherException {
-        DiagramOccurrencesResult occ = getDiagramOccurrencesResult(pathway, query);
+        DiagramOccurrencesResult occ = getDiagramOccurrencesResult(pathway, query, includeInteractors);
         Collection<String> toFlag = occ.getOccurrences() != null ? occ.getOccurrences() : new ArrayList<>();
         if (includeInteractors && occ.getInteractsWith() != null) toFlag.addAll(occ.getInteractsWith());
 

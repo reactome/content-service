@@ -2,28 +2,39 @@ package org.reactome.server.service.controller.graph;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.reactome.server.analysis.core.model.PathwayNodeData;
+import org.reactome.server.analysis.core.data.AnalysisData;
+import org.reactome.server.analysis.core.model.PathwayHierarchy;
+import org.reactome.server.analysis.core.model.PathwayNode;
+import org.reactome.server.analysis.core.model.SpeciesNode;
+import org.reactome.server.analysis.core.model.SpeciesNodeFactory;
 import org.reactome.server.analysis.core.result.AnalysisStoredResult;
 import org.reactome.server.analysis.core.result.PathwayNodeSummary;
 import org.reactome.server.analysis.core.result.utils.TokenUtils;
+import org.reactome.server.graph.domain.model.Event;
+import org.reactome.server.graph.domain.model.Species;
 import org.reactome.server.graph.domain.result.EventProjection;
 import org.reactome.server.graph.domain.result.EventProjectionWrapper;
 import org.reactome.server.graph.service.EventsService;
 import org.reactome.server.graph.service.HierarchyService;
+import org.reactome.server.graph.service.SpeciesService;
 import org.reactome.server.graph.service.helper.PathwayBrowserNode;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.model.graph.AnalysedPathwayBrowserNode;
+import org.reactome.server.service.model.graph.SizedPathwayBrowserNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -39,14 +50,20 @@ public class EventsController {
     private static final Logger infoLogger = LoggerFactory.getLogger("infoLogger");
 
     private final HierarchyService eventHierarchyService;
+    private final SpeciesService speciesService;
     private final EventsService eventsService;
+    private final AnalysisData analysisData;
     private final TokenUtils tokenUtils;
+    private final Map<SpeciesNode, PathwayHierarchy> pathwayHierarchies;
 
     @Autowired
-    public EventsController(HierarchyService eventHierarchyService, EventsService eventsService, TokenUtils tokenUtils) {
+    public EventsController(HierarchyService eventHierarchyService, SpeciesService speciesService, EventsService eventsService, AnalysisData analysisData, TokenUtils tokenUtils) {
         this.eventHierarchyService = eventHierarchyService;
+        this.speciesService = speciesService;
         this.eventsService = eventsService;
+        this.analysisData = analysisData;
         this.tokenUtils = tokenUtils;
+        this.pathwayHierarchies = analysisData.getPathwayHierarchies();
     }
 
     @Operation(
@@ -96,7 +113,29 @@ public class EventsController {
                                                             @RequestParam(required = false, defaultValue = "false") Boolean importableOnly,
 
                                                             HttpServletResponse response) {
-        Collection<PathwayBrowserNode> pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species, pathwaysOnly);
+        Instant start = Instant.now();
+        Collection<PathwayBrowserNode> pathwayBrowserNodes;
+        Species speciesData = speciesService.getSpecies(species);
+        SpeciesNode speciesNode = SpeciesNodeFactory.getSpeciesNode(speciesData);
+        PathwayHierarchy hierarchy = pathwayHierarchies.get(speciesNode);
+
+        if (pathwaysOnly) {
+            pathwayBrowserNodes = hierarchy.getChildren().stream()
+                    .map(SizedPathwayBrowserNode::new)
+                    .collect(Collectors.toCollection(TreeSet::new));
+        } else {
+            pathwayBrowserNodes = eventHierarchyService.getEventHierarchy(species, false);
+            Map<String, PathwayNode> stIdToNode = new HashMap<>();
+            hierarchy.getChildren().forEach(child ->
+                    buildMapFromTree(stIdToNode, child, PathwayNode::getStId, PathwayNode::getChildren)
+            );
+            pathwayBrowserNodes = pathwayBrowserNodes.stream()
+                    .map(SizedPathwayBrowserNode::new)
+                    .peek(node -> node.initSize(stIdToNode))
+                    .collect(Collectors.toList());
+        }
+
+
         if (pathwayBrowserNodes == null || pathwayBrowserNodes.isEmpty())
             throw new NotFoundException("No event hierarchy found for given species: " + species);
         response.setHeader("Content-Disposition", "inline; swaggerDownload=\"attachment\"; filename=\"" + species + ".json\"");
@@ -104,12 +143,42 @@ public class EventsController {
 
         if (token != null) {
             AnalysisStoredResult result = tokenUtils.getFromToken(token);
-            Map<String, PathwayNodeData> stIdToNodeData = result.getPathways().stream().collect(Collectors.toMap(PathwayNodeSummary::getStId, PathwayNodeSummary::getData));
+            Map<String, PathwayNodeSummary> stIdToNodeData = result.getPathways().stream().collect(Collectors.toMap(PathwayNodeSummary::getStId, Function.identity()));
             pathwayBrowserNodes = pathwayBrowserNodes.stream()
+                    .map(node -> (SizedPathwayBrowserNode) node)
                     .map(AnalysedPathwayBrowserNode::new)
                     .peek(node -> node.initAnalysis(stIdToNodeData, resource, interactors, importableOnly))
                     .collect(Collectors.toList());
         }
+
         return pathwayBrowserNodes;
+    }
+
+    private static <K, N> void buildMapFromTree(@Nullable Map<K, N> map, N node, Function<N, K> keyFunction, Function<N, Collection<N>> childrenFunction) {
+        if (map == null) map = new HashMap<>();
+        map.put(keyFunction.apply(node), node);
+        Map<K, N> finalMap = map;
+        childrenFunction.apply(node).forEach(child -> buildMapFromTree(finalMap, child, keyFunction, childrenFunction));
+    }
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Identifier does not match with any in current data"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/event/{id}/in-depth", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Event getEventInDepth(
+            @Parameter(description = "The complex for which subunits are requested", example = "R-HSA-9612973", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Specify the depth needed for the given entity. If negative, fetches everything. If not, fetches the specified amount of nesting", examples = {@ExampleObject("-1"), @ExampleObject("1"), @ExampleObject("10")})
+            @RequestParam(defaultValue = "1") int maxDepth,
+            @Parameter(description = "Specify the attributes to load for each level of the entity", example = "species,compartment")
+            @RequestParam(defaultValue = "species,compartment")
+            String attributes
+    ) {
+        Optional<Event> event = this.eventsService.getEventInDepth(id, maxDepth, List.of(attributes.split(",")));
+        if (event.isEmpty()) throw new NotFoundException("No event found for given identifier: " + id);
+        return event.get();
     }
 }

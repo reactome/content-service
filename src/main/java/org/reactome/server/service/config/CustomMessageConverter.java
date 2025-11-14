@@ -1,6 +1,11 @@
 package org.reactome.server.service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.reactome.server.graph.aop.LazyFetchAspect;
+import org.reactome.server.graph.domain.annotations.StoichiometryView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpInputMessage;
@@ -26,32 +31,68 @@ public class CustomMessageConverter extends MappingJackson2HttpMessageConverter 
 
     private final ObjectMapper defaultObjectMapper;
     private final ObjectMapper jsogObjectMapper;
+    private final LazyFetchAspect lazyFetchAspect;
+
 
     @Autowired
-    public CustomMessageConverter(ObjectMapper defaultObjectMapper, @Qualifier("jsogObjectMapper") ObjectMapper jsogObjectMapper) {
+    public CustomMessageConverter(ObjectMapper defaultObjectMapper, @Qualifier("jsogObjectMapper") ObjectMapper jsogObjectMapper, LazyFetchAspect lazyFetchAspect) {
         super(defaultObjectMapper);
         this.defaultObjectMapper = defaultObjectMapper;
         this.jsogObjectMapper = jsogObjectMapper;
+        this.lazyFetchAspect = lazyFetchAspect;
     }
 
-    public ObjectMapper getObjectMapper(HttpServletRequest request) {
+    private ObjectMapper getMapper(HttpServletRequest request) {
         boolean useJsog = Boolean.parseBoolean(request.getParameter("includeRef"));
-        return useJsog ? jsogObjectMapper : defaultObjectMapper;
+        ObjectMapper mapper = useJsog ? jsogObjectMapper : defaultObjectMapper;
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        return mapper;
     }
+
+    public ObjectWriter getObjectWriter(HttpServletRequest request) {
+        ObjectMapper mapper = getMapper(request);
+        String view = request.getParameter("view");
+        if (view == null) return mapper.writerWithView(StoichiometryView.Flatten.class);
+        switch (view) {
+            case "nested":
+                return mapper.writerWithView(StoichiometryView.Nested.class);
+            case "nested-aggregated":
+                return mapper.writerWithView(StoichiometryView.NestedAggregated.class);
+            case "flatten":
+            default:
+                return mapper.writerWithView(StoichiometryView.Flatten.class);
+        }
+    }
+
+    public ObjectReader getObjectReader(HttpServletRequest request) {
+        ObjectMapper mapper = getMapper(request);
+        String view = request.getParameter("view");
+        if (view == null) return mapper.readerWithView(StoichiometryView.Flatten.class);
+        switch (view) {
+            case "nested":
+                return mapper.readerWithView(StoichiometryView.Nested.class);
+            case "nested-aggregated":
+                return mapper.readerWithView(StoichiometryView.NestedAggregated.class);
+            case "flatten":
+            default:
+                return mapper.readerWithView(StoichiometryView.Flatten.class);
+        }
+    }
+
 
     // serializing an object to JSON, keeping type for method override
     @Override
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        ObjectMapper objectMapper = this.getObjectMapper(request);
-        objectMapper.writeValue(outputMessage.getBody(), object);
+        ObjectWriter writer = this.getObjectWriter(request);
+        writer.writeValue(outputMessage.getBody(), object);
     }
 
     // deserializing JSON
     @Override
     protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        ObjectMapper objectMapper = this.getObjectMapper(request);
-        return objectMapper.readValue(inputMessage.getBody(), clazz);
+        ObjectReader reader = this.getObjectReader(request);
+        return reader.readValue(inputMessage.getBody(), clazz);
     }
 }

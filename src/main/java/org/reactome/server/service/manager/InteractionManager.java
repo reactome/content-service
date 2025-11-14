@@ -3,6 +3,7 @@ package org.reactome.server.service.manager;
 import org.apache.commons.lang3.StringUtils;
 import org.hupo.psi.mi.psicquic.registry.client.PsicquicRegistryClientException;
 import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.result.CustomInteraction;
 import org.reactome.server.graph.service.InteractionsService;
 import org.reactome.server.interactors.exception.PsicquicQueryException;
 import org.reactome.server.interactors.exception.PsicquicResourceNotFoundException;
@@ -221,5 +222,15 @@ public class InteractionManager {
         interactionMapper.setResource(resource);
         interactionMapper.setEntities(entities);
         return interactionMapper;
+    }
+
+    /**
+     * Custom interactor result for rendering the interactor tables in Angular PWB description page for PE
+     *
+     * @param acc identifier
+     * @return CustomInteractions Collection
+     */
+    public Collection<CustomInteraction> getInteractionsResult(String acc) {
+        return interactionsService.getCustomInteractions(acc);
     }
 }

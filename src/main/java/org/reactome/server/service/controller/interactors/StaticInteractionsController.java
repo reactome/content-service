@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.Pathway;
+import org.reactome.server.graph.domain.result.CustomInteraction;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.InteractionManager;
 import org.reactome.server.service.model.interactors.Interactors;
@@ -74,6 +75,24 @@ public class StaticInteractionsController {
         }
         return interactors;
     }
+
+    @Operation(summary = "Retrieve a custom interaction information of a given accession in Reactome knowledgebase for UI to use, including Reactome entity number")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Could not find the Interactor Resource"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/molecule/enhanced/{acc}/details", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<CustomInteraction> getCustomInteractionsByAcc(@Parameter(description = "Interactor accession (or identifier)", required = true, example = "Q13501") @PathVariable String acc) {
+        infoLogger.info("Static custom interaction details query for accession {}", acc);
+        Collection<CustomInteraction> interactionResults = interactions.getInteractionsResult(acc);
+        if (interactionResults == null ) {
+            throw new NotFoundException("No interactors found for accession: " + acc);
+        }
+        return interactionResults;
+    }
+
 
     @Operation(summary = "Retrieve a summary of a given accession list")
     @ApiResponses({

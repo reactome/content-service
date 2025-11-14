@@ -3,6 +3,7 @@ package org.reactome.server.service.controller.graph;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,6 +107,25 @@ public class PhysicalEntityController {
             throw new NotFoundException("Id: " + id + " has not been found in the System");
         infoLogger.info("Request for subunits of Complex with id: {}", id);
         return componentOfs;
+    }
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Identifier does not match with any in current data"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/entity/{id}/in-depth", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public PhysicalEntity getPhysicalEntityInDepth(
+            @Parameter(description = "The complex for which subunits are requested", example = "R-HSA-5674003", required = true)
+            @PathVariable String id,
+            @Parameter(description = "Specify the depth needed for the given entity. If negative, fetches everything. If not, fetches the specified amount of nesting", examples = {@ExampleObject("-1"), @ExampleObject("1"), @ExampleObject("10")})
+            @RequestParam(defaultValue = "1") int maxDepth,
+            @Parameter(description = "Specify the attributes to load for each level of the entity", example = "species,compartment")
+            @RequestParam(defaultValue = "species,compartment")
+            String attributes
+    ) {
+        return this.physicalEntityService.getPhysicalEntityInDepth(id, maxDepth, List.of(attributes.split(",")));
     }
 
 
