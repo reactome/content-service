@@ -170,12 +170,11 @@ public class CitationController {
             response.setContentType(contentType);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 
-            InputStream in = new ByteArrayInputStream(citationString.getBytes(StandardCharsets.UTF_8));
-            OutputStream out = response.getOutputStream();
-            IOUtils.copy(in, out);
-            out.flush();
-            out.close();
-            in.close();
+            try (InputStream in = new ByteArrayInputStream(citationString.getBytes(StandardCharsets.UTF_8))) {
+                OutputStream out = response.getOutputStream();
+                IOUtils.copy(in, out);
+                out.flush();
+            }
         }
     }
 

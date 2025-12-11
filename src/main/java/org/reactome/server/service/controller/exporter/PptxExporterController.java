@@ -102,12 +102,11 @@ public class PptxExporterController {
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
         // delete only the temporary file.
-        OutputStream out = response.getOutputStream();
-        FileInputStream in = new FileInputStream(pptx);
-        IOUtils.copy(in, out);
-        out.flush();
-        out.close();
-        in.close();
+        try (FileInputStream in = new FileInputStream(pptx)) {
+            OutputStream out = response.getOutputStream();
+            IOUtils.copy(in, out);
+            out.flush();
+        }
 
         // deleting the file in case it is decorated.
         if (decorator.isDecorated() && !pptx.delete()) {
@@ -160,12 +159,11 @@ public class PptxExporterController {
         // when returning a FileSystemResource using Spring, then the file won't be deleted because it still has the
         // reference to the file and then we cannot delete. Writing the file directly in the response allows us to
         // delete only the temporary file.
-        OutputStream out = response.getOutputStream();
-        FileInputStream in = new FileInputStream(pptx);
-        IOUtils.copy(in, out);
-        out.flush();
-        out.close();
-        in.close();
+        try (FileInputStream in = new FileInputStream(pptx)) {
+            OutputStream out = response.getOutputStream();
+            IOUtils.copy(in, out);
+            out.flush();
+        }
 
         // deleting the file in case it is decorated.
         if (decorator.isDecorated() && !pptx.delete()) {
