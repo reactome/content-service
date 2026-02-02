@@ -65,10 +65,11 @@ public class SbxxExporterController {
         String fileName = event.getStId() + SBGN_FILE_EXTENSION;
         response.setContentType("application/sbgn+xml");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        OutputStream out = response.getOutputStream();
-        IOUtils.copy(getSBGN(event, fileName), out);
-        out.flush();
-        out.close();
+        try (InputStream sbgn = getSBGN(event, fileName)) {
+            OutputStream out = response.getOutputStream();
+            IOUtils.copy(sbgn, out);
+            out.flush();
+        }
     }
 
     private InputStream getSBGN(Event event, String fileName) throws FileNotFoundException {
@@ -106,10 +107,11 @@ public class SbxxExporterController {
         String fileName = event.getStId() + SBML_FILE_EXTENSION;
         response.setContentType("application/sbml+xml");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        OutputStream out = response.getOutputStream();
-        IOUtils.copy(getSBML(event, fileName), out);
-        out.flush();
-        out.close();
+        try (InputStream sbml = getSBML(event, fileName)) {
+            OutputStream out = response.getOutputStream();
+            IOUtils.copy(sbml, out);
+            out.flush();
+        }
     }
 
     private InputStream getSBML(Event event, String fileName) throws FileNotFoundException {
