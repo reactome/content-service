@@ -18,7 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import org.reactome.server.graph.service.helper.AttributeProperties;
+import org.reactome.server.service.model.content.AttributeResponse;
+
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
@@ -126,6 +132,39 @@ public class SchemaController {
                 throw new NotFoundException("No entries have been found for species: " + species);
             return count;
         }
+    }
+
+    @Operation(summary = "Attribute table for a schema class", description = "Returns the list of properties (own and inherited) for the specified schema class, including name, cardinality, value types, and declaring class.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Schema class does not match any class in the data model"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/schema/{className}/attributes", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<AttributeResponse> getAttributeTable(@Parameter(description = "Schema class name", example = "Pathway", required = true) @PathVariable String className) throws ClassNotFoundException {
+        Set<AttributeProperties> properties = DatabaseObjectUtils.getAttributeTable(className);
+        infoLogger.info("Request for attribute table of class: {}", className);
+        return properties.stream().map(this::toAttributeResponse).collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Referrals for a schema class", description = "Returns the list of properties from other classes that reference the specified schema class.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Schema class does not match any class in the data model"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/schema/{className}/referrals", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<AttributeResponse> getReferrals(@Parameter(description = "Schema class name", example = "Pathway", required = true) @PathVariable String className) throws ClassNotFoundException {
+        Set<AttributeProperties> properties = DatabaseObjectUtils.getReferrals(className);
+        infoLogger.info("Request for referrals of class: {}", className);
+        return properties.stream().map(this::toAttributeResponse).collect(Collectors.toList());
+    }
+
+    private AttributeResponse toAttributeResponse(AttributeProperties prop) {
+        List<AttributeResponse.ValueType> valueTypes = prop.getAttributeClasses().stream()
+                .map(ac -> new AttributeResponse.ValueType(ac.getType().getSimpleName(), ac.isValueTypeDatabaseObject()))
+                .collect(Collectors.toList());
+        return new AttributeResponse(prop.getName(), prop.getCardinality(), valueTypes, prop.getOrigin().getSimpleName());
     }
 
     @Operation(summary = "A list of Reactome data model", description = "This method retrieves a full specification of all Reactome classes.")
