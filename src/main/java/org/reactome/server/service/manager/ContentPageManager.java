@@ -88,7 +88,7 @@ public class ContentPageManager {
                     if (speciesList != null && !speciesList.isEmpty()) {
                         speciesName = speciesList.get(0).getDisplayName();
                     }
-                    subs.add(new TocSubpathway(ev.getStId(), ev.getDisplayName(), ev.getDoi(), speciesName));
+                    subs.add(new TocSubpathway(ev.getStId(), ev.getDisplayName(), null, speciesName));
                 }
             }
             r.setSubpathways(subs);
