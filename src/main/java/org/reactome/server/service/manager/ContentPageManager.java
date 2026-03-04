@@ -1,6 +1,8 @@
 package org.reactome.server.service.manager;
 
+import org.reactome.server.graph.domain.model.Event;
 import org.reactome.server.graph.domain.model.Person;
+import org.reactome.server.graph.domain.model.Species;
 import org.reactome.server.graph.domain.result.DoiPathwayDTO;
 import org.reactome.server.graph.domain.result.PersonAuthorReviewer;
 import org.reactome.server.graph.domain.result.TocPathwayDTO;
@@ -77,9 +79,18 @@ public class ContentPageManager {
         r.setEditors(toSimplePersonList(dto.getEditors()));
 
         if (dto.getSubpathways() != null) {
-            List<TocSubpathway> subs = dto.getSubpathways().stream()
-                    .map(sub -> new TocSubpathway(sub.getStId(), sub.getDisplayName(), sub.getDoi(), sub.getSpecies()))
-                    .collect(Collectors.toList());
+            List<TocSubpathway> subs = new ArrayList<>();
+            for (Object obj : dto.getSubpathways()) {
+                if (obj instanceof Event) {
+                    Event ev = (Event) obj;
+                    String speciesName = "";
+                    List<Species> speciesList = ev.getSpecies();
+                    if (speciesList != null && !speciesList.isEmpty()) {
+                        speciesName = speciesList.get(0).getDisplayName();
+                    }
+                    subs.add(new TocSubpathway(ev.getStId(), ev.getDisplayName(), ev.getDoi(), speciesName));
+                }
+            }
             r.setSubpathways(subs);
         } else {
             r.setSubpathways(Collections.emptyList());
@@ -113,7 +124,7 @@ public class ContentPageManager {
         );
     }
 
-    private List<SimplePerson> toSimplePersonList(Collection<Person> persons) {
+    private List<SimplePerson> toSimplePersonList(Collection<? extends Person> persons) {
         if (persons == null) return Collections.emptyList();
         return persons.stream().map(this::toSimplePerson).collect(Collectors.toList());
     }
