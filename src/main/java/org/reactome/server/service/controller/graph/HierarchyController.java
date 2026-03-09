@@ -22,7 +22,7 @@ import java.util.Set;
  * @author Florian Korninger (florian.korninger@ebi.ac.uk)
  * @since 18.05.16.
  */
-//@RestController
+@RestController
 @Hidden
 @Tag(name = "hierarchy")
 @RequestMapping("/data")
