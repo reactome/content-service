@@ -266,7 +266,7 @@ public class ImageExporterController {
                     @ApiResponse(responseCode = "404", description = "Stable Identifier does not match with any of the reactions.")
             }
     )
-    @RequestMapping(value = "/reaction/{identifier}.json", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/reaction/{identifier}/diagram", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public Map<String, Object> reactionJson(@Parameter(description = "Reaction identifier", required = true, example = "R-HSA-6787403")
                                             @PathVariable String identifier) {
