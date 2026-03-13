@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Antonio Fabregat (fabregat@ebi.ac.uk)
@@ -254,6 +255,26 @@ public class ImageExporterController {
         } catch (IOException | TranscoderException | AnalysisException e) {
             throw new RuntimeException(e.getMessage()); //This won't generate a 400, but a 500 instead (@see GlobalExceptionHandler.handleUnclassified)
         }
+    }
+
+    @Operation(
+            summary = "Exports a given reaction diagram and graph as JSON",
+            description = "This method accepts identifiers for <a href=\"/content/schema/ReactionLikeEvent\" target=\"_blank\">ReactionLikeEvent class</a> instances." +
+                    "<br/>Returns the diagram layout and graph data as JSON, suitable for client-side rendering.",
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "404", description = "Stable Identifier does not match with any of the reactions.")
+            }
+    )
+    @RequestMapping(value = "/reaction/{identifier}.json", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> reactionJson(@Parameter(description = "Reaction identifier", required = true, example = "R-HSA-6787403")
+                                            @PathVariable String identifier) {
+        ReactionLikeEvent rle = getReactionLikeEvent(identifier);
+        Layout layout = reactionExporter.getReactionLayout(rle);
+        Diagram diagram = reactionExporter.getReactionDiagram(layout);
+        Graph graph = reactionExporter.getReactionGraph(rle, layout);
+        return Map.of("diagram", diagram, "graph", graph);
     }
 
     private ReactionLikeEvent getReactionLikeEvent(String id) {
