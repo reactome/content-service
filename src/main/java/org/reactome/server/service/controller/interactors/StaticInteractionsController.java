@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.Pathway;
 import org.reactome.server.graph.domain.result.CustomInteraction;
+import org.reactome.server.graph.exception.CustomQueryException;
+import org.reactome.server.graph.service.AdvancedDatabaseObjectService;
 import org.reactome.server.service.exception.NotFoundException;
 import org.reactome.server.service.manager.InteractionManager;
+import org.reactome.server.service.model.InteractionWithEntities;
 import org.reactome.server.service.model.interactors.Interactors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -38,6 +43,9 @@ public class StaticInteractionsController {
 
     @Autowired
     private InteractionManager interactions;
+
+    @Autowired
+    private AdvancedDatabaseObjectService advancedDatabaseObjectService;
 
     @Operation(summary = "Retrieve a summary of a given accession")
     @ApiResponses({
@@ -91,6 +99,55 @@ public class StaticInteractionsController {
             throw new NotFoundException("No interactors found for accession: " + acc);
         }
         return interactionResults;
+    }
+
+    @Operation(
+            summary = "Interactions for an accession with each interactor's Reactome physical entities pre-resolved",
+            description = "Same set of interactions as /molecule/enhanced/{acc}/details, but each row also includes the list of Reactome PhysicalEntities (dbId, stId, displayName, schemaClass) that reference the interactor partner. Used by the Angular interactor detail page to avoid fanning out a separate /references/mapping/{id}/xrefs call per interactor (TP53 has ~250)."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Could not find the Interactor Resource"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/molecule/{acc}/withEntities", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<InteractionWithEntities> getInteractionsWithEntities(
+            @Parameter(description = "Interactor accession (or identifier)", required = true, example = "P04637") @PathVariable String acc) {
+        infoLogger.info("Static interactions-with-entities query for accession {}", acc);
+        // Mirrors the Cypher in data-content/InteractionsController#getCustomInteractions:
+        // each interaction row is joined with the PhysicalEntities that reference the
+        // partner ReferenceEntity AND that participate in some ReactionLikeEvent.
+        // language=cypher
+        String query = "" +
+                "MATCH (s:ReferenceEntity)<-[:interactor]-(it:Interaction), " +
+                "      (it)-[ir:interactor]->(in:ReferenceEntity)<-[re:referenceEntity]-(pe:PhysicalEntity), " +
+                "      (:ReactionLikeEvent)-[:input|output|catalystActivity|physicalEntity|entityFunctionalStatus|diseaseEntity|regulatedBy|regulator*]->(pe) " +
+                "WHERE s.variantIdentifier = $accession OR (s.variantIdentifier IS NULL AND s.identifier = $accession) " +
+                "RETURN DISTINCT it.score AS score, in.identifier AS accession, in.url AS accessionURL, " +
+                "                COLLECT(DISTINCT{ " +
+                "                         dbId: pe.dbId, " +
+                "                         stId: pe.stId, " +
+                "                         displayName: pe.displayName, " +
+                "                         schemaClass: pe.schemaClass " +
+                "                }) AS physicalEntity, " +
+                "                SIZE(it.accession) AS evidences, " +
+                "                it.url AS url " +
+                "ORDER BY score DESC, accession";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("accession", acc);
+
+        try {
+            Collection<InteractionWithEntities> result =
+                    advancedDatabaseObjectService.getCustomQueryResults(InteractionWithEntities.class, query, params);
+            if (result == null || result.isEmpty()) {
+                throw new NotFoundException("No interactors found for accession: " + acc);
+            }
+            return result;
+        } catch (CustomQueryException e) {
+            throw new NotFoundException("No interactors found for accession: " + acc);
+        }
     }
 
 
