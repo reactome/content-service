@@ -138,4 +138,55 @@ public class PersonController {
         infoLogger.info("Request for all authored pathways of person with id: {}", id);
         return pathways;
     }
+
+    @Operation(
+            summary = "A list of reactions authored by a given person",
+            description = "Retrieves a list of reactions authored by a given person. OrcidId or DbId can be used to specify the person."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "OrcidId or DbId does not retrieve any reaction"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/person/{id}/authoredReactions", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<SimpleEventProjection> getAuthoredReactions(@Parameter(description = "Person identifier: Can be OrcidId or DbId", example = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+        Collection<SimpleEventProjection> reactions = personService.getAuthoredReactions(id);
+        infoLogger.info("Request for all authored reactions of person with id: {}", id);
+        return reactions;
+    }
+
+    @Operation(
+            summary = "A list of pathways reviewed by a given person",
+            description = "Retrieves a list of pathways reviewed by a given person. OrcidId or DbId can be used to specify the person."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "OrcidId or DbId does not retrieve any pathway"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/person/{id}/reviewedPathways", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<SimpleEventProjection> getReviewedPathways(@Parameter(description = "Person identifier: Can be OrcidId or DbId", example = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+        Collection<SimpleEventProjection> pathways = personService.getReviewedPathways(id);
+        infoLogger.info("Request for all reviewed pathways of person with id: {}", id);
+        return pathways;
+    }
+
+    @Operation(
+            summary = "A list of reactions reviewed by a given person",
+            description = "Retrieves a list of reactions reviewed by a given person. OrcidId or DbId can be used to specify the person."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "OrcidId or DbId does not retrieve any reaction"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/person/{id}/reviewedReactions", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<SimpleEventProjection> getReviewedReactions(@Parameter(description = "Person identifier: Can be OrcidId or DbId", example = "0000-0001-5807-0069", required = true) @PathVariable String id) {
+        Collection<SimpleEventProjection> reactions = personService.getReviewedReactions(id);
+        infoLogger.info("Request for all reviewed reactions of person with id: {}", id);
+        return reactions;
+    }
 }
