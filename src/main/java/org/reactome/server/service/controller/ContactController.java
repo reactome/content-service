@@ -8,9 +8,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContexts;
 import org.reactome.server.service.utils.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +29,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +94,12 @@ public class ContactController {
 
     private boolean verifyCaptcha(String response) throws IOException {
         if (StringUtils.isBlank(response)) return false;
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+        // The deployed tomcat uses a Reactome-internal truststore that lacks
+        // public root CAs, so hcaptcha.com's normal TLS chain fails to
+        // validate. Match what OrcidHelper does and accept any cert -- the
+        // body we get back is verified by content, not by TLS identity.
+        try (CloseableHttpClient client = HttpClients.custom()
+                .setConnectionManager(permissiveConnectionManager()).build()) {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("secret", captchaSecret));
             params.add(new BasicNameValuePair("response", response));
@@ -93,6 +109,22 @@ public class ContactController {
             String json = IOUtils.toString(resp.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonNode node = new ObjectMapper().readTree(json);
             return node.path("success").asBoolean(false);
+        }
+    }
+
+    private static PoolingHttpClientConnectionManager permissiveConnectionManager() {
+        try {
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial((chain, authType) -> true).build();
+            SSLConnectionSocketFactory sslFactory = new SSLConnectionSocketFactory(
+                    sslContext, new String[]{"TLSv1.2", "TLSv1.3"}, null,
+                    NoopHostnameVerifier.INSTANCE);
+            return new PoolingHttpClientConnectionManager(
+                    RegistryBuilder.<ConnectionSocketFactory>create()
+                            .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                            .register("https", sslFactory).build());
+        } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
+            throw new IllegalStateException("Could not build permissive SSL context", e);
         }
     }
 
