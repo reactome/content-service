@@ -113,4 +113,37 @@ public class SearchControllerTest extends BaseTest {
 
         mockMvcGetResult("/search/diagram/summary", "application/json;Charset=UTF-8", params);
     }
+
+    //##################### Icon Endpoints #####################//
+
+    @Test
+    public void iconFacet() throws Exception {
+        mockMvcGetResult("/search/icon/facet", "application/json;charset=UTF-8");
+    }
+
+    @Test
+    public void iconQuery() throws Exception {
+        mockMvcGetResult("/search/icon/query");
+    }
+
+    @Test
+    public void iconQueryWithParams() throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", "mitochondria");
+        params.put("category", "cell_type");
+        params.put("page", "1");
+        params.put("pageSize", "28");
+
+        mockMvcGetResult("/search/icon/query", "application/json;charset=UTF-8", params);
+    }
+
+    @Test
+    public void iconDetail() throws Exception {
+        mockMvcGetResult("/search/icon/R-ICO-013428", "application/json;charset=UTF-8");
+    }
+
+    @Test
+    public void iconDetailNotFound() throws Exception {
+        mockMvcGetResultNotFound("/search/icon/R-ICO-999999");
+    }
 }

@@ -336,6 +336,58 @@ class SearchController {
         return searchService.getDiagramSearchSummary(queryObject);
     }
 
+    @Operation(summary = "Icon category facets", description = "Returns icon category names and counts for the icon library")
+    @ApiResponses({
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
+    })
+    @RequestMapping(value = "/icon/facet", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public FacetMapping iconFacet() throws SolrSearcherException {
+        infoLogger.info("Request for icon faceting information");
+        return searchService.getIconFacetingInformation();
+    }
+
+    @Operation(summary = "Paginated icon search results", description = "Returns icons optionally filtered by category or search text, with pagination")
+    @ApiResponses({
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
+    })
+    @RequestMapping(value = "/icon/query", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Result iconQuery(@Parameter(description = "Search text", example = "mitochondria") @RequestParam(required = false) String query,
+                            @Parameter(description = "Icon category filter", example = "cell_type") @RequestParam(required = false) String category,
+                            @Parameter(description = "Page number (1-indexed)", example = "1") @RequestParam(required = false, defaultValue = "1") Integer page,
+                            @Parameter(description = "Results per page", example = "28") @RequestParam(required = false, defaultValue = "28") Integer pageSize) throws SolrSearcherException {
+        infoLogger.info("Icon query request: query={}, category={}, page={}", query, category, page);
+        String q = "";
+        if (StringUtils.isNotEmpty(category)) {
+            q = "iconCategories_facet:" + category.toLowerCase().replaceAll("\\s+", "_");
+        }
+        if (StringUtils.isNotEmpty(query)) {
+            q = q.isEmpty() ? query : q + " " + query;
+        }
+        if (q.isEmpty()) q = "*";
+        Query queryObject = new Query.Builder(q).build();
+        return searchService.getIconsResult(queryObject, pageSize, page);
+    }
+
+    @Operation(summary = "Icon detail by identifier", description = "Returns a single icon entry by its stable identifier")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Icon not found"),
+            @ApiResponse(responseCode = "406", description = "Not acceptable according to the accept headers sent in the request"),
+            @ApiResponse(responseCode = "500", description = "Internal Error in SolR")
+    })
+    @RequestMapping(value = "/icon/{identifier}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Entry iconDetail(@Parameter(description = "Icon stable identifier", example = "R-ICO-013428", required = true) @PathVariable String identifier) throws SolrSearcherException {
+        infoLogger.info("Icon detail request for: {}", identifier);
+        Query queryObject = new Query.Builder(identifier).build();
+        Entry entry = searchService.getIcon(queryObject);
+        if (entry == null) throw new NotFoundException("Icon not found: " + identifier);
+        return entry;
+    }
+
     @Autowired
     public void setSearchService(SearchService searchService) {
         this.searchService = searchService;
