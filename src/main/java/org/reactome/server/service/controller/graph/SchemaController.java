@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactome.server.graph.domain.model.DatabaseObject;
+import org.reactome.server.graph.domain.result.Referrals;
 import org.reactome.server.graph.domain.result.SimpleDatabaseObject;
 import org.reactome.server.graph.domain.result.SimpleReferenceObject;
+import org.reactome.server.graph.service.AdvancedLinkageService;
 import org.reactome.server.graph.service.GeneralService;
 import org.reactome.server.graph.service.SchemaService;
 import org.reactome.server.graph.service.helper.SchemaNode;
@@ -43,6 +45,8 @@ public class SchemaController {
     private SchemaService schemaService;
     @Autowired
     private GeneralService generalService;
+    @Autowired
+    private AdvancedLinkageService advancedLinkageService;
 
     @Operation(summary = "A list of entries corresponding to a given schema class", description = "This method retrieves the list of entries in Reactome that belong to the specified schema class. Please take into account that if species is specified to filter the results, schema class needs to be an instance of Event or PhysicalEntity. Additionally, paging is required, while a maximum of 25 entries can be returned per request.")
     @ApiResponses({
@@ -158,6 +162,22 @@ public class SchemaController {
         Set<AttributeProperties> properties = DatabaseObjectUtils.getReferrals(className);
         infoLogger.info("Request for referrals of class: {}", className);
         return properties.stream().map(this::toAttributeResponse).collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Referrals for a single instance", description = "Returns every instance that references the given dbId/stId, grouped by the attribute name through which it points. Mirrors the 'Referrals' section that the legacy Joomla /content/schema/instance/browser/{id} page rendered, so the Angular instance browser can show the same view.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "No object found for the supplied id"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @RequestMapping(value = "/instance/{id}/referrers", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Collection<Referrals> getInstanceReferrers(@Parameter(description = "DbId or StId of a DatabaseObject", example = "10658788", required = true) @PathVariable String id) {
+        Collection<Referrals> referrers = advancedLinkageService.getReferralsTo(id);
+        if (referrers == null) {
+            throw new NotFoundException("No referrers found for id: " + id);
+        }
+        infoLogger.info("Request for instance referrers of id: {}", id);
+        return referrers;
     }
 
     private AttributeResponse toAttributeResponse(AttributeProperties prop) {
