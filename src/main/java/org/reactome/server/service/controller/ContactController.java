@@ -96,8 +96,8 @@ public class ContactController {
         if (StringUtils.isBlank(response)) return false;
         // The deployed tomcat uses a Reactome-internal truststore that lacks
         // public root CAs, so hcaptcha.com's normal TLS chain fails to
-        // validate. Match what OrcidHelper does and accept any cert -- the
-        // body we get back is verified by content, not by TLS identity.
+        // validate. Use a trust-any SSL context -- the body we get back
+        // is verified by content, not by TLS identity.
         try (CloseableHttpClient client = HttpClients.custom()
                 .setConnectionManager(permissiveConnectionManager()).build()) {
             List<NameValuePair> params = new ArrayList<>();
